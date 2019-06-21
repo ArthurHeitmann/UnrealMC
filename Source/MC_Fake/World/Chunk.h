@@ -29,10 +29,8 @@ public:
 		void ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 			int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	void SetData(const TArray<TArray<TArray<Block*>>>& NewData, bool bUpdateMesh);
-	void SetMeshData(TMap<TEnumAsByte<EAllBlocks>, TArray<FVector>>& pTmpVertecies, TMap<TEnumAsByte<EAllBlocks>, TArray<FVector2D>>& pTmpUVs, TMap<TEnumAsByte<EAllBlocks>, TArray<int32>>& pTmpTriangles, TMap<TEnumAsByte<EAllBlocks>, TArray<FVector>>& pTmpNormals, TMap<TEnumAsByte<EAllBlocks>, Block*>& pTmpMaterials);
 	void SetHasDataChanged(bool state = true);
 	void UpdateMesh();
-	void QuickUpdateMesh();
 	void SetMeshLifeStage(int Stage);
 	Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);
 	bool ContinueHit(class ABlockBreaking* Block, class Item* Item);
@@ -75,12 +73,6 @@ private:
 	AChunk* SouthChunk;
 	AChunk* WestChunk;
 
-	bool bHasTmpMeshChanged = false;
-	TMap<TEnumAsByte<EAllBlocks>, TArray<FVector>> TmpVertecies;
-	TMap<TEnumAsByte<EAllBlocks>, TArray<FVector2D>> TmpUVs;
-	TMap<TEnumAsByte<EAllBlocks>, TArray<int32>> TmpTriangles;
-	TMap<TEnumAsByte<EAllBlocks>, TArray<FVector>> TmpNormals;
-	TMap<TEnumAsByte<EAllBlocks>, Block*> TmpMaterials;
 
 	TArray<BlockBreakingData> BreakingBlocks;
 

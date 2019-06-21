@@ -71,6 +71,7 @@ Build/*/**
 Saved/Autosaves/*
 Saved/Backup/*
 Saved/Collections/*
+Saved/Config/*
 Saved/Crashes/*
 Saved/EditorCooked/*
 Saved/Logs/*

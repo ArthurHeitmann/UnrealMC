@@ -54,10 +54,10 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FVector2D ChunkCoordinatesNew(ChunkCoordinatesNew3D.X, ChunkCoordinatesNew3D.Y);
 	ChunkCoordinatesNew.X = FGenericPlatformMath::FloorToInt(ChunkCoordinatesNew.X / 1600);
 	ChunkCoordinatesNew.Y = FGenericPlatformMath::FloorToInt(ChunkCoordinatesNew.Y / 1600);
-	if (ChunkCoordinatesNew3D.X < 0)
+	/*if (ChunkCoordinatesNew3D.X < 0)
 		ChunkCoordinatesNew.X -= 1;
 	if (ChunkCoordinatesNew3D.Y < 0)
-		ChunkCoordinatesNew.Y -= 1;
+		ChunkCoordinatesNew.Y -= 1;*/
 
 	if (CurrentChunkCoordinates == ChunkCoordinatesNew)
 		return;

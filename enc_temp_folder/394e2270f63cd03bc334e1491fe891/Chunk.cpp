@@ -227,7 +227,6 @@ void AChunk::SetMeshLifeStage(int Stage)
 
 Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 {
-	//what a mess
 	Block* HitBlock;
 	FVector HitLocation(((int) HitResult.ImpactPoint.X / 100) % 16, ((int) HitResult.ImpactPoint.Y / 100) % 16, ((int) HitResult.ImpactPoint.Z / 100) % 256);
 	
@@ -260,9 +259,9 @@ Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 		yChange = 1;
 	}
 	if (HitLocation.X < 0)
-		HitLocation.X += 15;
+		HitLocation.X += 16;
 	if (HitLocation.Y < 0)
-		HitLocation.Y += 15;
+		HitLocation.Y += 16;
 
 	if (ChunkBlockData[HitLocation.X][HitLocation.Y][HitLocation.Z]->GetBlockEnum() == Air)
 	{

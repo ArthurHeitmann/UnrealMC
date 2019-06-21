@@ -93,8 +93,8 @@ void ChunkGenerator::Stage0()
 	PerlinNoise p(54658);
 	UFastNoise* HeightNoise = NewObject<UFastNoise>();
 	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	HeightNoise->SetFractalOctaves(7);
-	HeightNoise->SetFrequency(1.f / 100.f);
+	HeightNoise->SetFractalOctaves(6);
+	HeightNoise->SetFrequency(1.f / 600.f);
 	UFastNoise * TurbulenceNoise = NewObject<UFastNoise>();
 	TurbulenceNoise->SetFrequency(1.f / 40.f);
 	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
@@ -115,7 +115,7 @@ void ChunkGenerator::Stage0()
 				int HeightMapX = x + PosX + TurbulenceNoise->GetNoise(x + PosX, z) * 13.f ;
 				int HeightMapY = y + PosY + TurbulenceNoise->GetNoise(z, y + PosY) * 13.f;
 				//float noise1 = p.OctaveNoise(HeightMapX, HeightMapY, 0, 50, 18, 3) + 30;
-				float noise2 = HeightNoise->GetNoise(HeightMapX, HeightMapY) * 25.f + 15;
+				float noise2 = HeightNoise->GetNoise(HeightMapX, HeightMapY) * 40.f + 15;
 				if (z <= noise2)
 					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(Stone));
 				/*else if (z < 13)
