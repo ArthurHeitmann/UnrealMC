@@ -57,6 +57,17 @@ void AChunk::EndPlay(EEndPlayReason::Type Reason)
 		EastChunk->SetWestChunk(nullptr);
 	if (WestChunk)
 		WestChunk->SetEastChunk(nullptr);
+	for (int x = 0; x < ChunkBlockData.Num(); x++)
+	{
+		for (int y = 0; y < ChunkBlockData[x].Num(); y++)
+		{
+			for (int z = 0; z < ChunkBlockData[x][y].Num(); z++)
+			{
+				if (ChunkBlockData[x][y][z] && ChunkBlockData[x][y][z]->GetBlockEnum() != Air)
+					delete ChunkBlockData[x][y][z];
+			}
+		}
+	}
 	/*UChunkSaveGame* ChunkSave = Cast<UChunkSaveGame>(UGameplayStatics::CreateSaveGameObject(UChunkSaveGame::StaticClass()));
 	ChunkSave->PosX = PosX / 16;
 	ChunkSave->PosY = PosY / 16;
@@ -72,7 +83,7 @@ bool AChunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EFaceDi
 {
 	return b2->IsSideOptimizable(Side)
 			&& b2->GetBlockModelType() != BLOCK
-		|| b1->IsBlockOpaque() != b2->IsBlockOpaque();
+		|| !b2->IsBlockOpaque();
 }
 
 void AChunk::ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

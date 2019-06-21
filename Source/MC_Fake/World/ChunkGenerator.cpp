@@ -66,7 +66,7 @@ void ChunkGenerator::Generate()
 			HasDataBeenChanged = true;
 			break;
 		case 5:
-			//Stage5();
+			Stage5();
 			HasDataBeenChanged = true;
 			break;
 		case 6:
@@ -194,7 +194,7 @@ void ChunkGenerator::Stage5()
 									if ((pow(xt - x, 2) + pow(yt - y, 2) == 8)
 										|| (pow(xt - x, 2) + pow(yt - y, 2) <= 2 && zt == z + TreeHeight - 3
 										|| xt == x && yt == y)
-										/*|| Rand.RandRange(0,6) == 6*/)
+										|| Rand.RandRange(0,6) == 5)
 										continue;
 									if (xt > -1 && xt < 16 && yt > -1 && yt < 16)			//Within chunkBoundaries
 										(*ChunkBlockData)[xt][yt][zt] = World->GetBlock(Leaves_Oak);
