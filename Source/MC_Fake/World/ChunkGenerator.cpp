@@ -117,11 +117,11 @@ void ChunkGenerator::Stage0()
 				//float noise1 = p.OctaveNoise(HeightMapX, HeightMapY, 0, 50, 18, 3) + 30;
 				float noise2 = HeightNoise->GetNoise(HeightMapX, HeightMapY) * 40.f + 15;
 				if (z <= noise2)
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(Stone));
+					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BStone));
 				/*else if (z < 13)
 					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(Water));*/
 				else
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(Air));
+					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BAir));
 			}
 		}
 	}
@@ -141,12 +141,12 @@ void ChunkGenerator::Stage2()
 			{
 
 				if (z < 250 && (*ChunkBlockData)[x][y][z] && (*ChunkBlockData)[x][y][z + 5] &&
-					(*ChunkBlockData)[x][y][z]->GetBlockEnum() == Stone && (*ChunkBlockData)[x][y][z + 5]->GetBlockEnum() == Air)
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(Dirt);
+					(*ChunkBlockData)[x][y][z]->GetBlockEnum() == BStone && (*ChunkBlockData)[x][y][z + 5]->GetBlockEnum() == BAir)
+					(*ChunkBlockData)[x][y][z] = World->GetBlock(BDirt);
 				if (z < 254 && (*ChunkBlockData)[x][y][z] && (*ChunkBlockData)[x][y][z + 1] &&
-					(*ChunkBlockData)[x][y][z]->GetBlockEnum() == Dirt && (*ChunkBlockData)[x][y][z + 1]->GetBlockEnum() == Air)
+					(*ChunkBlockData)[x][y][z]->GetBlockEnum() == BDirt && (*ChunkBlockData)[x][y][z + 1]->GetBlockEnum() == BAir)
 				{
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(Grass);
+					(*ChunkBlockData)[x][y][z] = World->GetBlock(BGrass);
 
 				}
 			}
@@ -177,12 +177,12 @@ void ChunkGenerator::Stage5()
 			{
 				for (int z = 200; z > 0; z--)
 				{
-					if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == Grass)
+					if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == BGrass)
 					{
 						int TreeHeight = Rand.RandRange(6, 10);
 						for (int zT = z + 1; zT <= z + TreeHeight; zT++)
 						{
-							(*ChunkBlockData)[x][y][zT] = World->GetBlock(Log_Oak);
+							(*ChunkBlockData)[x][y][zT] = World->GetBlock(BLog_Oak);
 						}
 
 						for (int zt = z + TreeHeight - 3; zt <= z + TreeHeight; zt++)
@@ -197,13 +197,13 @@ void ChunkGenerator::Stage5()
 										|| Rand.RandRange(0,6) == 5)
 										continue;
 									if (xt > -1 && xt < 16 && yt > -1 && yt < 16)			//Within chunkBoundaries
-										(*ChunkBlockData)[xt][yt][zt] = World->GetBlock(Leaves_Oak);
+										(*ChunkBlockData)[xt][yt][zt] = World->GetBlock(BLeaves_Oak);
 									else
-										World->AddBlockSetTask(PosX + xt, PosY + yt, zt, World->GetBlock(Leaves_Oak), 1);
+										World->AddBlockSetTask(PosX + xt, PosY + yt, zt, World->GetBlock(BLeaves_Oak), 1);
 								}
 							}
 						}
-						(*ChunkBlockData)[x][y][z + TreeHeight + 1] = World->GetBlock(Leaves_Oak);
+						(*ChunkBlockData)[x][y][z + TreeHeight + 1] = World->GetBlock(BLeaves_Oak);
 						
 						break;
 					}

@@ -12,7 +12,8 @@ B_Dirt::B_Dirt()
 	BlockID = 2;
 	BlockName = TEXT("Dirt");
 	BlockModelType = EBlockModelType::BLOCK;
-	BlockEnum = Dirt;
+	BlockEnum = BDirt;
+	BreakingAction = ABreakSand;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/dirt.dirt'"));
 	Texture = TextureObj.Object;
 }

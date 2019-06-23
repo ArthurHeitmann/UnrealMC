@@ -18,6 +18,11 @@ private:
 	class UWorldLoadingComponent* WorldLoader;
 	UPROPERTY(EditAnywhere)
 	class ULineTraceingInteractions* LineTracer;
+	UPROPERTY(EditAnywhere)
+	class UItemMeshComponent* CurrentItemMesh;
+	
+	class Item** CurrentItem;
+	class Item* PreviousItem;
 
 	void MoveForward(float v);
 	void MoveRight(float v);
@@ -29,6 +34,10 @@ private:
 	void RightClickEnd();
 	void Save();
 	void Load();
+	void SelectItem1();
+	void SelectItem2();
+	void StartCrouch();
+	void EndCrouch();
 
 protected:
 	virtual void BeginPlay() override;

@@ -133,9 +133,9 @@ TArray<uint8> FileIO::ChunkToBytes(AChunk* Chunk)
 		{
 			for (int y = 0; y < 16; y++)
 			{
-				if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == Air && LastAirIter < 0)
+				if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == BAir && LastAirIter < 0)
 					LastAirIter = Bytes.Num();
-				else if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() != Air && LastAirIter != -1)
+				else if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() != BAir && LastAirIter != -1)
 					LastAirIter = -1;
 				Bytes.Append((*ChunkBlockData)[x][y][z]->GetBinaryData());
 			}

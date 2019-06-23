@@ -12,7 +12,7 @@ B_Air::B_Air()
 	BlockID = 0;
 	BlockName = TEXT("Air");
 	BlockModelType = NONE;
-	BlockEnum = Air;
+	BlockEnum = BAir;
 }
 
 UMaterialInstanceDynamic* B_Air::GetMaterial(UObject* UO)

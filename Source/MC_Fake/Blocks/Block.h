@@ -17,7 +17,7 @@ protected:
 	uint8 SubID;
 	FName BlockName;
 	TEnumAsByte<EBlockModelType> BlockModelType;
-	//FName TextureName;
+	TEnumAsByte<EItemActions> BreakingAction;
 	TEnumAsByte<EAllBlocks> BlockEnum;
 	class UTexture* Texture;
 	float BreakTime;
@@ -37,7 +37,9 @@ public:
 	virtual bool HasConstantMaterial();	//Actually use this method
 	virtual TEnumAsByte<EBlockModelType> GetBlockModelType();
 	virtual TEnumAsByte<EAllBlocks> GetBlockEnum();
+	virtual TEnumAsByte<EItemActions> GetBreakingAction();
 	virtual class UMaterialInstanceDynamic* GetMaterial(UObject* UObj);
+	virtual UTexture* GetTexture();
 	//virtual class UTexture* GetTexture();
 	float GetBreakTime();
 	Block GetSelf();

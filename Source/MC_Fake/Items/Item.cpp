@@ -8,11 +8,18 @@ Item::Item()
 	BreakingSpeed = 1.f;
 	AttackDamage = 1.f;
 	Strength = 0;
+	ItemEnum = INoItem;
+	Texture = nullptr;
 }
 
 TSet<TEnumAsByte<EItemActions>> Item::GetItemActions()
 {
 	return ItemActions;
+}
+
+TEnumAsByte<EAllItems> Item::GetItemEnum()
+{
+	return ItemEnum;
 }
 
 float Item::GetAttackDamage()
@@ -28,4 +35,14 @@ float Item::GetBreakingSpeed()
 int Item::GetStrength()
 {
 	return Strength;
+}
+
+bool Item::IsStackableWith(Item* OtherItem)
+{
+	return ItemEnum == OtherItem->GetItemEnum();
+}
+
+UTexture* Item::GetTexture()
+{
+	return Texture;
 }

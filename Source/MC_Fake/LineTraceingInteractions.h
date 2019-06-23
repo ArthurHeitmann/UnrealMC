@@ -21,7 +21,8 @@ private:
 	class AChunk* HittingChunk;
 	class UCameraComponent* RayShootingCamera;
 	bool bIsHitting;
-	class Item* TestItem;
+	class Item** CurrentItem;
+	class AMcWorld* World;
 
 protected:
 	virtual void BeginPlay() override;
@@ -31,8 +32,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void LeftClickStart();
 	void LeftClickEnd();
-	void RightClickStart(FVector Start, FVector Direction);
+	void RightClickStart();
 	void RightClickEnd();
 	void SetCamera(class UCameraComponent* Cam);
-		
+	void SetCurrentItem(class Item** SelectedItem);
 };

@@ -1,16 +1,21 @@
 #pragma once
 
 enum EAllBlocks {
-	Air, Stone, Dirt, Grass, Water, Log_Oak, Leaves_Oak
+	BAir, BStone, BDirt, BGrass, BWater, BLog_Oak, BLeaves_Oak
 };
+
+enum EAllItems {
+	INoItem, IStone, IDirt, IGrass, ILog_Oak, ILeaves_Oak, IPickaxe_Stone
+};
+
 enum EFaceDirection {
 	TOP, RIGHT, BOTTOM, LEFT, SOUTH, NORTH
 };
 
 enum EBlockModelType {
-	NONE, BLOCK, WATER
+	NONE, BLOCK, WATER, ITEM
 };
 
 enum EItemActions {
-	EAT, BREAKWOOD, BREAKSTONE, BREAKSAND, ATTACK
+	ANoAction, AEat, AWood, APickaxe, ABreakSand, ABreakPlant, AAttack
 };

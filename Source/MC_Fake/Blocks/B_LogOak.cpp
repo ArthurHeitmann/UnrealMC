@@ -11,7 +11,8 @@ B_LogOak::B_LogOak()
 	SubID = 0;
 	BlockName = TEXT("Log Oak");
 	BlockModelType = BLOCK;
-	BlockEnum = Log_Oak;
+	BreakingAction = AWood;
+	BlockEnum = BLog_Oak;
 	BreakTime = 3;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/log_oak.log_oak'"));
 	Texture = TextureObj.Object;

@@ -240,16 +240,16 @@ Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 {
 	//what a mess
 	Block* HitBlock;
-	FVector HitLocation(((int) HitResult.Location.X / 100) % 16, ((int) HitResult.Location.Y / 100) % 16, ((int) HitResult.Location.Z / 100) % 256);
+	FVector HitLocation(((int) HitResult.ImpactPoint.X / 100) % 16, ((int) HitResult.ImpactPoint.Y / 100) % 16, ((int) HitResult.ImpactPoint.Z / 100) % 256);
 	
 	bool SkipXNegativeAdj = false;
 	bool SkipYNegativeAdj = false;
-	if (HitLocation.X == 0 && ((int) HitResult.Location.X / 100) != PosX)
+	if (HitLocation.X == 0 && ((int) HitResult.ImpactPoint.X / 100) != PosX)
 	{
 		HitLocation.X = 15;
 		SkipXNegativeAdj = true;
 	}
-	if (HitLocation.Y == 0 && ((int) HitResult.Location.Y / 100) != PosY)
+	if (HitLocation.Y == 0 && ((int) HitResult.ImpactPoint.Y / 100) != PosY)
 	{
 		HitLocation.Y = 15;
 		SkipYNegativeAdj = true;
@@ -260,13 +260,13 @@ Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 	int yChange = -1;
  	if (PosX < 0)
 	{
-		if (!SkipXNegativeAdj && floorf(HitResult.Location.X) != HitResult.Location.X)
+		if (!SkipXNegativeAdj && floorf(HitResult.ImpactPoint.X) != HitResult.ImpactPoint.X)
 			HitLocation.X += 15;	
 		xChange = 1;
 	}
 	if (PosY < 0)
 	{
-		if (!SkipYNegativeAdj && floorf(HitResult.Location.Y) != HitResult.Location.Y)
+		if (!SkipYNegativeAdj && floorf(HitResult.ImpactPoint.Y) != HitResult.ImpactPoint.Y)
 			HitLocation.Y += 15;
 		yChange = 1;
 	}
@@ -277,17 +277,17 @@ Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 
 	if (ChunkBlockData[HitLocation.X][HitLocation.Y][HitLocation.Z]->GetBlockEnum() == BAir)
 	{
-		if (floorf(HitResult.Location.X) == HitResult.Location.X)
+		if (floorf(HitResult.ImpactPoint.X) == HitResult.ImpactPoint.X)
 		{
 			if (xChange == 1 && HitLocation.X < 15 || xChange == -1 && HitLocation.X > 0)
 				HitLocation.X += xChange;
 		}
-		else if (HitLocation.Y && HitLocation.Y < 15 && floorf(HitResult.Location.Y) == HitResult.Location.Y)
+		else if (HitLocation.Y && HitLocation.Y < 15 && floorf(HitResult.ImpactPoint.Y) == HitResult.ImpactPoint.Y)
 		{
 			if (yChange == 1 && HitLocation.Y < 15 || yChange == -1 && HitLocation.Y > 0)
 				HitLocation.Y += yChange;
 		}
-		else if (HitLocation.Z && floorf(HitResult.Location.Z) == HitResult.Location.Z)
+		else if (HitLocation.Z && floorf(HitResult.ImpactPoint.Z) == HitResult.ImpactPoint.Z)
 			HitLocation.Z += -1;
 	}
 

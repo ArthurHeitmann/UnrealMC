@@ -7,7 +7,6 @@
 #include "Items/I_NoItem.h"
 #include "World/McWorld.h"
 #include "Kismet/GameplayStatics.h"
-#include "Blocks/B_Dirt.h"
 
 // Sets default values for this component's properties
 ULineTraceingInteractions::ULineTraceingInteractions()
@@ -93,35 +92,14 @@ void ULineTraceingInteractions::RightClickStart()
 	FVector EndPosition(Start + Direction * HandReachDistance);
 	if (GetWorld()->LineTraceSingleByChannel(Result, Start, EndPosition, ECC_Visibility))
 	{
-		int32 x = Result.Location.X / 100;
-		int32 y = Result.Location.Y / 100;
-		int32 z = Result.Location.Z / 100;
-		bool NegXApplied = false;
-		bool NegYApplied = false;
-		if (Result.Location.X < 0)
-		{
+		int32 x = Result.ImpactPoint.X / 100;
+		int32 y = Result.ImpactPoint.Y / 100;
+		int32 z = Result.ImpactPoint.Z / 100;
+		if (Result.ImpactNormal.X < 0)
 			x--;
-			NegXApplied = true;
-		}
-		if (Result.ImpactPoint.Y < 0)
-		{
+		if (Result.ImpactNormal.Y < 0)
 			y--;
-			NegYApplied = true;
-		}
-		
-	/*	if (Result.ImpactNormal.Z > 0)
-			z++;
-		else*/ if (Result.ImpactNormal.Z < 0)
-			z--;
-		else if (Result.ImpactNormal.X > 0)
-			x++;
-		else if (Result.ImpactNormal.X < 0 && !NegXApplied)
-			x--;
-		else if (Result.ImpactNormal.Y > 0)
-			y++;
-		else if (Result.ImpactNormal.Y < 0 && !NegYApplied)
-			y--;
-		World->AddBlockSetTask(x, y, z, new B_Dirt(), 255);
+		Block* BlockAt = World->GetBlockAt(x, y, z, false);
 	}
 }
 

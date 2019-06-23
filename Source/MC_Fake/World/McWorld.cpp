@@ -30,10 +30,10 @@ AMcWorld::AMcWorld()
 void AMcWorld::BeginPlay()
 {
 	Super::BeginPlay();
-	GeneratorThreads.SetNum(1);
+	GeneratorThreads.SetNum(2);
 	//GeneratorThreads.SetNum(FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2);
 	//for (int i = 0; i < FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2; i++)
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		GeneratorThreads[i] = new ChunkGenerator;
 		GeneratorThreads[i]->SetWorld(this);
@@ -197,19 +197,19 @@ Block* AMcWorld::GetBlock(TEnumAsByte<EAllBlocks> Block)
 {
 	switch (Block)
 	{
-	case Air:
+	case BAir:
 		return B_Air::AirRef;
-	case Stone:
+	case BStone:
 		return new B_Stone();
-	case Dirt:
+	case BDirt:
 		return new B_Dirt();
-	case Grass:
+	case BGrass:
 		return new B_Grass();
-	case Water:
+	case BWater:
 		return new B_Water();
-	case Leaves_Oak:
+	case BLeaves_Oak:
 		return new B_Leaves();
-	case Log_Oak:
+	case BLog_Oak:
 		return new B_LogOak();
 	}
 
@@ -358,47 +358,37 @@ void AMcWorld::QuickLoad()
 
 Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool ForceSuccess, int MinGenStage, int maxGenStage)
 {
-	//int32 ChunkX = x / 16;
-	//int32 ChunkY = y / 16;
-	//int32 relX = x % 16;
-	//int32 relY = y % 16;
-	//if (relX < 0)
-	//	relX += 16;
-	//if (relY < 0)
-	//	relY += 16;
-	//if (CurrentlyLoadedChunks.Contains({ ChunkX, ChunkY }))
-	//{
-	//	auto data = CurrentlyLoadedChunks[{ ChunkX, ChunkY }]->GetChunkBlockData();
-	//	return (*data)[relX][relY][z];
-	//}
-	//else if (ForceSuccess && FileIO::DoesChunkExist("Debug_World", ChunkX, ChunkY))
-	//{
-	//	ChunkData data = FileIO::LoadChunk("Debug_World", ChunkX, ChunkY);		//TODO check GenVersion
-	//	AChunk* Chunk = GetWorld()->SpawnActor<AChunk>({ (float) x - relX, (float) y - relY, 0 }, FRotator::ZeroRotator);
-	//	CurrentlyLoadedChunks.Add({ ChunkX, ChunkY }, Chunk);
-	//	Chunk->SetData(data.BlockData, true);
-	//	Chunk->SetNextGenerationStage(data.NextGenerationStage);
-	//	Chunk->SetLastTimeUpdated(data.LastTimeUpdated);
-	//	ChunkGenerator Generator;
-	//	Generator.SetWorld(this);
-	//	Generator.Reset(x - relX, y - relY, Chunk, data.NextGenerationStage, maxGenStage, false);
-	//	Generator.Generate();
-	//	auto BlockData = Chunk->GetChunkBlockData();
-	//	return (*BlockData)[relX][relY][z];
-	//}
-	//else if (ForceSuccess)
-	//{
-	//	AChunk* Chunk = GetWorld()->SpawnActor<AChunk>({ (float) x - relX, (float) y - relY, 0 }, FRotator::ZeroRotator);
-	//	CurrentlyLoadedChunks.Add({ ChunkX, ChunkY }, Chunk);
-	//	ChunkGenerator Generator;
-	//	Generator.SetWorld(this);
-	//	Generator.Reset(x - relX, y - relY, Chunk, MinGenStage, maxGenStage, false);
-	//	Generator.Generate();
-	//	auto BlockData = Chunk->GetChunkBlockData();
-	//	return (*BlockData)[relX][relY][z];
-	//}
+	int32 ChunkX = x / 16;
+	int32 ChunkY = y / 16;
+	int32 relX = x % 16;
+	int32 relY = y % 16;
+	if (relX < 0)
+		relX += 16;
+	if (relY < 0)
+		relY += 16;
+	if (CurrentlyLoadedChunks.Contains({ ChunkX, ChunkY }))
+	{
+		auto data = CurrentlyLoadedChunks[{ ChunkX, ChunkY }]->GetChunkBlockData();
+		return (*data)[relX][relY][z];
+	}
+	else if (ForceSuccess && FileIO::DoesChunkExist("Debug_World", ChunkX, ChunkY))
+	{
+		ChunkData data = FileIO::LoadChunk("Debug_World", ChunkX, ChunkY);		//TODO check GenVersion
+		return data.BlockData[relX][relY][z];
+	}
+	else if (ForceSuccess)
+	{
+		AChunk* Chunk = GetWorld()->SpawnActor<AChunk>({ (float) x - relX, (float) y - relY, 0 }, FRotator::ZeroRotator);
+		CurrentlyLoadedChunks.Add({ ChunkX, ChunkY }, Chunk);
+		ChunkGenerator Generator;
+		Generator.SetWorld(this);
+		Generator.Reset(x - relX, y - relY, Chunk, MinGenStage, maxGenStage, false);
+		Generator.Generate();
+		auto BlockData = Chunk->GetChunkBlockData();
+		return (*BlockData)[relX][relY][z];
+	}
 
-	return B_Air::AirRef;
+	return nullptr;
 }
 
 void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class Block* Block, uint8 MinGenStage)

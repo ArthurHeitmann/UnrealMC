@@ -15,7 +15,8 @@ B_Stone::B_Stone()
 	BlockID = 1;
 	BlockName = TEXT("Stone");
 	BlockModelType = EBlockModelType::BLOCK;
-	BlockEnum = Stone;
+	BlockEnum = BStone;
+	BreakingAction = APickaxe;
 	BreakTime = 7.5f;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/stone.stone'"));
 	Texture = TextureObj.Object;
