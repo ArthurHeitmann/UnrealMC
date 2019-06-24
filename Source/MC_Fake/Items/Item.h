@@ -4,12 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Enums.h"
+#include "Engine/EngineTypes.h"
 
 /**
  * 
  */
 class MC_FAKE_API Item
 {
+public:
+	struct PostUseTask {
+		TEnumAsByte<EPostItemUseTask> Tasks;
+		int32 Count;
+	};
+
 protected:
 	TEnumAsByte<EAllItems> ItemEnum;
 	TSet<TEnumAsByte<EItemActions>> ItemActions;
@@ -27,6 +34,8 @@ public:
 	float GetBreakingSpeed();
 	int GetStrength();
 	virtual bool IsStackableWith(Item* OtherItem);
+
+	virtual PostUseTask OnItemUse(FHitResult HitPointData, class AMcWorld* World);
 
 	class UTexture* GetTexture();
 };

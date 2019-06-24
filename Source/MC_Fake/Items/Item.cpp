@@ -42,6 +42,11 @@ bool Item::IsStackableWith(Item* OtherItem)
 	return ItemEnum == OtherItem->GetItemEnum();
 }
 
+Item::PostUseTask Item::OnItemUse(FHitResult HitPointData, AMcWorld* World)
+{
+	return { NoTask };
+}
+
 UTexture* Item::GetTexture()
 {
 	return Texture;

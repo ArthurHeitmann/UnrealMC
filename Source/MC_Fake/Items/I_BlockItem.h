@@ -15,4 +15,5 @@ private:
 
 public:
 	I_BlockItem(class Block* Block);
+	virtual Item::PostUseTask OnItemUse(FHitResult HitPointData, class AMcWorld* World) override;
 };

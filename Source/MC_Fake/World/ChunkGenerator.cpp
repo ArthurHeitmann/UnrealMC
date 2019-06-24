@@ -19,7 +19,7 @@ uint32 ChunkGenerator::Run()
 	{
 		while (bIsDone)
 		{ 
-			//wait 
+			;	// wait
 		}
 		Generate();
 	}

@@ -19,3 +19,7 @@ enum EBlockModelType {
 enum EItemActions {
 	ANoAction, AEat, AWood, APickaxe, ABreakSand, ABreakPlant, AAttack
 };
+
+enum EPostItemUseTask {
+	NoTask, Decrement, RemoveCharges, Destroy, Remove
+};

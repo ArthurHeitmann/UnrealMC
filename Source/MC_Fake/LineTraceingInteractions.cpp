@@ -93,35 +93,8 @@ void ULineTraceingInteractions::RightClickStart()
 	FVector EndPosition(Start + Direction * HandReachDistance);
 	if (GetWorld()->LineTraceSingleByChannel(Result, Start, EndPosition, ECC_Visibility))
 	{
-		int32 x = Result.Location.X / 100;
-		int32 y = Result.Location.Y / 100;
-		int32 z = Result.Location.Z / 100;
-		bool NegXApplied = false;
-		bool NegYApplied = false;
-		if (Result.Location.X < 0)
-		{
-			x--;
-			NegXApplied = true;
-		}
-		if (Result.ImpactPoint.Y < 0)
-		{
-			y--;
-			NegYApplied = true;
-		}
+		(*CurrentItem)->OnItemUse(Result, World);
 		
-	/*	if (Result.ImpactNormal.Z > 0)
-			z++;
-		else*/ if (Result.ImpactNormal.Z < 0)
-			z--;
-		else if (Result.ImpactNormal.X > 0)
-			x++;
-		else if (Result.ImpactNormal.X < 0 && !NegXApplied)
-			x--;
-		else if (Result.ImpactNormal.Y > 0)
-			y++;
-		else if (Result.ImpactNormal.Y < 0 && !NegYApplied)
-			y--;
-		World->AddBlockSetTask(x, y, z, new B_Dirt(), 255);
 	}
 }
 
