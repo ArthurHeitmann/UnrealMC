@@ -25,6 +25,8 @@ private:
 	void Stage5();
 	void Stage6();
 
+	void wait();
+
 public:
 	~ChunkGenerator();
 	virtual uint32 Run();

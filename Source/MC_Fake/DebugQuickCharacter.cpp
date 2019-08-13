@@ -12,6 +12,8 @@
 #include "Items/I_BlockItem.h"
 #include "Blocks/B_Stone.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/BoxComponent.h"
+#include "Player/ItemSystemComponent.h"
 
 // Sets default values
 ADebugQuickCharacter::ADebugQuickCharacter()
@@ -34,6 +36,8 @@ ADebugQuickCharacter::ADebugQuickCharacter()
 	LineTracer->SetCamera(Camera);
 	CurrentItemMesh->SetupAttachment(Camera);
 
+	ItemSystem = CreateDefaultSubobject<UItemSystemComponent>(TEXT("Item System"));
+	ItemSystem->SetupAttachment(GetRootComponent());
 }
 
 void ADebugQuickCharacter::MoveForward(float v)
@@ -114,6 +118,8 @@ void ADebugQuickCharacter::BeginPlay()
 	CurrentItemMesh->InitWithItem(*CurrentItem);
 	LineTracer->SetCurrentItem(CurrentItem);
 	PreviousItem = *CurrentItem;
+
+	ItemSystem->InitQuickAccessSlots(10);
 }
 
 // Called every frame

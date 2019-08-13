@@ -3,27 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
+#include "../Items/ItemStack.h"
 #include "ItemSystemComponent.generated.h"
 
-struct ItemStack {
-	class Item* Item;
-	int32 Count;
-};
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MC_FAKE_API UItemSystemComponent : public UActorComponent
+class MC_FAKE_API UItemSystemComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
 public:	
+	class UItemSlots* Slot_QuickAcces;
+
+
 	UItemSystemComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	FItemStack AddItemStackToInventory(FItemStack Items);
+	void InitQuickAccessSlots(int32 Num);
+
 protected:
+	UPROPERTY(EditAnywhere)
+		class UBoxComponent* ItemPickupBox;
+
 	virtual void BeginPlay() override;
 
-private:	
-	ItemStack* CurrentItem;
-		
+	UFUNCTION()
+		void ItemPickBoxTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+
 };

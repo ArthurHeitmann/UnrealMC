@@ -58,7 +58,9 @@ Block* Block::GetBlockFromBytes(uint8* Bytes)
 void Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
 {
 	AItemDrop* Drop = World->SpawnActor<AItemDrop>(Location + FVector(50, 50, 50), FRotator::ZeroRotator);
-	Drop->SetItem(DropItem);
+	if (!Drop)
+		return;
+	Drop->SetItemStack({ DropItem, 1 });
 	Drop->SetMesh(GetAllVertecies(-50, -50, -50), GetAllTrainglesFrom(0), GetAllUVs(), GetAllNormals(), GetMaterial(Drop));
 }
 

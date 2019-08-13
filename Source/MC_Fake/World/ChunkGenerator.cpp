@@ -4,7 +4,7 @@
 #include "Chunk.h"
 #include "Engine/Texture.h"
 #include "Enums.h"
-#include "D:/Dokumente/Unreal Engine/MC_Fake/Plugins/UnrealFastNoise-master/Source/UnrealFastNoisePlugin/Public/FastNoise/FastNoise.h"
+#include "FastNoise/FastNoise.h"
 
 
 ChunkGenerator::~ChunkGenerator()
@@ -17,10 +17,7 @@ uint32 ChunkGenerator::Run()
 {
 	while (bRun)
 	{
-		while (bIsDone)
-		{ 
-			;	// wait
-		}
+		wait();
 		Generate();
 	}
 
@@ -61,6 +58,10 @@ void ChunkGenerator::Generate()
 			Stage0();
 			HasDataBeenChanged = true;
 			break;
+		case 1:
+			Stage1();
+			HasDataBeenChanged = true;
+			break;
 		case 2:
 			Stage2();
 			HasDataBeenChanged = true;
@@ -71,6 +72,7 @@ void ChunkGenerator::Generate()
 			break;
 		case 6:
 			NextGenerationStage = 244;
+			Chunk->SetHasFinishedGenerating(true);
 			break;
 		}
 		Chunk->SetNextGenerationStage(++NextGenerationStage);
@@ -90,15 +92,37 @@ void ChunkGenerator::Generate()
 
 void ChunkGenerator::Stage0()
 {
-	PerlinNoise p(54658);
+	//Noise setup
+		//Height
 	UFastNoise* HeightNoise = NewObject<UFastNoise>();
 	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
 	HeightNoise->SetFractalOctaves(6);
 	HeightNoise->SetFrequency(1.f / 600.f);
+		//Turbulence for height
 	UFastNoise * TurbulenceNoise = NewObject<UFastNoise>();
 	TurbulenceNoise->SetFrequency(1.f / 40.f);
 	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
 	TurbulenceNoise->SetFractalOctaves(2);
+		//Ocean/Lake noise
+	UFastNoise* WaterNoise = NewObject<UFastNoise>();
+	WaterNoise->SetFractalOctaves(3);
+	WaterNoise->SetFrequency(1.f / 1500.f);
+	WaterNoise->SetNoiseType(ENoiseType::SimplexFractal);
+
+	//Height map generation
+		//26 x 26 Array (base = 16 x 16; + 5 on each side)
+	TArray<TArray<float>> HeightMap;
+	HeightMap.SetNum(26);
+	for (int x = 0; x < 26; x++)
+	{
+		HeightMap[x].SetNumZeroed(26);
+		for (int y = 0; y < 26; y++)
+			HeightMap[x][y] = HeightNoise->GetNoise(PosX + x - 5, PosY + y - 5);
+	}
+
+	//Terrain generation
+	int WaterLow = 28;
+	float minCaveNoise = 0;
 	if (ChunkBlockData->Num() != 16)
 		ChunkBlockData->SetNum(16);
 	for (int x = 0; x < 16; x++)
@@ -109,17 +133,33 @@ void ChunkGenerator::Stage0()
 		{
 			if ((*ChunkBlockData)[x][y].Num() != 256)
 				(*ChunkBlockData)[x][y].SetNum(256);
+			
+			float wNoise = WaterNoise->GetNoise(x + PosX, y + PosY) * 3;
+
 			for (int z = 0; z < 256; z++)
 			{
 				//TODO generate heightmap
-				int HeightMapX = x + PosX + TurbulenceNoise->GetNoise(x + PosX, z) * 13.f ;
-				int HeightMapY = y + PosY + TurbulenceNoise->GetNoise(z, y + PosY) * 13.f;
-				//float noise1 = p.OctaveNoise(HeightMapX, HeightMapY, 0, 50, 18, 3) + 30;
-				float noise2 = HeightNoise->GetNoise(HeightMapX, HeightMapY) * 40.f + 15;
-				if (z <= noise2)
+				int RelX = x + TurbulenceNoise->GetNoise(x + PosX, z) * 13.f;
+				int RelY = y + TurbulenceNoise->GetNoise(y + PosY, z) * 13.f;
+				float HeightMapValue;
+				if (RelX >= -5 && RelX <= 20 && RelY >= -5 && RelY <= 20)
+					HeightMapValue = HeightMap[RelX + 5][RelY + 5];
+				else
+					HeightMapValue = HeightNoise->GetNoise(PosX + RelX, PosY + RelY);
+
+				HeightMapValue = HeightMapValue * 40.f + 50;
+
+				if (wNoise < -.5f)
+				{
+					float factor = FMath::Clamp<float>(wNoise * (-2.f) - 1, 0.f, 1.f);
+					HeightMapValue -= factor * (HeightMapValue - WaterLow);
+				}
+
+				
+				if (z <= HeightMapValue)
 					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BStone));
-				/*else if (z < 13)
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(Water));*/
+				/*else if (z < 44)
+					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BWater));*/
 				else
 					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BAir));
 			}
@@ -129,25 +169,61 @@ void ChunkGenerator::Stage0()
 
 void ChunkGenerator::Stage1()
 {
-}
-
-void ChunkGenerator::Stage2()
-{
 	for (int x = 0; x < 16; x++)
 	{
 		for (int y = 0; y < 16; y++)
 		{
-			for (int z = 0; z < 251; z++)
+			for (int z = 0; z < 256; z++)
 			{
-
-				if (z < 250 && (*ChunkBlockData)[x][y][z] && (*ChunkBlockData)[x][y][z + 5] &&
-					(*ChunkBlockData)[x][y][z]->GetBlockEnum() == BStone && (*ChunkBlockData)[x][y][z + 5]->GetBlockEnum() == BAir)
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(BDirt);
-				if (z < 254 && (*ChunkBlockData)[x][y][z] && (*ChunkBlockData)[x][y][z + 1] &&
-					(*ChunkBlockData)[x][y][z]->GetBlockEnum() == BDirt && (*ChunkBlockData)[x][y][z + 1]->GetBlockEnum() == BAir)
+				EAllBlocks b = (*ChunkBlockData)[x][y][z]->GetBlockEnum();
+				EAllBlocks b1 = z < 255 ? (*ChunkBlockData)[x][y][z + 1]->GetBlockEnum() : BAir;
+				EAllBlocks b2 = z < 254 ? (*ChunkBlockData)[x][y][z + 2]->GetBlockEnum() : BAir;
+				EAllBlocks b3 = z < 253 ? (*ChunkBlockData)[x][y][z + 3]->GetBlockEnum() : BAir;
+				EAllBlocks b4 = z < 252 ? (*ChunkBlockData)[x][y][z + 4]->GetBlockEnum() : BAir;
+				EAllBlocks b5 = z < 251 ? (*ChunkBlockData)[x][y][z + 5]->GetBlockEnum() : BAir;
+				EAllBlocks b6 = z < 250 ? (*ChunkBlockData)[x][y][z + 6]->GetBlockEnum() : BAir;
+				
+				if (b == BStone && (b2 == BAir || b3 == BAir || b4 == BAir || b5 == BAir || b6 == BAir))
 				{
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(BGrass);
+					if (b1 != BAir)
+					{
+						if (b != BAir)
+							delete (*ChunkBlockData)[x][y][z];
+						(*ChunkBlockData)[x][y][z] = World->GetBlock(BDirt);
+					}
+					else
+					{
+						if (b != BAir)
+							delete (*ChunkBlockData)[x][y][z];
+						(*ChunkBlockData)[x][y][z] = World->GetBlock(BGrass);
+					}
+				}
+			}
+		}
+	}
+}
 
+void ChunkGenerator::Stage2()
+{
+	//Cave noise 1
+	UFastNoise* CaveNoise1 = NewObject<UFastNoise>();
+	CaveNoise1->SetFractalOctaves(4);
+	CaveNoise1->SetFrequency(1.f / 400.f);
+	CaveNoise1->SetNoiseType(ENoiseType::SimplexFractal);
+
+	for (int x = 0; x < 16; x++)
+	{
+		for (int y = 0; y < 16; y++)
+		{
+			for (int z = 0; z < 256; z++)
+			{
+				float CaveNoiseValue = abs(CaveNoise1->GetNoise(PosX + x, PosY + y, z));
+
+				if (CaveNoiseValue < .035)
+				{
+					if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() != BAir)
+						delete (*ChunkBlockData)[x][y][z];
+					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BAir));
 				}
 			}
 		}
@@ -215,4 +291,12 @@ void ChunkGenerator::Stage5()
 
 void ChunkGenerator::Stage6()
 {
+}
+
+void ChunkGenerator::wait()
+{
+	while (bIsDone)
+	{
+		FPlatformProcess::Sleep(.1);	// wait
+	}
 }

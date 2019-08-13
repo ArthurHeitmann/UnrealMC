@@ -15,5 +15,5 @@ private:
 
 public:
 	I_BlockItem(class Block* Block);
-	virtual Item::PostUseTask OnItemUse(FHitResult HitPointData, class AMcWorld* World) override;
+	virtual Item::PostUseTask OnItemUse(const FHitResult& HitPointData, class AMcWorld* World) override;
 };

@@ -8,6 +8,8 @@ Item::Item()
 	BreakingSpeed = 1.f;
 	AttackDamage = 1.f;
 	Strength = 0;
+	MaxStackCount = 64;
+	bIsStackable = true;
 	ItemEnum = INoItem;
 	Texture = nullptr;
 }
@@ -37,12 +39,22 @@ int Item::GetStrength()
 	return Strength;
 }
 
+bool Item::IsItemStackable()
+{
+	return bIsStackable;
+}
+
+int32 Item::GetMaxStackCount()
+{
+	return MaxStackCount;
+}
+
 bool Item::IsStackableWith(Item* OtherItem)
 {
 	return ItemEnum == OtherItem->GetItemEnum();
 }
 
-Item::PostUseTask Item::OnItemUse(FHitResult HitPointData, AMcWorld* World)
+Item::PostUseTask Item::OnItemUse(const FHitResult& HitPointData, AMcWorld* World)
 {
 	return { NoTask };
 }
@@ -50,4 +62,8 @@ Item::PostUseTask Item::OnItemUse(FHitResult HitPointData, AMcWorld* World)
 UTexture* Item::GetTexture()
 {
 	return Texture;
+}
+
+Item::~Item()
+{
 }

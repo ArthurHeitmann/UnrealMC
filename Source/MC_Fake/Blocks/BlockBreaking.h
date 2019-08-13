@@ -13,8 +13,8 @@ class MC_FAKE_API ABlockBreaking : public AActor
 	
 private:
 	class Block* BlockData;
-	class UProceduralMeshComponent* Mesh;
-	class UProceduralMeshComponent* CollisionMesh;
+	class URuntimeMeshComponent* Mesh;
+	class URuntimeMeshComponent* CollisionMesh;
 	UPROPERTY(EditAnywhere)
 	USceneComponent* Root;
 

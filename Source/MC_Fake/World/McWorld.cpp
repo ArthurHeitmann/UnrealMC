@@ -30,10 +30,10 @@ AMcWorld::AMcWorld()
 void AMcWorld::BeginPlay()
 {
 	Super::BeginPlay();
-	GeneratorThreads.SetNum(1);
+	GeneratorThreads.SetNum(2);
 	//GeneratorThreads.SetNum(FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2);
 	//for (int i = 0; i < FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2; i++)
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		GeneratorThreads[i] = new ChunkGenerator;
 		GeneratorThreads[i]->SetWorld(this);

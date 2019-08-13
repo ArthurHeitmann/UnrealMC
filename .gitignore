@@ -72,10 +72,14 @@ Saved/Autosaves/*
 Saved/Backup/*
 Saved/Collections/*
 Saved/Config/*
+Saved/Config/CrashReportClient/*
+Saved/Cooked/*
 Saved/Crashes/*
 Saved/EditorCooked/*
 Saved/Logs/*
 Saved/Profiling/*
+Saved/StagedBuilds/*
+Saved/Screenshots/*
 
 # Compiled source files for the engine to use
 Intermediate/*
@@ -83,3 +87,6 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+#custom
+enc_temp_folder/*

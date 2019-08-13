@@ -5,6 +5,8 @@
 
 I_Tool::I_Tool()
 {
+	bIsStackable = false;
+	MaxStackCount = 1;
 }
 
 int32 I_Tool::GetDurability()

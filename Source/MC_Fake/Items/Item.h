@@ -11,6 +11,7 @@
  */
 class MC_FAKE_API Item
 {
+
 public:
 	struct PostUseTask {
 		TEnumAsByte<EPostItemUseTask> Tasks;
@@ -22,7 +23,9 @@ protected:
 	TSet<TEnumAsByte<EItemActions>> ItemActions;
 	float AttackDamage;
 	float BreakingSpeed;
-	int Strength;
+	int32 Strength;
+	bool bIsStackable;
+	int32 MaxStackCount;
 	UTexture* Texture;
 
 public:
@@ -33,9 +36,13 @@ public:
 	float GetAttackDamage();
 	float GetBreakingSpeed();
 	int GetStrength();
+	bool IsItemStackable();
+	int32 GetMaxStackCount();
 	virtual bool IsStackableWith(Item* OtherItem);
 
-	virtual PostUseTask OnItemUse(FHitResult HitPointData, class AMcWorld* World);
+	virtual PostUseTask OnItemUse(const FHitResult& HitPointData, class AMcWorld* World);
 
 	class UTexture* GetTexture();
+
+	virtual ~Item();
 };

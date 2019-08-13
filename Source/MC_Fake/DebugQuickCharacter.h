@@ -20,6 +20,8 @@ private:
 	class ULineTraceingInteractions* LineTracer;
 	UPROPERTY(EditAnywhere)
 	class UItemMeshComponent* CurrentItemMesh;
+	UPROPERTY(EditAnywhere)
+	class UItemSystemComponent* ItemSystem;
 	
 	class Item** CurrentItem;
 	class Item* PreviousItem;

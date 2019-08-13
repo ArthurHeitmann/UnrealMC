@@ -3,6 +3,7 @@
 
 #include "BlockBreaking.h"
 #include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
+#include "RuntimeMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Block.h"
 
@@ -10,8 +11,8 @@ ABlockBreaking::ABlockBreaking()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Breaking Block Mesh"));
-	CollisionMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Breaking Block Collision Mesh"));
+	Mesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Breaking Block Mesh"));
+	CollisionMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Breaking Block Collision Mesh"));
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 	Mesh->SetupAttachment(GetRootComponent());
@@ -37,9 +38,9 @@ void ABlockBreaking::InitWithBlock(Block* NewBlock)
 	TArray<FVector2D> UVs(NewBlock->GetAllUVs());
 	TArray<FVector> Normals(NewBlock->GetAllNormals());
 
-	Mesh->CreateMeshSection(0, Vertecies, Triangles, Normals, UVs, TArray<FColor>(), TArray<FProcMeshTangent>(), false);
+	Mesh->CreateMeshSection(0, Vertecies, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
 	Mesh->SetMaterial(0, NewBlock->GetMaterial(this));
-	CollisionMesh->CreateMeshSection(0, Vertecies, Triangles, Normals, UVs, TArray<FColor>(), TArray<FProcMeshTangent>(), true);
+	CollisionMesh->CreateMeshSection(0, Vertecies, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
 }
 
 void ABlockBreaking::SetBreakingStage(float percentage)

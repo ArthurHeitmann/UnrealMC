@@ -4,7 +4,8 @@
 #include "Chunk.h"
 #include "Components/BoxComponent.h"
 #include "Blocks/B_Stone.h"
-#include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
+//#include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
+#include "RuntimeMeshComponent.h"
 #include "PerlinNoise.h"
 #include "McWorld.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -24,9 +25,11 @@ AChunk::AChunk()
 	ChunkEnterTriggerBox->SetBoxExtent(FVector(799, 799, 12800));
 	ChunkEnterTriggerBox->AddLocalOffset({800, 800, 12800});
 	ChunkEnterTriggerBox->SetupAttachment(GetRootComponent());
-	ChunkEnterTriggerBox->bHiddenInGame = false;	
-	ChunkMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Chunk Procedural Mesh"));
+	//ChunkEnterTriggerBox->bHiddenInGame = false;	
+	ChunkMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Chunk Procedural Mesh"));
 	ChunkMesh->SetupAttachment(GetRootComponent());
+	/*ChunkMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Chunk Procedural Mesh"));
+	ChunkMesh->SetupAttachment(GetRootComponent());*/
 }
 
 void AChunk::BeginPlay()
@@ -104,11 +107,15 @@ void AChunk::SetHasDataChanged(bool state)
 	bHasDataChanged = state;
 }
 
+void AChunk::SetHasFinishedGenerating(bool state = true)
+{
+	bHasFinishedGenerating = state;
+}
+
 void AChunk::UpdateMesh()
 {
-	if (!bHasDataChanged || !ChunkBlockData.Num())
+	if (!bHasDataChanged || !ChunkBlockData.Num() || !bHasFinishedGenerating)
 		return;
-
 	TMap<TEnumAsByte<EAllBlocks>, TArray<FVector>> Vertecies;
 	TMap<TEnumAsByte<EAllBlocks>, TArray<FVector2D>> UVs;
 	TMap<TEnumAsByte<EAllBlocks>, TArray<int32>> Triangles;
@@ -118,7 +125,7 @@ void AChunk::UpdateMesh()
 	{
 		for (int y = 0; y < 16; y++)
 		{
-			for (int z = 0; z < 99; z++)
+			for (int z = 0; z < 256; z++)
 			{
 				if (ChunkBlockData[x][y][z]->GetBlockModelType() != TEnumAsByte<EBlockModelType>(EBlockModelType::NONE))
 				{
@@ -196,7 +203,7 @@ void AChunk::UpdateMesh()
 	for (auto i = Vertecies.CreateConstIterator(); i; ++i)
 	{ 
 		TEnumAsByte<EAllBlocks> key = i.Key();
-		ChunkMesh->CreateMeshSection(key, i.Value(), Triangles[key], Normals[key], UVs[key], TArray<FColor>(), TArray<FProcMeshTangent>(), true);
+		ChunkMesh->CreateMeshSection(key, i.Value(), Triangles[key], Normals[key], UVs[key], TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
 		ChunkMesh->SetMaterial(key, Materials[key]->GetMaterial(this));
 	}
 

@@ -30,6 +30,7 @@ public:
 			int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	void SetData(const TArray<TArray<TArray<Block*>>>& NewData, bool bUpdateMesh);
 	void SetHasDataChanged(bool state = true);
+	void SetHasFinishedGenerating(bool state);
 	void UpdateMesh();
 	void SetMeshLifeStage(int Stage);
 	Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);
@@ -60,13 +61,15 @@ private:
 	USceneComponent* Root;
 	class UBoxComponent* ChunkEnterTriggerBox;
 	UPROPERTY(EditAnywhere)
-	class UProceduralMeshComponent* ChunkMesh;
+	class URuntimeMeshComponent* ChunkMesh;
+	//class UProceduralMeshComponent* ChunkMesh;
 	TArray<TArray<TArray<Block*>>> ChunkBlockData;
 	int NextGenerationStage = 0;
 	class AMcWorld* McFWorld;
 	int32 PosX, PosY;
 	int LifeStage = 0;		//0: normal (visible), 1: Only shadows; no Mesh, 2: Hidden, 3: to be destroyed
 	bool bHasDataChanged = false;
+	bool bHasFinishedGenerating = false;
 	double LastTimeUpdated = 0;
 	AChunk* NorthChunk;
 	AChunk* EastChunk;

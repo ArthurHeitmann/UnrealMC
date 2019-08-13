@@ -22,13 +22,13 @@ AItemDrop::AItemDrop()
 	SetRootComponent(SM);
 	Mesh->SetupAttachment(GetRootComponent());
 	Mesh->AddLocalOffset({0, 0, 15});
-	SM->SetCollisionProfileName(TEXT(""));
+	InteractionZone->SetCollisionProfileName(TEXT("NoCollision"));
+	SM->SetCollisionProfileName(TEXT("NoCollision"));
 	//SM->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
-	SM->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	/*SM->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	SM->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
-	SM->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	SM->SetEnableGravity(true);
-	SM->SetSimulatePhysics(true);
+	SM->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);*/
+
 	//Mesh->SetWorldScale3D({.25, .25, .25});
 	SM->SetWorldScale3D({.25, .25, .25});
 	SM->SetVisibility(false);
@@ -40,8 +40,20 @@ void AItemDrop::ItemOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	if (AItemDrop* Drop = Cast<AItemDrop>(OtherActor))
 	{
-		if (Drop != this && ItemRef && Drop->GetItem() && ItemRef->IsStackableWith(Drop->GetItem()) && GetActorLocation().Z < Drop->GetActorLocation().Z)
-			Destroy();
+		//if the 2 Items are stackable destroy the lower drop and add the that item count to the other drop
+		if (Drop != this														//Avoid self-collision
+			&& ItemStack.ItemS && ItemStack.Number &&							//make sure that this drop
+			Drop->GetItemStack().ItemS && Drop->GetItemStack().Number			//and the other one are valid
+			 &&
+			ItemStack.ItemS->IsStackableWith(Drop->GetItemStack().ItemS))		//Is this Item stackable with the other
+		{
+			if (GetActorLocation().Z < Drop->GetActorLocation().Z)				//is this drop physically below the other one ? Yes then stack
+			{
+				Drop->IncreaseItemCount(ItemStack.Number);
+				Drop->SetActorScale3D(Drop->GetActorScale3D() + ItemStack.Number / 128);
+				Destroy();
+			}
+		}
 	}
 }
 
@@ -55,7 +67,6 @@ void AItemDrop::BeginPlay()
 
 void AItemDrop::EndPlay(EEndPlayReason::Type Reason)
 {
-	delete ItemRef;
 }
 
 // Called every frame
@@ -67,6 +78,13 @@ void AItemDrop::Tick(float DeltaTime)
 	{
 		InteractionZone->SetSphereRadius(20 * 4);
 		InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AItemDrop::ItemOverlap);
+		InteractionZone->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECR_Overlap);
+		SM->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+		SM->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+		SM->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		SM->SetEnableGravity(true);
+		SM->SetSimulatePhysics(true);
+		SM->WakeAllRigidBodies();
 		InitComplete = true;
 	}
 
@@ -89,13 +107,24 @@ void AItemDrop::SetMesh(const TArray<FVector>& Verts, const TArray<int32>& Tris,
 	Mesh->SetMaterial(0, Material);
 }
 
-void AItemDrop::SetItem(Item* NewItem)
+void AItemDrop::SetItemStack(FItemStack NewItemStack)
 {
-	ItemRef = NewItem;
+	ItemStack = NewItemStack;
 }
 
-Item* AItemDrop::GetItem()
+void AItemDrop::UpdateItemCount(int32 NewCount)
 {
-	return ItemRef;
+	ItemStack.Number = NewCount;
+	if (NewCount == 0)
+		Destroy();
 }
 
+void AItemDrop::IncreaseItemCount(int32 AdditionalCount)
+{
+	ItemStack.Number += AdditionalCount;
+}
+
+FItemStack AItemDrop::GetItemStack()
+{
+	return ItemStack;
+}

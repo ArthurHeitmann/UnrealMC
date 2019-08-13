@@ -1,5 +1,6 @@
 #include "LineTraceingInteractions.h"
 #include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
+#include "RuntimeMeshComponent.h"
 #include "Engine/World.h"
 #include "World/Chunk.h"
 #include "Blocks/BlockBreaking.h"
@@ -51,7 +52,7 @@ void ULineTraceingInteractions::LeftClickStart()
 	FVector EndPosition(Start + Direction * HandReachDistance);
 	if (GetWorld()->LineTraceSingleByChannel(Result, Start, EndPosition, ECC_Visibility))
 	{
-		if (Cast<UProceduralMeshComponent>(Result.Component))
+		if (Cast<URuntimeMeshComponent>(Result.Component))
 		{
 			if (AChunk * Chunk = Cast<AChunk>(Result.Actor))
 			{
