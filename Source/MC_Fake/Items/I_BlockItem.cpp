@@ -6,6 +6,8 @@ I_BlockItem::I_BlockItem(class Block* Block)
 {
 	this->Block = Block;
 	Texture = Block->GetTexture();
+	Id = Block->GetBlockEnum();
+	ItemName = Block->GetName();
 
 	switch (Block->GetBlockEnum())
 	{

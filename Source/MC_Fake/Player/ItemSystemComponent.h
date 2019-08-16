@@ -20,6 +20,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	FItemStack AddItemStackToInventory(FItemStack Items);
+	void InitPickUpBox(const FVector& BoxExtent);
 	void InitQuickAccessSlots(int32 Num);
 
 protected:

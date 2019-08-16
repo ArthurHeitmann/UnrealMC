@@ -120,6 +120,7 @@ void ADebugQuickCharacter::BeginPlay()
 	PreviousItem = *CurrentItem;
 
 	ItemSystem->InitQuickAccessSlots(10);
+	ItemSystem->InitPickUpBox( { 125, 125, 125 } );
 }
 
 // Called every frame

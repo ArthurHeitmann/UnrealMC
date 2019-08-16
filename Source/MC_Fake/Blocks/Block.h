@@ -35,6 +35,7 @@ public:
 	virtual bool IsBlockOpaque();
 	virtual bool UsesCustomModel();
 	virtual bool HasConstantMaterial();	//Actually use this method
+	virtual FName GetName();
 	virtual TEnumAsByte<EBlockModelType> GetBlockModelType();
 	virtual TEnumAsByte<EAllBlocks> GetBlockEnum();
 	virtual TEnumAsByte<EItemActions> GetBreakingAction();

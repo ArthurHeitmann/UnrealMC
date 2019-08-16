@@ -19,6 +19,8 @@ public:
 	};
 
 protected:
+	FName ItemName;
+	int32 Id;
 	TEnumAsByte<EAllItems> ItemEnum;
 	TSet<TEnumAsByte<EItemActions>> ItemActions;
 	float AttackDamage;
@@ -31,6 +33,8 @@ protected:
 public:
 	Item();
 
+	FName GetName();
+	int32 GetId();
 	TSet<TEnumAsByte<EItemActions>> GetItemActions();
 	TEnumAsByte<EAllItems> GetItemEnum();
 	float GetAttackDamage();

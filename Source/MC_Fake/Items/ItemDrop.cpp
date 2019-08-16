@@ -42,15 +42,15 @@ void AItemDrop::ItemOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	{
 		//if the 2 Items are stackable destroy the lower drop and add the that item count to the other drop
 		if (Drop != this														//Avoid self-collision
-			&& ItemStack.ItemS && ItemStack.Number &&							//make sure that this drop
-			Drop->GetItemStack().ItemS && Drop->GetItemStack().Number			//and the other one are valid
+			&& ItemStack.ItemS && ItemStack.ItemCount &&							//make sure that this drop
+			Drop->GetItemStack().ItemS && Drop->GetItemStack().ItemCount			//and the other one are valid
 			 &&
 			ItemStack.ItemS->IsStackableWith(Drop->GetItemStack().ItemS))		//Is this Item stackable with the other
 		{
 			if (GetActorLocation().Z < Drop->GetActorLocation().Z)				//is this drop physically below the other one ? Yes then stack
 			{
-				Drop->IncreaseItemCount(ItemStack.Number);
-				Drop->SetActorScale3D(Drop->GetActorScale3D() + ItemStack.Number / 128);
+				Drop->IncreaseItemCount(ItemStack.ItemCount);
+				Drop->SetActorScale3D(Drop->GetActorScale3D() + ItemStack.ItemCount / 128);
 				Destroy();
 			}
 		}
@@ -114,14 +114,14 @@ void AItemDrop::SetItemStack(FItemStack NewItemStack)
 
 void AItemDrop::UpdateItemCount(int32 NewCount)
 {
-	ItemStack.Number = NewCount;
+	ItemStack.ItemCount = NewCount;
 	if (NewCount == 0)
 		Destroy();
 }
 
 void AItemDrop::IncreaseItemCount(int32 AdditionalCount)
 {
-	ItemStack.Number += AdditionalCount;
+	ItemStack.ItemCount += AdditionalCount;
 }
 
 FItemStack AItemDrop::GetItemStack()

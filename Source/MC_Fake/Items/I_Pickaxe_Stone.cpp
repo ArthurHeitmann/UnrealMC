@@ -6,6 +6,8 @@
 
 I_Pickaxe_Stone::I_Pickaxe_Stone()
 {
+	Id = 274;
+	ItemName = TEXT("Pickaxe Stone");
 	Durability = Charges = 132;
 	BreakingSpeed = 6.5;
 

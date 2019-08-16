@@ -84,6 +84,11 @@ bool Block::HasConstantMaterial()
 	return true;
 }
 
+FName Block::GetName()
+{
+	return BlockName;
+}
+
 float Block::GetBreakTime()
 {
 	return BreakTime;

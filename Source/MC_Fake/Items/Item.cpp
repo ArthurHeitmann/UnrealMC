@@ -14,6 +14,16 @@ Item::Item()
 	Texture = nullptr;
 }
 
+FName Item::GetName()
+{
+	return ItemName;
+}
+
+int32 Item::GetId()
+{
+	return Id;
+}
+
 TSet<TEnumAsByte<EItemActions>> Item::GetItemActions()
 {
 	return ItemActions;

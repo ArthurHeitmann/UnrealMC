@@ -14,10 +14,13 @@ public class MC_Fake : ModuleRules
             "InputCore",
             "ProceduralMeshComponent",
             "EngineSettings",
-            "UnrealFastNoisePlugin"
+            "UnrealFastNoisePlugin",
+            "UMG"
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "RenderCore", "RHI", "RuntimeMeshComponent" });
+
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 //#ifndef UE_4_22_OR_LATER
 //        PublicDependencyModuleNames.AddRange(new string[] { "ShaderCore" });
 //#endif
