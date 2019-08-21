@@ -114,3 +114,8 @@ TArray<FVector2D> B_LogOak::GetAllUVs()
 		{0, 1}
 	};
 }
+
+Block* B_LogOak::Clone()
+{
+	return new B_LogOak();
+}

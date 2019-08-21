@@ -24,3 +24,8 @@ bool B_Water::IsBlockOpaque()
 {
 	return false;
 }
+
+Block* B_Water::Clone()
+{
+	return new B_Water();
+}

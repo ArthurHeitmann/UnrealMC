@@ -7,8 +7,8 @@ public class MC_Fake : ModuleRules
 	public MC_Fake(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core",
+        bUseRTTI = true;    //TODo remove
+        PublicDependencyModuleNames.AddRange(new string[] { "Core",
             "CoreUObject",
             "Engine",
             "InputCore",

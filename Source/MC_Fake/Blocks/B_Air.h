@@ -17,4 +17,5 @@ public:
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj);
 
 	TArray<uint8> GetBinaryData() override;
+	virtual Block* Clone() override;
 };

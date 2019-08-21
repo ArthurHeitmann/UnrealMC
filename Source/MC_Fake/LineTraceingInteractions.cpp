@@ -17,6 +17,7 @@ ULineTraceingInteractions::ULineTraceingInteractions()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	HandReachDistance = 500;
 }
 
 
@@ -56,7 +57,7 @@ void ULineTraceingInteractions::LeftClickStart()
 		{
 			if (AChunk * Chunk = Cast<AChunk>(Result.Actor))
 			{
-				Block* NewHittingBlock = Chunk->RegisterHitAt(Result, *CurrentItem);
+				Block* NewHittingBlock = Chunk->RegisterHitAt(Result, (*CurrentItem)->ItemS);
 				if (HittingBlock && NewHittingBlock != HittingBlock)
 					HittingChunk->CancelBreaking(HittingBlock);
 				HittingChunk = Chunk;
@@ -64,7 +65,7 @@ void ULineTraceingInteractions::LeftClickStart()
 			}
 			else if (ABlockBreaking* Block = Cast<ABlockBreaking>(Result.Actor))
 			{
-				if (HittingChunk->ContinueHit(Block, *CurrentItem))
+				if (HittingChunk->ContinueHit(Block, (*CurrentItem)->ItemS))
 				{
 					HittingBlock = nullptr;
 					HittingChunk = nullptr;
@@ -94,7 +95,17 @@ void ULineTraceingInteractions::RightClickStart()
 	FVector EndPosition(Start + Direction * HandReachDistance);
 	if (GetWorld()->LineTraceSingleByChannel(Result, Start, EndPosition, ECC_Visibility))
 	{
-		(*CurrentItem)->OnItemUse(Result, World);
+		Item::PostUseTask Task = (*CurrentItem)->ItemS->OnItemUse(Result, World);
+		switch (Task.Tasks) {
+		case Decrement:
+			(*CurrentItem)->ItemCount -= Task.Count;
+			if ((*CurrentItem)->ItemCount <= 0)
+			{
+				delete (*CurrentItem)->ItemS;
+				(*CurrentItem)->ItemS = new I_NoItem();
+				(*CurrentItem)->ItemCount = 0;
+			}
+		}
 		
 	}
 }
@@ -108,8 +119,7 @@ void ULineTraceingInteractions::SetCamera(UCameraComponent* Cam)
 	RayShootingCamera = Cam;
 }
 
-void ULineTraceingInteractions::SetCurrentItem(Item** SelectedItem)
+void ULineTraceingInteractions::SetSelectedItemPointer(FItemStack** NewPointer)
 {
-	CurrentItem = SelectedItem;
+	CurrentItem = NewPointer;
 }
-

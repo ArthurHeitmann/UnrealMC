@@ -12,3 +12,8 @@ void AMC_FakeGameModeBase::BeginPlay()
 	ItemSlotWidget->SetSize(10);
 	ItemSlotWidget->AddToViewport();
 }
+
+AMC_FakeGameModeBase::AMC_FakeGameModeBase()
+{
+	DefaultPawnClass = ADebugQuickCharacter::StaticClass();
+}

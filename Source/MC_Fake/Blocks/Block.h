@@ -43,7 +43,7 @@ public:
 	virtual UTexture* GetTexture();
 	//virtual class UTexture* GetTexture();
 	float GetBreakTime();
-	Block GetSelf();
+	virtual Block* Clone();
 	virtual TArray<uint8> GetBinaryData();
 
 	virtual void OnPlace(class UWorld* World, FVector Location);

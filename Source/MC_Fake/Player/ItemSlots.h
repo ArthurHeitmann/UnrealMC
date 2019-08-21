@@ -27,11 +27,10 @@ class MC_FAKE_API UItemSlots : public UObject
 protected:
 	TArray<FItemStack> Slots;
 
-
 public:
 	UItemSlots();
 
-	virtual FItemStack GetStackAt(int x);
+	virtual FItemStack& GetStackAt(int x);
 	virtual void SetNumSlots(int Num);
 	FItemStack PickupItemStack(FItemStack Items);
 	void DebugPrint(UWorld* world);

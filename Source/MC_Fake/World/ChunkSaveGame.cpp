@@ -14,7 +14,7 @@ void UChunkSaveGame::ParseData(const TArray<TArray<TArray<Block*>>>& NewData)
 			ChunkBlockData[x][y].Reserve(256);
 			for (int z = 0; z < 256; z++)
 			{
-				ChunkBlockData[x][y].Add(NewData[x][y][z]->GetSelf());
+				ChunkBlockData[x][y].Add(*NewData[x][y][z]->Clone());
 			}
 		}
 	}
@@ -34,7 +34,7 @@ TArray<TArray<TArray<Block*>>> UChunkSaveGame::GetData()
 			out[x][y].SetNumUninitialized(256);
 			for (int z = 0; z < 256; z++)
 			{
-				out[x][y][z] = new Block(ChunkBlockData[x][y][z]);
+				out[x][y][z] = ChunkBlockData[x][y][z].Clone();
 			}
 		}
 	}

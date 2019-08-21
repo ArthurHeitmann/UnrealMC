@@ -16,4 +16,6 @@ protected:
 public:
 	B_Stone();
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
+
+	virtual Block* Clone() override;
 };

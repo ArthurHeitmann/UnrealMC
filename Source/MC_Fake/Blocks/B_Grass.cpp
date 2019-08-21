@@ -118,3 +118,8 @@ UMaterialInstanceDynamic* B_Grass::GetMaterial(UObject* UObj)
 	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
 	return OutMat;
 }
+
+Block* B_Grass::Clone()
+{
+	return new B_Grass();
+}

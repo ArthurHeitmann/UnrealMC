@@ -94,9 +94,10 @@ float Block::GetBreakTime()
 	return BreakTime;
 }
 
-Block Block::GetSelf()
+Block* Block::Clone()
 {
-	return *this;
+	UE_LOG(LogTemp, Warning, TEXT("Cloning default Block"));
+	return new Block(*this);
 }
 
 TArray<uint8> Block::GetBinaryData()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Items/ItemStack.h"
 #include "DebugQuickCharacter.generated.h"
 
 UCLASS()
@@ -19,12 +20,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	class ULineTraceingInteractions* LineTracer;
 	UPROPERTY(EditAnywhere)
-	class UItemMeshComponent* CurrentItemMesh;
-	UPROPERTY(EditAnywhere)
 	class UItemSystemComponent* ItemSystem;
 	
-	class Item** CurrentItem;
-	class Item* PreviousItem;
+	FItemStack* CurrentItem;
 
 	void MoveForward(float v);
 	void MoveRight(float v);
@@ -38,6 +36,8 @@ private:
 	void Load();
 	void SelectItem1();
 	void SelectItem2();
+	void SelectItem(int32 numb);
+	DECLARE_DELEGATE_OneParam(FSelectItemDelegate, int32);
 	void StartCrouch();
 	void EndCrouch();
 

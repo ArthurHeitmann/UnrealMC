@@ -17,8 +17,7 @@ B_Stone::B_Stone()
 	BlockModelType = EBlockModelType::BLOCK;
 	BlockEnum = BStone;
 	BreakingAction = APickaxe;
-	BreakTime = 1.5f;
-	//BreakTime = 7.5f;
+	BreakTime = 7.5f;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/stone.stone'"));
 	Texture = TextureObj.Object;
 }
@@ -28,4 +27,9 @@ UMaterialInstanceDynamic* B_Stone::GetMaterial(UObject* UObj)
 	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(Block::BlockMaterial, UObj);
 	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
 	return OutMat;
+}
+
+Block* B_Stone::Clone()
+{
+	return new B_Stone();
 }

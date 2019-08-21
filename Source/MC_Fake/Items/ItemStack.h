@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "Item.h"
 #include "ItemUEWrapper.h"
+#include "I_NoItem.h"
 #include "ItemStack.generated.h"
 
 
@@ -18,7 +19,7 @@ struct FItemStack {
 	UPROPERTY(BlueprintReadOnly)
 	int32 ItemCount;
 
-	FItemStack() : ItemS(nullptr), ItemCount(0) {}
+	FItemStack() : ItemS(new I_NoItem), ItemCount(0) {}
 	FItemStack(Item* I, int32 Num) : ItemS(I), ItemCount(Num) {}
 	~FItemStack() {
 		UE_LOG(LogTemp, Warning, TEXT(""));

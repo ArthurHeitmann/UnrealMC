@@ -391,14 +391,16 @@ Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool ForceSuccess, int Mi
 	return nullptr;
 }
 
-void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class Block* Block, uint8 MinGenStage)
+void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class Block* NewBlock, uint8 MinGenStage)
 {
-	BlockSetBufferElement e(x, y, z, Block, MinGenStage);
+	auto a = dynamic_cast<B_Grass*>(NewBlock);
+	auto b = dynamic_cast<B_Stone*>(NewBlock);
+	BlockSetBufferElement e(x, y, z, NewBlock, MinGenStage);
 	FIntPoint key(e.ChunkX, e.ChunkY);
 	if (CurrentlyLoadedChunks.Contains(key) && CurrentlyLoadedChunks[key]->GetNextGenerationStage() >= MinGenStage)
 	{
 		auto BlockData = CurrentlyLoadedChunks[key]->GetChunkBlockData();
-		(*BlockData)[e.RelX][e.RelY][z] = Block;
+		(*BlockData)[e.RelX][e.RelY][z] = NewBlock;
 		CurrentlyLoadedChunks[key]->SetHasDataChanged(true);
 	}
 	else

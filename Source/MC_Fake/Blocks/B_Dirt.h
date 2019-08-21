@@ -10,4 +10,6 @@ class MC_FAKE_API B_Dirt : public Block
 public:
 	B_Dirt();
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
+
+	virtual Block* Clone() override;
 };

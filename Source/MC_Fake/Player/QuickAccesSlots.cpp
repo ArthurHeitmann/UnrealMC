@@ -9,12 +9,12 @@ UQuickAccesSlots::UQuickAccesSlots()
 	SelectedItemId = 0;
 }
 
-void UQuickAccesSlots::SetSelecteddItemPointer(Item** NewItemPointer)
+/*void UQuickAccesSlots::SetSelecteddItemPointer(Item** NewItemPointer)
 {
 	SelectedItem = NewItemPointer;
-}
+}*/
 
-void UQuickAccesSlots::SetSelecteddItemSlotById(int32 id)
+FItemStack& UQuickAccesSlots::SetSelecteddItemSlotById(int32 id)
 {
 	if (id < Slots.Num() && id >= 0)
 		SelectedItemId = id;
@@ -23,17 +23,21 @@ void UQuickAccesSlots::SetSelecteddItemSlotById(int32 id)
 	else
 		SelectedItemId = -id % Slots.Num();
 
-	*SelectedItem = Slots[SelectedItemId].ItemS;
+	//*SelectedItem = Slots[SelectedItemId].ItemS;
+	return Slots[SelectedItemId];
 }
 
-void UQuickAccesSlots::NextSelectedItem()
+FItemStack& UQuickAccesSlots::NextSelectedItem()
 {
 	SelectedItemId = ++SelectedItemId % Slots.Num();
-	*SelectedItem = Slots[SelectedItemId].ItemS;
+	//*SelectedItem = Slots[SelectedItemId].ItemS;
+	return Slots[SelectedItemId];
 }
 
-void UQuickAccesSlots::PreviousSelectedItem()
+FItemStack& UQuickAccesSlots::PreviousSelectedItem()
 {
 	SelectedItemId = --SelectedItemId % Slots.Num();
-	*SelectedItem = Slots[SelectedItemId].ItemS;
+	//*SelectedItem = Slots[SelectedItemId].ItemS;
+
+	return Slots[SelectedItemId];
 }

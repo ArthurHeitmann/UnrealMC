@@ -24,4 +24,6 @@ public:
 	TArray<FVector2D> GetAllUVs() override;
 
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
+
+	virtual Block* Clone() override;
 };

@@ -7,15 +7,11 @@
 #include "../Items/ItemDrop.h"
 #include "../Items/ItemStack.h"
 #include "Components/BoxComponent.h"
+#include "../Items/ItemMeshComponent.h"
 
 UItemSystemComponent::UItemSystemComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-	/*ItemPickupBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Item Pickup Trigger"));
-	ItemPickupBox->SetupAttachment(this);*/
-	//ItemPickupBox->SetWorldLocation(GetComponentLocation());
-	//ItemPickupBox->AddRelativeLocation({ 0, 0, 25 });
 }
 
 
@@ -54,6 +50,12 @@ void UItemSystemComponent::InitPickUpBox(const FVector& BoxExtent)
 	ItemPickupBox->OnComponentBeginOverlap.AddDynamic(this, &UItemSystemComponent::ItemPickBoxTrigger);
 }
 
+void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform& Offset)
+{
+	SelectedItemMesh = NewObject<UItemMeshComponent>(AttachTo);
+	SelectedItemMesh->AddLocalTransform(Offset);
+}
+
 void UItemSystemComponent::InitQuickAccessSlots(int32 Num)
 {
 	if (Slot_QuickAcces)
@@ -61,6 +63,34 @@ void UItemSystemComponent::InitQuickAccessSlots(int32 Num)
 
 	Slot_QuickAcces = NewObject<UQuickAccesSlots>();
 	Slot_QuickAcces->SetNumSlots(Num);
+}
+
+void UItemSystemComponent::SelectItemSlot(int32 num)
+{
+	FItemStack& ItemS = Slot_QuickAcces->SetSelecteddItemSlotById(num);
+	*SelectedItemRef = &ItemS;
+}
+
+void UItemSystemComponent::SelectNextItem()
+{
+	FItemStack& ItemS = Slot_QuickAcces->NextSelectedItem();
+	*SelectedItemRef = &ItemS;
+}
+
+void UItemSystemComponent::SelectPreviousItem()
+{
+	FItemStack& ItemS = Slot_QuickAcces->PreviousSelectedItem();
+	*SelectedItemRef = &ItemS;
+}
+
+void UItemSystemComponent::SetSelectedItemPointer(FItemStack** NewISPointer)
+{
+	SelectedItemRef = NewISPointer;
+	if (Slot_QuickAcces)
+	{
+		FItemStack& FISR = Slot_QuickAcces->GetStackAt(0);
+		*SelectedItemRef = &FISR;
+	}
 }
 
 void UItemSystemComponent::ItemPickBoxTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

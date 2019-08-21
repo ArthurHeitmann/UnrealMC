@@ -34,3 +34,8 @@ void B_Leaves::OnBreak(UWorld* World, FVector Location)
 {
 }
 
+Block* B_Leaves::Clone()
+{
+	return new B_Leaves;
+}
+

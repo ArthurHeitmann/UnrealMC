@@ -10,17 +10,18 @@ class MC_FAKE_API UQuickAccesSlots : public UItemSlots
 
 private:
 	int32 SelectedItemId;
-	class Item** SelectedItem;
+	//TODO remove below
+	//class Item** SelectedItem;
 	
 public:
 	UQuickAccesSlots();
 
-	void SetSelecteddItemPointer(class Item** NewItemPointer);
+	//void SetSelecteddItemPointer(class Item** NewItemPointer);
 
-	void SetSelecteddItemSlotById(int32 id);
+	FItemStack& SetSelecteddItemSlotById(int32 id);
 
-	void NextSelectedItem();
+	FItemStack& NextSelectedItem();
 
-	void PreviousSelectedItem();
+	FItemStack& PreviousSelectedItem();
 
 };

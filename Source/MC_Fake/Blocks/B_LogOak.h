@@ -24,4 +24,5 @@ public:
 
 	TArray<FVector2D> GetAllUVs() override;
 
+	virtual Block* Clone() override;
 };

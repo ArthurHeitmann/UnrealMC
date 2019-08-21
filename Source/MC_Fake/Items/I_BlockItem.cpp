@@ -4,7 +4,7 @@
 
 I_BlockItem::I_BlockItem(class Block* Block)
 {
-	this->Block = Block;
+	this->BlockRef = Block;
 	Texture = Block->GetTexture();
 	Id = Block->GetBlockEnum();
 	ItemName = Block->GetName();
@@ -60,7 +60,7 @@ Item::PostUseTask I_BlockItem::OnItemUse(const FHitResult& HitPointData, AMcWorl
 			y++;*/
 		else if (HitPointData.ImpactNormal.Y < 0/* && !NegYApplied*/)
 			y--;
-	World->AddBlockSetTask(x, y, z, Block, 255);
+	World->AddBlockSetTask(x, y, z, BlockRef->Clone(), 255);
 
 	return { Decrement, 1 };
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Items/ItemStack.h"
 #include "LineTraceingInteractions.generated.h"
 
 
@@ -21,7 +22,7 @@ private:
 	class AChunk* HittingChunk;
 	class UCameraComponent* RayShootingCamera;
 	bool bIsHitting;
-	class Item** CurrentItem;
+	FItemStack** CurrentItem;
 	class AMcWorld* World;
 
 protected:
@@ -35,5 +36,5 @@ public:
 	void RightClickStart();
 	void RightClickEnd();
 	void SetCamera(class UCameraComponent* Cam);
-	void SetCurrentItem(class Item** SelectedItem);
+	void SetSelectedItemPointer(FItemStack** NewPointer);
 };

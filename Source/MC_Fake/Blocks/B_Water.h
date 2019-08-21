@@ -16,4 +16,6 @@ public:
 	B_Water();
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
 	bool IsBlockOpaque() override;
+
+	virtual Block* Clone() override;
 };

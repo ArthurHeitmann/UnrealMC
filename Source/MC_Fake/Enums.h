@@ -21,5 +21,8 @@ enum EItemActions {
 };
 
 enum EPostItemUseTask {
-	NoTask, Decrement, RemoveCharges, Destroy, Remove
+	NoTask, 
+	Decrement, //Remove N Items from Stack
+	RemoveCharges, //Remove N charges from Item
+	Destroy	//Destroy Item
 };

@@ -16,4 +16,6 @@ public:
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
 	bool IsBlockOpaque() override;
 	virtual void OnBreak(class UWorld* World, FVector Location) override;
+
+	virtual Block* Clone() override;
 };

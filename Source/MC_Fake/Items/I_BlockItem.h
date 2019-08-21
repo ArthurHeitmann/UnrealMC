@@ -11,7 +11,7 @@
 class MC_FAKE_API I_BlockItem : public Item
 {
 private:
-	class Block* Block;
+	class Block* BlockRef;
 
 public:
 	I_BlockItem(class Block* Block);

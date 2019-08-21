@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "DebugQuickCharacter.h"
 #include "MC_FakeGameModeBase.generated.h"
 
 /**
@@ -18,5 +19,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	AMC_FakeGameModeBase();
 	class UItemSlotsHUD* ItemSlotWidget;
+
+
 };
