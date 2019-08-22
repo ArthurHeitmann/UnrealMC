@@ -28,7 +28,6 @@ bool UItemSlot::Initialize()
 	NumberSlot->SetHorizontalAlignment(HAlign_Left);
 	NumberSlot->SetVerticalAlignment(VAlign_Bottom);
 	NumberSlot->SetPadding(FMargin(100, 50, 0, 0));
-
 	return true;
 }
 

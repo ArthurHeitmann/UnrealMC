@@ -64,6 +64,16 @@ bool Item::IsStackableWith(Item* OtherItem)
 	return ItemEnum == OtherItem->GetItemEnum();
 }
 
+bool Item::operator==(const Item& I)
+{
+	return ItemName == I.ItemName && ItemEnum == I.ItemEnum;
+}
+
+bool Item::operator!=(const Item& I)
+{
+	return !(*this == I);
+}
+
 Item::PostUseTask Item::OnItemUse(const FHitResult& HitPointData, AMcWorld* World)
 {
 	return { NoTask };

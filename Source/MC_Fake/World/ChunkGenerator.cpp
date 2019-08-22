@@ -138,7 +138,6 @@ void ChunkGenerator::Stage0()
 
 			for (int z = 0; z < 256; z++)
 			{
-				//TODO generate heightmap
 				int RelX = x + TurbulenceNoise->GetNoise(x + PosX, z) * 13.f;
 				int RelY = y + TurbulenceNoise->GetNoise(y + PosY, z) * 13.f;
 				float HeightMapValue;

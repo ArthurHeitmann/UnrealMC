@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/MeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "ItemStack.h"
 #include "ItemMeshComponent.generated.h"
 
@@ -11,14 +11,16 @@
  * 
  */
 UCLASS()
-class MC_FAKE_API UItemMeshComponent : public UMeshComponent
+class MC_FAKE_API UItemMeshComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
 protected:
-	UStaticMeshComponent* StaticMesh;
-	UMaterial* ItemMaterial;
-	Item* PreviousItem;
+	UPROPERTY(EditAnywhere)
+	//UStaticMeshComponent* StaticMesh;
+	UMaterialInstanceDynamic* ItemMaterial;
+	Item PreviousItem;
+	bool bWasPreviouseItemEmpty = true;
 	FItemStack** ItemPointer;
 
 	void OnItemChange();

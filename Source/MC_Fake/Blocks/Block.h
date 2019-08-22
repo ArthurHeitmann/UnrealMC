@@ -45,6 +45,8 @@ public:
 	float GetBreakTime();
 	virtual Block* Clone();
 	virtual TArray<uint8> GetBinaryData();
+	virtual bool operator==(const Block& B);
+	virtual bool operator!=(const Block& B);
 
 	virtual void OnPlace(class UWorld* World, FVector Location);
 	virtual void OnLeftclick(class UWorld* World, FVector Location);

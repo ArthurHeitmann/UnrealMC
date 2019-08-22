@@ -33,7 +33,7 @@ public:
 	virtual FItemStack& GetStackAt(int x);
 	virtual void SetNumSlots(int Num);
 	FItemStack PickupItemStack(FItemStack Items);
-	void DebugPrint(UWorld* world);
+	void UpdateSlotsUI(UWorld* world);
 
 	virtual ~UItemSlots() override;
 };

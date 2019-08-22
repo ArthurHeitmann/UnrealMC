@@ -9,32 +9,46 @@
 
 void UItemMeshComponent::OnItemChange()
 {
-	PreviousItem = (*ItemPointer)->ItemS;
-	UMaterialInstanceDynamic* TmpMaterial = UMaterialInstanceDynamic::Create(ItemMaterial, this);
-	TmpMaterial->SetTextureParameterValue(TEXT("Item Material"), (*ItemPointer)->ItemS->GetTexture());
-	StaticMesh->SetMaterial(0, TmpMaterial);
+	if ((*ItemPointer)->ItemCount > 0)
+	{
+		if (bWasPreviouseItemEmpty)
+			SetVisibility(true);
+
+		ItemMaterial->SetTextureParameterValue(TEXT("Item Material"), (*ItemPointer)->ItemS->GetTexture());
+		SetMaterial(0, ItemMaterial);
+	}
+	else
+	{
+		SetVisibility(false);
+		bWasPreviouseItemEmpty = true;
+	}
 }
 
 void UItemMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunc)
 {
-	if (PreviousItem != (*ItemPointer)->ItemS)
+	if (PreviousItem != (*(*ItemPointer)->ItemS))
 	{
-		PreviousItem = (*ItemPointer)->ItemS;
 		OnItemChange();
+		PreviousItem = *((*ItemPointer)->ItemS);
 	}
 }
 
-UItemMeshComponent::UItemMeshComponent() {
+UItemMeshComponent::UItemMeshComponent() 
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ItemMeshFinder(TEXT("StaticMesh'/Game/Meshes/Item/AutoItem_16px.AutoItem_16px'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> ItemMaterialFinder(TEXT("Material'/Game/Materials/Items/ItemMaterial.ItemMaterial'"));
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StatMesh"));
-	StaticMesh->SetStaticMesh(ItemMeshFinder.Object);
+	SetStaticMesh(ItemMeshFinder.Object);
+	ItemMaterial = UMaterialInstanceDynamic::Create(ItemMaterialFinder.Object, GetWorld());
+	//SetMaterial(0, ItemMaterial);
 	SetCollisionProfileName(TEXT("NoCollision"));
-	ItemMaterial = ItemMaterialFinder.Object;
 }
 
 void UItemMeshComponent::SetItem(FItemStack** NewItemStackPointer)
 {
 	ItemPointer = NewItemStackPointer;
+	PreviousItem = *((*ItemPointer)->ItemS);
 	OnItemChange();
+	
 }

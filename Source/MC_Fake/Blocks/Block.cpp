@@ -113,6 +113,16 @@ TArray<uint8> Block::GetBinaryData()
 	return out;
 }
 
+bool Block::operator==(const Block& B)
+{
+	return BlockName == B.BlockName && BlockEnum == B.BlockEnum;
+}
+
+bool Block::operator!=(const Block& B)
+{
+	return !(*this == B);
+}
+
 void Block::OnPlace(class UWorld* World, FVector Location)
 {
 }

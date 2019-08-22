@@ -4,7 +4,6 @@
 #include "Chunk.h"
 #include "Components/BoxComponent.h"
 #include "Blocks/B_Stone.h"
-//#include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
 #include "RuntimeMeshComponent.h"
 #include "PerlinNoise.h"
 #include "McWorld.h"
@@ -14,6 +13,7 @@
 #include "../Items/Item.h"
 #include "ChunkSaveGame.h"
 #include "../Misc/FileIO.h"
+#include "GameFramework/Character.h"
 
 AChunk::AChunk()
 {
@@ -28,8 +28,6 @@ AChunk::AChunk()
 	//ChunkEnterTriggerBox->bHiddenInGame = false;	
 	ChunkMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Chunk Procedural Mesh"));
 	ChunkMesh->SetupAttachment(GetRootComponent());
-	/*ChunkMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Chunk Procedural Mesh"));
-	ChunkMesh->SetupAttachment(GetRootComponent());*/
 }
 
 void AChunk::BeginPlay()
@@ -307,7 +305,6 @@ Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 		multiplier = Item->GetBreakingSpeed();
 	float BreakingTime = GetWorld()->GetDeltaSeconds() * multiplier;
 	HitBlock->OnBeginBreak(GetWorld(), (HitLocation + FVector(PosX, PosY, 0)) * 100);
-	//TODO delete old ref
 	ChunkBlockData[HitLocation.X][HitLocation.Y][HitLocation.Z] = McFWorld->GetBlock(BAir);
 	bHasDataChanged = true;
 	ABlockBreaking* BB = GetWorld()->SpawnActor<ABlockBreaking>(HitLocation * 100 + FVector(PosX * 100, PosY * 100, 0), FRotator::ZeroRotator);;
@@ -434,7 +431,6 @@ uint64 AChunk::GetLastTimeUpdated()
 void AChunk::SetLastTimeUpdated(float NewTime)
 {
 	LastTimeUpdated = NewTime;
-	//TODO update ticks
 }
 
 void AChunk::Tick(float Delta)

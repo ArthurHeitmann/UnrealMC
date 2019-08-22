@@ -7,6 +7,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Item.h"
 #include "Components/SphereComponent.h"
+#include "Components/TimelineComponent.h"
 
 // Sets default values
 AItemDrop::AItemDrop()
@@ -33,9 +34,22 @@ AItemDrop::AItemDrop()
 	SM->SetWorldScale3D({.25, .25, .25});
 	SM->SetVisibility(false);
 	InteractionZone->SetupAttachment(SM);
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(TEXT("CurveFloat'/Game/Animation/Curves/C_ItemPickup.C_ItemPickup'"));
+	FloatCurve = CurveFinder.Object;
 }
 
-void AItemDrop::ItemOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+void AItemDrop::TimelineUpdate(float val)
+{
+	SetActorLocation(FMath::Lerp<FVector>(StartLoc, TargetLoc->GetComponentLocation() + TargetOffset, val));
+}
+
+void AItemDrop::TimelineEnd()
+{
+	Destroy();
+}
+
+void AItemDrop::ItemOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (AItemDrop* Drop = Cast<AItemDrop>(OtherActor))
@@ -63,6 +77,22 @@ void AItemDrop::BeginPlay()
 	Super::BeginPlay();
 	
 	Mesh->WakeAllRigidBodies();
+
+
+	FOnTimelineFloat onTimelineCallback;
+	FOnTimelineEventStatic onTimelineFinishedCallback;
+
+	TLComp = NewObject<UTimelineComponent>(this, TEXT("Timeline for Item pickup anim"));
+	TLComp->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	BlueprintCreatedComponents.Add(TLComp);
+	TLComp->SetNetAddressable();
+	TLComp->SetLooping(false);
+	onTimelineCallback.BindUFunction(this, TEXT("TimelineUpdate"));
+	onTimelineFinishedCallback.BindUFunction(this, TEXT("TimelineEnd"));
+	TLComp->AddInterpFloat(FloatCurve, onTimelineCallback);
+	TLComp->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+	TLComp->RegisterComponent();
+
 }
 
 void AItemDrop::EndPlay(EEndPlayReason::Type Reason)
@@ -96,7 +126,10 @@ void AItemDrop::Tick(float DeltaTime)
 	Mesh->SetWorldRotation(currRot);
 	Mesh->AddLocalOffset({0, 0, sinf(TimeElapsed)});
 
-	TimeElapsed += DeltaTime; //TODO replace with timer
+	if (TLComp)
+		TLComp->TickComponent(DeltaTime, LEVELTICK_TimeOnly, nullptr);
+
+	TimeElapsed += DeltaTime; 
 	if (TimeElapsed > 60 * 2)
 		Destroy();
 }
@@ -112,11 +145,22 @@ void AItemDrop::SetItemStack(FItemStack NewItemStack)
 	ItemStack = NewItemStack;
 }
 
-void AItemDrop::UpdateItemCount(int32 NewCount)
+void AItemDrop::UpdateItemCount(int32 NewCount, USceneComponent* TargetLocation, FVector Offset)
 {
 	ItemStack.ItemCount = NewCount;
-	if (NewCount == 0)
+	if (NewCount == 0 && TargetLocation == nullptr)
 		Destroy();
+	else if (NewCount == 0 && TargetLocation)
+	{
+		SM->SetSimulatePhysics(false);
+		SM->SetCollisionProfileName(TEXT("NoCollision"));
+		InteractionZone->OnComponentBeginOverlap.RemoveAll(this);
+		StartLoc = GetActorLocation();
+		TargetLoc = TargetLocation;
+		TargetOffset = Offset;
+		TLComp->PlayFromStart();
+	}
+
 }
 
 void AItemDrop::IncreaseItemCount(int32 AdditionalCount)

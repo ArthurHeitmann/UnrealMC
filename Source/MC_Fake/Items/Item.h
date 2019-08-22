@@ -44,6 +44,9 @@ public:
 	int32 GetMaxStackCount();
 	virtual bool IsStackableWith(Item* OtherItem);
 
+	virtual bool operator==(const Item& I);
+	virtual bool operator!=(const Item& I);
+
 	virtual PostUseTask OnItemUse(const FHitResult& HitPointData, class AMcWorld* World);
 
 	class UTexture* GetTexture();

@@ -54,7 +54,7 @@ FItemStack UItemSlots::PickupItemStack(FItemStack Items)
 	return Items;
 }
 
-void UItemSlots::DebugPrint(UWorld* world)
+void UItemSlots::UpdateSlotsUI(UWorld* world)
 {
 	AMC_FakeGameModeBase* GM = Cast<AMC_FakeGameModeBase>(world->GetAuthGameMode());
 	for (int i = 0; i < Slots.Num(); i++)

@@ -34,8 +34,6 @@ private:
 	void RightClickEnd();
 	void Save();
 	void Load();
-	void SelectItem1();
-	void SelectItem2();
 	void SelectItem(int32 numb);
 	DECLARE_DELEGATE_OneParam(FSelectItemDelegate, int32);
 	void StartCrouch();

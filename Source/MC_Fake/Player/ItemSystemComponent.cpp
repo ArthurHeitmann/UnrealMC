@@ -8,10 +8,12 @@
 #include "../Items/ItemStack.h"
 #include "Components/BoxComponent.h"
 #include "../Items/ItemMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 UItemSystemComponent::UItemSystemComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -27,6 +29,8 @@ void UItemSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+
+	Slot_QuickAcces->UpdateSlotsUI(GetWorld());
 }
 
 FItemStack UItemSystemComponent::AddItemStackToInventory(FItemStack Items)
@@ -52,8 +56,10 @@ void UItemSystemComponent::InitPickUpBox(const FVector& BoxExtent)
 
 void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform& Offset)
 {
-	SelectedItemMesh = NewObject<UItemMeshComponent>(AttachTo);
-	SelectedItemMesh->AddLocalTransform(Offset);
+	SelectedItemMesh = NewObject<UItemMeshComponent>(this, TEXT("Selected Item Mesh Component"));
+	SelectedItemMesh->SetupAttachment(AttachTo);
+	SelectedItemMesh->RegisterComponent();
+	SelectedItemMesh->SetRelativeTransform(Offset);
 }
 
 void UItemSystemComponent::InitQuickAccessSlots(int32 Num)
@@ -61,7 +67,7 @@ void UItemSystemComponent::InitQuickAccessSlots(int32 Num)
 	if (Slot_QuickAcces)
 		return;
 
-	Slot_QuickAcces = NewObject<UQuickAccesSlots>();
+	Slot_QuickAcces = NewObject<UQuickAccesSlots>(this);
 	Slot_QuickAcces->SetNumSlots(Num);
 }
 
@@ -91,6 +97,8 @@ void UItemSystemComponent::SetSelectedItemPointer(FItemStack** NewISPointer)
 		FItemStack& FISR = Slot_QuickAcces->GetStackAt(0);
 		*SelectedItemRef = &FISR;
 	}
+	if (SelectedItemMesh)
+		SelectedItemMesh->SetItem(SelectedItemRef);
 }
 
 void UItemSystemComponent::ItemPickBoxTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -99,8 +107,6 @@ void UItemSystemComponent::ItemPickBoxTrigger(UPrimitiveComponent* OverlappedCom
 	{
 		int32 ItemsLeft = AddItemStackToInventory(Drop->GetItemStack())
 			.ItemCount;
-		Drop->UpdateItemCount(ItemsLeft);
-
-		Slot_QuickAcces->DebugPrint(GetWorld());
+		Drop->UpdateItemCount(ItemsLeft, UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetRootComponent(), {0, 0, -30});
 	}
 }

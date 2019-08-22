@@ -83,18 +83,6 @@ void ADebugQuickCharacter::Load()
 	Cast<AMcWorld>(FoundActors[0])->QuickLoad();
 }
 
-void ADebugQuickCharacter::SelectItem1()
-{
-	ItemSystem->SelectItemSlot(0);
-	//*CurrentItem = new I_Pickaxe_Stone();
-}
-
-void ADebugQuickCharacter::SelectItem2()
-{
-	ItemSystem->SelectItemSlot(1);
-	//*CurrentItem = new I_BlockItem(new B_Stone());
-}
-
 void ADebugQuickCharacter::SelectItem(int32 numb)
 {
 	ItemSystem->SelectItemSlot(numb);
@@ -116,8 +104,8 @@ void ADebugQuickCharacter::BeginPlay()
 
 	ItemSystem->InitQuickAccessSlots(10);
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
-	FVector TransOffset;
-	FRotator RotOffset(0, 120, -50);
+	FVector TransOffset(38, 45, -45);
+	FRotator RotOffset(0, 90, 0);
 	FVector ScaleTr(0.9, 0.9, 0.9);
 	ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset, TransOffset, ScaleTr));
 	FItemStack** SelectedItemPointer = new FItemStack*;
