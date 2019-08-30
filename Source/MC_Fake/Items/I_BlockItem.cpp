@@ -1,6 +1,7 @@
 #include "I_BlockItem.h"
 #include "../Blocks/Block.h"
 #include "Misc/McStaticFunctions.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 I_BlockItem::I_BlockItem(class Block* Block)
 {
@@ -8,6 +9,7 @@ I_BlockItem::I_BlockItem(class Block* Block)
 	Texture = Block->GetTexture();
 	Id = Block->GetBlockEnum();
 	ItemName = Block->GetName();
+	bCustomDisplayMesh = true;
 
 	switch (Block->GetBlockEnum())
 	{
@@ -63,4 +65,13 @@ Item::PostUseTask I_BlockItem::OnItemUse(const FHitResult& HitPointData, AMcWorl
 	World->AddBlockSetTask(x, y, z, BlockRef->Clone(), 255);
 
 	return { Decrement, 1 };
+}
+
+void I_BlockItem::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TArray<FVector2D>& UVs, TArray<int32>& Tris, TArray<FVector>& Normals, UMaterial*& Mat)
+{
+	Verts = BlockRef->GetAllVertecies(0, 0, 0);
+	UVs = BlockRef->GetAllUVs();
+	Tris = BlockRef->GetAllTrainglesFrom();
+	Normals = BlockRef->GetAllNormals();
+	Mat = (UMaterial*) BlockRef->GetMaterial(Base);
 }

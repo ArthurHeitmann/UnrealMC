@@ -1,4 +1,4 @@
-
+#pragma once
 #include "CoreMinimal.h"
 #include "ItemSlots.h"
 #include "QuickAccesSlots.generated.h"

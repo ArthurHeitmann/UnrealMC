@@ -54,12 +54,13 @@ void UItemSystemComponent::InitPickUpBox(const FVector& BoxExtent)
 	ItemPickupBox->OnComponentBeginOverlap.AddDynamic(this, &UItemSystemComponent::ItemPickBoxTrigger);
 }
 
-void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform& Offset)
+void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform & Offset1, const FTransform & Offset2)
 {
 	SelectedItemMesh = NewObject<UItemMeshComponent>(this, TEXT("Selected Item Mesh Component"));
 	SelectedItemMesh->SetupAttachment(AttachTo);
 	SelectedItemMesh->RegisterComponent();
-	SelectedItemMesh->SetRelativeTransform(Offset);
+	SelectedItemMesh->SetItemMeshOffset(Offset1);
+	SelectedItemMesh->SetCustomMeshOffset(Offset2);
 }
 
 void UItemSystemComponent::InitQuickAccessSlots(int32 Num)

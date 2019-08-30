@@ -104,10 +104,15 @@ void ADebugQuickCharacter::BeginPlay()
 
 	ItemSystem->InitQuickAccessSlots(10);
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
-	FVector TransOffset(38, 45, -45);
-	FRotator RotOffset(0, 90, 0);
-	FVector ScaleTr(0.9, 0.9, 0.9);
-	ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset, TransOffset, ScaleTr));
+
+	FVector TransOffset1(38, 45, -45);
+	FRotator RotOffset1(0, 90, 0);
+	FVector ScaleTr1(0.9, 0.9, 0.9);
+
+	FVector TransOffset2(27, 28, -34);
+	FRotator RotOffset2(0, 315, 0);
+	FVector ScaleTr2(0.25, 0.25, 0.25);
+	ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset1, TransOffset1, ScaleTr1), FTransform(RotOffset2, TransOffset2, ScaleTr2));
 	FItemStack** SelectedItemPointer = new FItemStack*;
 	ItemSystem->SetSelectedItemPointer(SelectedItemPointer);
 	LineTracer->SetSelectedItemPointer(SelectedItemPointer);

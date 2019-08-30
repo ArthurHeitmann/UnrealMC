@@ -12,6 +12,7 @@ Item::Item()
 	bIsStackable = true;
 	ItemEnum = INoItem;
 	Texture = nullptr;
+	bCustomDisplayMesh = false;
 }
 
 FName Item::GetName()
@@ -62,6 +63,15 @@ int32 Item::GetMaxStackCount()
 bool Item::IsStackableWith(Item* OtherItem)
 {
 	return ItemEnum == OtherItem->GetItemEnum();
+}
+
+bool Item::HasCutomDisplayMesh()
+{
+	return bCustomDisplayMesh;
+}
+
+void Item::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TArray<FVector2D>& UVs, TArray<int32>& Tris, TArray<FVector>& Normals, UMaterial *& Mat)
+{
 }
 
 bool Item::operator==(const Item& I)

@@ -18,7 +18,7 @@ public:
 
 	FItemStack AddItemStackToInventory(FItemStack Items);
 	void InitPickUpBox(const FVector& BoxExtent);
-	void InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform& Offset = FTransform());
+	void InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform & Offset1 = FTransform(), const FTransform & Offset2 = FTransform());
 	void InitQuickAccessSlots(int32 Num);
 
 	void SelectItemSlot(int32 num);

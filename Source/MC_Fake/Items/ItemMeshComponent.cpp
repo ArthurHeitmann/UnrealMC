@@ -11,15 +11,36 @@ void UItemMeshComponent::OnItemChange()
 {
 	if ((*ItemPointer)->ItemCount > 0)
 	{
+		bool bCustomMesh = (*ItemPointer)->ItemS->HasCutomDisplayMesh();
 		if (bWasPreviouseItemEmpty)
-			SetVisibility(true);
+		{
+			if (bCustomMesh)
+				CustomMesh->SetVisibility(true);
+			else
+				ItemMesh->SetVisibility(true);
+		}
 
-		ItemMaterial->SetTextureParameterValue(TEXT("Item Material"), (*ItemPointer)->ItemS->GetTexture());
-		SetMaterial(0, ItemMaterial);
+		if (bCustomMesh)
+		{
+			TArray<FVector> Verts;
+			TArray<FVector2D> UVs;
+			TArray<int32> Tris;
+			TArray<FVector> Normals;
+			UMaterial* Mat;
+			(*ItemPointer)->ItemS->GetCustomDisplayMesh(CustomMesh, Verts, UVs, Tris, Normals, Mat);
+			CustomMesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
+			CustomMesh->SetMaterial(0, Mat);
+		}
+		else
+		{
+			ItemMaterial->SetTextureParameterValue(TEXT("Item Material"), (*ItemPointer)->ItemS->GetTexture());
+			ItemMesh->SetMaterial(0, ItemMaterial);
+		}
 	}
 	else
 	{
-		SetVisibility(false);
+		ItemMesh->SetVisibility(false);
+		CustomMesh->SetVisibility(false);
 		bWasPreviouseItemEmpty = true;
 	}
 }
@@ -30,7 +51,27 @@ void UItemMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	{
 		OnItemChange();
 		PreviousItem = *((*ItemPointer)->ItemS);
+		auto l = GetComponentLocation();
+		UE_LOG(LogTemp, Warning, TEXT("x %f y %f z %f"), l.X, l.Y, l.Z);
 	}
+}
+
+void UItemMeshComponent::BeginPlay()
+{
+	//FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false);
+	//CustomMesh->AttachToComponent(this, Rules);
+	//ItemMesh->AttachToComponent(this, Rules);
+	auto a = GetOwner();
+	ItemMesh = NewObject<UStaticMeshComponent>(this, TEXT("Item Mesh"));
+	CustomMesh = NewObject<URuntimeMeshComponent>(this, TEXT("Custom Mesh"));
+	ItemMesh->SetupAttachment(this);
+	CustomMesh->SetupAttachment(this);
+	ItemMesh->RegisterComponent();
+	CustomMesh->RegisterComponent();
+	ItemMesh->SetStaticMesh(TmpItemMesh);
+	ItemMaterial = UMaterialInstanceDynamic::Create(TmpItemMaterial, this);
+	ItemMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	CustomMesh->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 UItemMeshComponent::UItemMeshComponent() 
@@ -39,10 +80,8 @@ UItemMeshComponent::UItemMeshComponent()
 	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ItemMeshFinder(TEXT("StaticMesh'/Game/Meshes/Item/AutoItem_16px.AutoItem_16px'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> ItemMaterialFinder(TEXT("Material'/Game/Materials/Items/ItemMaterial.ItemMaterial'"));
-	SetStaticMesh(ItemMeshFinder.Object);
-	ItemMaterial = UMaterialInstanceDynamic::Create(ItemMaterialFinder.Object, GetWorld());
-	//SetMaterial(0, ItemMaterial);
-	SetCollisionProfileName(TEXT("NoCollision"));
+	TmpItemMesh = ItemMeshFinder.Object;
+	TmpItemMaterial = ItemMaterialFinder.Object;
 }
 
 void UItemMeshComponent::SetItem(FItemStack** NewItemStackPointer)
@@ -51,4 +90,14 @@ void UItemMeshComponent::SetItem(FItemStack** NewItemStackPointer)
 	PreviousItem = *((*ItemPointer)->ItemS);
 	OnItemChange();
 	
+}
+
+void UItemMeshComponent::SetItemMeshOffset(const FTransform & Offset)
+{
+	ItemMesh->SetRelativeTransform(Offset);
+}
+
+void UItemMeshComponent::SetCustomMeshOffset(const FTransform & Offset)
+{
+	CustomMesh->SetRelativeTransform(Offset);
 }

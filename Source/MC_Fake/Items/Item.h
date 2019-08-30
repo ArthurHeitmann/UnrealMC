@@ -29,6 +29,7 @@ protected:
 	bool bIsStackable;
 	int32 MaxStackCount;
 	UTexture* Texture;
+	bool bCustomDisplayMesh;
 
 public:
 	Item();
@@ -43,6 +44,9 @@ public:
 	bool IsItemStackable();
 	int32 GetMaxStackCount();
 	virtual bool IsStackableWith(Item* OtherItem);
+	bool HasCutomDisplayMesh();
+	virtual void GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TArray<FVector2D>& UVs, 
+		TArray<int32>& Tris, TArray<FVector>& Normals, UMaterial*& Mat);
 
 	virtual bool operator==(const Item& I);
 	virtual bool operator!=(const Item& I);
