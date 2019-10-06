@@ -25,14 +25,14 @@ protected:
 	UMaterial* TmpItemMaterial;
 	Item PreviousItem;
 	bool bWasPreviouseItemEmpty = true;
-	FItemStack** ItemPointer;
+	FItemStack const ** ItemPointer;
 
 	void OnItemChange();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunc) override;
 	virtual void BeginPlay() override;
 public:
 	UItemMeshComponent();
-	void SetItem(FItemStack** NewItemStackPointer);
+	void SetItem(FItemStack const ** NewItemStackPointer);
 
 	void SetItemMeshOffset(const FTransform & Offset);
 	void SetCustomMeshOffset(const FTransform & Offset);

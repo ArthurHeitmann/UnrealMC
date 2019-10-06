@@ -15,14 +15,9 @@ B_LogOak::B_LogOak()
 	BlockEnum = BLog_Oak;
 	BreakTime = 3;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/log_oak.log_oak'"));
+	//static ConstructorHelpers::FObjectFinder<UTexture> TextureBmpObj(TEXT("Texture2D'/Game/Materials/Textures/log_oak_BMP.log_oak_BMP'"));
 	Texture = TextureObj.Object;
-}
-
-UMaterialInstanceDynamic* B_LogOak::GetMaterial(UObject* UObj)
-{
-	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
-	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
-	return OutMat;
+	//TextureBMP = TextureBmpObj.Object;
 }
 
 TArray<FVector2D> B_LogOak::GetTopUVs()

@@ -12,7 +12,8 @@
 #include "Blocks/B_Stone.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
-#include "Player/ItemSystemComponent.h"
+#include "Player/Inventory/ItemSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADebugQuickCharacter::ADebugQuickCharacter()
@@ -98,11 +99,25 @@ void ADebugQuickCharacter::EndCrouch()
 	UnCrouch();
 }
 
+void ADebugQuickCharacter::ToggleChunkBoarders()
+{
+	UWorld* W = GetWorld();
+	if (!W)
+		return;
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(W, AChunk::StaticClass(), FoundActors);
+	for (AActor* Chunk : FoundActors)
+	{
+		Cast<AChunk>(Chunk)->ToggleChunkBorders();
+	}
+}
+
 void ADebugQuickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ItemSystem->InitQuickAccessSlots(10);
+	
+	ItemSystem->InitItemSlots(5);
+	ItemSystem->InitUI(GetWorld()->GetAuthGameMode());
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
 
 	FVector TransOffset1(38, 45, -45);
@@ -112,9 +127,9 @@ void ADebugQuickCharacter::BeginPlay()
 	FVector TransOffset2(27, 28, -34);
 	FRotator RotOffset2(0, 315, 0);
 	FVector ScaleTr2(0.25, 0.25, 0.25);
-	ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset1, TransOffset1, ScaleTr1), FTransform(RotOffset2, TransOffset2, ScaleTr2));
-	FItemStack** SelectedItemPointer = new FItemStack*;
-	ItemSystem->SetSelectedItemPointer(SelectedItemPointer);
+	//ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset1, TransOffset1, ScaleTr1), FTransform(RotOffset2, TransOffset2, ScaleTr2));
+	FItemStack ** SelectedItemPointer = new FItemStack*;
+	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
 	LineTracer->SetSelectedItemPointer(SelectedItemPointer);
 }
 
@@ -149,6 +164,7 @@ void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction<FSelectItemDelegate>(TEXT("Item10"),IE_Pressed, this, &ADebugQuickCharacter::SelectItem, 9);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ADebugQuickCharacter::StartCrouch);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ADebugQuickCharacter::EndCrouch);
+	PlayerInputComponent->BindAction(TEXT("ShowChunkBoarders"), IE_Pressed, this, &ADebugQuickCharacter::ToggleChunkBoarders);
 
 	PlayerInputComponent->BindAxis(TEXT("Move Forward"), this, &ADebugQuickCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("Move Right"), this, &ADebugQuickCharacter::MoveRight);

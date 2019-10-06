@@ -3,11 +3,11 @@
 
 #include "ItemSystemComponent.h"
 #include "ItemSlots.h"
-#include "QuickAccesSlots.h"
-#include "../Items/ItemDrop.h"
-#include "../Items/ItemStack.h"
+#include "../../UI/UI_QuickAccessSlots.h"
+#include "../../Items/ItemDrop.h"
+#include "../../Items/ItemStack.h"
 #include "Components/BoxComponent.h"
-#include "../Items/ItemMeshComponent.h"
+#include "../../Items/ItemMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
@@ -24,21 +24,20 @@ void UItemSystemComponent::BeginPlay()
 }
 
 
-// Called every frame
 void UItemSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
-	Slot_QuickAcces->UpdateSlotsUI(GetWorld());
+	//QuickAccessSlots->UpdateSlotsUI(GetWorld());
 }
 
 FItemStack UItemSystemComponent::AddItemStackToInventory(FItemStack Items)
 {
-	if (!Slot_QuickAcces)
+	if (!QuickAccessSlots)
 		return Items;
 
-	return Slot_QuickAcces->PickupItemStack(Items);
+	return Slot_BasicInventory->PickupItemStack(Items);
 }
 
 void UItemSystemComponent::InitPickUpBox(const FVector& BoxExtent)
@@ -63,39 +62,49 @@ void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo, const
 	SelectedItemMesh->SetCustomMeshOffset(Offset2);
 }
 
-void UItemSystemComponent::InitQuickAccessSlots(int32 Num)
+void UItemSystemComponent::InitItemSlots(int32 Num)
 {
-	if (Slot_QuickAcces)
+	if (Slot_BasicInventory)
 		return;
 
-	Slot_QuickAcces = NewObject<UQuickAccesSlots>(this);
-	Slot_QuickAcces->SetNumSlots(Num);
+	Slot_BasicInventory = NewObject<UItemSlots>(this);
+	Slot_BasicInventory->SetNumSlots(Num);
+}
+
+void UItemSystemComponent::InitUI(AGameModeBase * Gamemode)
+{
+	if (!Slot_BasicInventory && QuickAccessSlots)
+		return;
+	//Check if getWorld works and Remove Gamemode Parameter
+	QuickAccessSlots = CreateWidget<UUI_QuickAccessSlots>(GetWorld(), UUI_QuickAccessSlots::StaticClass(), TEXT("Quick Access Slots"));
+	QuickAccessSlots->SetInventorySlots(Slot_BasicInventory);
+	QuickAccessSlots->AddToViewport();
 }
 
 void UItemSystemComponent::SelectItemSlot(int32 num)
 {
-	FItemStack& ItemS = Slot_QuickAcces->SetSelecteddItemSlotById(num);
-	*SelectedItemRef = &ItemS;
+	/*FItemStack& ItemS = QuickAccessSlots->SetSelecteddItemSlotById(num);
+	*SelectedItemRef = &ItemS;*/
 }
 
 void UItemSystemComponent::SelectNextItem()
 {
-	FItemStack& ItemS = Slot_QuickAcces->NextSelectedItem();
-	*SelectedItemRef = &ItemS;
+	/*FItemStack& ItemS = QuickAccessSlots->NextSelectedItem();
+	*SelectedItemRef = &ItemS;*/
 }
 
 void UItemSystemComponent::SelectPreviousItem()
 {
-	FItemStack& ItemS = Slot_QuickAcces->PreviousSelectedItem();
-	*SelectedItemRef = &ItemS;
+	/*FItemStack& ItemS = QuickAccessSlots->PreviousSelectedItem();
+	*SelectedItemRef = &ItemS;*/
 }
 
-void UItemSystemComponent::SetSelectedItemPointer(FItemStack** NewISPointer)
+void UItemSystemComponent::SetSelectedItemPointer(FItemStack const ** NewISPointer)
 {
 	SelectedItemRef = NewISPointer;
-	if (Slot_QuickAcces)
+	if (QuickAccessSlots)
 	{
-		FItemStack& FISR = Slot_QuickAcces->GetStackAt(0);
+		FItemStack& FISR = Slot_BasicInventory->GetStackAt(0);
 		*SelectedItemRef = &FISR;
 	}
 	if (SelectedItemMesh)

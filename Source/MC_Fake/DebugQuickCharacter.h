@@ -38,6 +38,7 @@ private:
 	DECLARE_DELEGATE_OneParam(FSelectItemDelegate, int32);
 	void StartCrouch();
 	void EndCrouch();
+	void ToggleChunkBoarders();
 
 protected:
 	virtual void BeginPlay() override;

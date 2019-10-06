@@ -22,7 +22,7 @@ private:
 	class AChunk* HittingChunk;
 	class UCameraComponent* RayShootingCamera;
 	bool bIsHitting;
-	FItemStack** CurrentItem;
+	FItemStack ** CurrentItem;
 	class AMcWorld* World;
 
 protected:
@@ -36,5 +36,5 @@ public:
 	void RightClickStart();
 	void RightClickEnd();
 	void SetCamera(class UCameraComponent* Cam);
-	void SetSelectedItemPointer(FItemStack** NewPointer);
+	void SetSelectedItemPointer(FItemStack ** NewPointer);
 };

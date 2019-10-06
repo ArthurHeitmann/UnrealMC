@@ -8,6 +8,7 @@
 
 class MC_FAKE_API Block
 {
+	
 
 	struct ItemDrops { float Chance; class Item* Item; };
 
@@ -20,6 +21,7 @@ protected:
 	TEnumAsByte<EItemActions> BreakingAction;
 	TEnumAsByte<EAllBlocks> BlockEnum;
 	class UTexture* Texture;
+	class UTexture* TextureBMP;
 	float BreakTime;
 	TArray<ItemDrops> PossibleItemDrops;
 
@@ -41,6 +43,7 @@ public:
 	virtual TEnumAsByte<EItemActions> GetBreakingAction();
 	virtual class UMaterialInstanceDynamic* GetMaterial(UObject* UObj);
 	virtual UTexture* GetTexture();
+	virtual UTexture* GetTextureBMP();
 	//virtual class UTexture* GetTexture();
 	float GetBreakTime();
 	virtual Block* Clone();

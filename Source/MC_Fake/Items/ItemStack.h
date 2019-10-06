@@ -15,12 +15,12 @@ struct FItemStack {
 	GENERATED_BODY()
 
 	//UPROPERTY()
-	Item* ItemS;
 	UPROPERTY(BlueprintReadOnly)
 	int32 ItemCount;
+	Item* ItemS;
 
-	FItemStack() : ItemS(new I_NoItem), ItemCount(0) {}
-	FItemStack(Item* I, int32 Num) : ItemS(I), ItemCount(Num) {}
+	FItemStack() : ItemCount(0), ItemS(nullptr) {}
+	FItemStack(Item* I, int32 Num) : ItemCount(Num), ItemS(I) {}
 	~FItemStack() {
 		UE_LOG(LogTemp, Warning, TEXT(""));
 	}

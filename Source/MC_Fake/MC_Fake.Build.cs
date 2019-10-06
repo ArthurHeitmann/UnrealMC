@@ -12,7 +12,7 @@ public class MC_Fake : ModuleRules
             "CoreUObject",
             "Engine",
             "InputCore",
-            "ProceduralMeshComponent",
+            //"ProceduralMeshComponent",
             "EngineSettings",
             "UnrealFastNoisePlugin",
             "UMG"
@@ -20,10 +20,10 @@ public class MC_Fake : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "RenderCore", "RHI", "RuntimeMeshComponent" });
 
-        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-//#ifndef UE_4_22_OR_LATER
-//        PublicDependencyModuleNames.AddRange(new string[] { "ShaderCore" });
-//#endif
+        //PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        //#ifndef UE_4_22_OR_LATER
+        //        PublicDependencyModuleNames.AddRange(new string[] { "ShaderCore" });
+        //#endif
         /*ublicDependencyModuleNames.AddRange(
             new string[]
             {
@@ -37,7 +37,7 @@ public class MC_Fake : ModuleRules
         );*/
 
         // Uncomment if you are using Slate UI
-        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         // Uncomment if you are using online features
         // PrivateDependencyModuleNames.Add("OnlineSubsystem");

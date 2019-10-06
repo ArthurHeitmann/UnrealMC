@@ -19,14 +19,9 @@ B_Stone::B_Stone()
 	BreakingAction = APickaxe;
 	BreakTime = 7.5f;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/stone.stone'"));
+	//static ConstructorHelpers::FObjectFinder<UTexture> TextureBmpObj(TEXT("Texture2D'/Game/Materials/Textures/stone_BMP.stone_BMP'"));
 	Texture = TextureObj.Object;
-}
-
-UMaterialInstanceDynamic* B_Stone::GetMaterial(UObject* UObj)
-{
-	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(Block::BlockMaterial, UObj);
-	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
-	return OutMat;
+	//TextureBMP = TextureBmpObj.Object;
 }
 
 Block* B_Stone::Clone()

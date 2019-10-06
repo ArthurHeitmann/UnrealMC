@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Items/ItemStack.h"
-#include "ItemSlot.h"
+#include "UI_ItemSlot.h"
 #include "ItemSlotsHUD.generated.h"
 
 /**
@@ -19,7 +19,7 @@ class MC_FAKE_API UItemSlotsHUD : public UUserWidget
 private:
 	class UHorizontalBox* SlotContainer;
 	class UCanvasPanelSlot* ContentSlot;
-	TArray<UItemSlot*> Slots;
+	TArray<UUI_ItemSlot*> Slots;
 	virtual void NativeConstruct() override;
 
 public:

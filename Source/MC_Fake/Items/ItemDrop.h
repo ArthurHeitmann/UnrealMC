@@ -41,7 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* SM;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UProceduralMeshComponent* Mesh;
+	class URuntimeMeshComponent* Mesh;
 
 	AItemDrop();
 	virtual void Tick(float DeltaTime) override;

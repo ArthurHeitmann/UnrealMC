@@ -10,10 +10,9 @@
  */
 class MC_FAKE_API B_LogOak : public Block
 {
+	
 public:
 	B_LogOak();
-
-	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
 
 	TArray<FVector2D> GetTopUVs() override;
 	TArray<FVector2D> GetFrontUVs() override;

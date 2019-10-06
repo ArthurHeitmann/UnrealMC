@@ -10,6 +10,7 @@
  */
 class MC_FAKE_API B_Air : public Block
 {
+	
 public:
 	static B_Air* AirRef;
 

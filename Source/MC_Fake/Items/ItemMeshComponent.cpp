@@ -47,10 +47,10 @@ void UItemMeshComponent::OnItemChange()
 
 void UItemMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunc)
 {
-	if (PreviousItem != (*(*ItemPointer)->ItemS))
+	if ((*ItemPointer)->ItemS && PreviousItem.operator!=(*(*ItemPointer)->ItemS))
 	{
 		OnItemChange();
-		PreviousItem = *((*ItemPointer)->ItemS);
+		PreviousItem = *(*ItemPointer)->ItemS;
 		auto l = GetComponentLocation();
 		UE_LOG(LogTemp, Warning, TEXT("x %f y %f z %f"), l.X, l.Y, l.Z);
 	}
@@ -58,6 +58,8 @@ void UItemMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 void UItemMeshComponent::BeginPlay()
 {
+	Super::BeginPlay();
+
 	//FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false);
 	//CustomMesh->AttachToComponent(this, Rules);
 	//ItemMesh->AttachToComponent(this, Rules);
@@ -68,6 +70,8 @@ void UItemMeshComponent::BeginPlay()
 	CustomMesh->SetupAttachment(this);
 	ItemMesh->RegisterComponent();
 	CustomMesh->RegisterComponent();
+	ItemMesh->SetRelativeTransform(GetComponentTransform());
+	CustomMesh->SetRelativeTransform(GetComponentTransform());
 	ItemMesh->SetStaticMesh(TmpItemMesh);
 	ItemMaterial = UMaterialInstanceDynamic::Create(TmpItemMaterial, this);
 	ItemMesh->SetCollisionProfileName(TEXT("NoCollision"));
@@ -84,20 +88,21 @@ UItemMeshComponent::UItemMeshComponent()
 	TmpItemMaterial = ItemMaterialFinder.Object;
 }
 
-void UItemMeshComponent::SetItem(FItemStack** NewItemStackPointer)
+void UItemMeshComponent::SetItem(FItemStack const ** NewItemStackPointer)
 {
 	ItemPointer = NewItemStackPointer;
-	PreviousItem = *((*ItemPointer)->ItemS);
+	PreviousItem = *(*ItemPointer)->ItemS;
 	OnItemChange();
 	
 }
 
 void UItemMeshComponent::SetItemMeshOffset(const FTransform & Offset)
 {
-	ItemMesh->SetRelativeTransform(Offset);
+	ItemMesh->AddLocalTransform(Offset);
+	CustomMesh->AddLocalTransform(Offset);
 }
 
 void UItemMeshComponent::SetCustomMeshOffset(const FTransform & Offset)
 {
-	CustomMesh->SetRelativeTransform(Offset);
+	CustomMesh->AddLocalTransform(Offset);
 }

@@ -2,7 +2,7 @@
 
 
 #include "ItemDrop.h"
-#include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
+#include "RuntimeMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Item.h"
@@ -16,7 +16,7 @@ AItemDrop::AItemDrop()
 	PrimaryActorTick.bCanEverTick = true;
 	InteractionZone = CreateDefaultSubobject<USphereComponent>(TEXT("ItemDrop Interaction Zone"));
 	InteractionZone->SetSphereRadius(0);
-	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Item Drop Mesh"));
+	Mesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Item Drop Mesh"));
 	SM = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeFinder(TEXT("StaticMesh'/Game/Meshes/Misc/cube.cube'"));
 	SM->SetStaticMesh(CubeFinder.Object);
@@ -118,13 +118,12 @@ void AItemDrop::Tick(float DeltaTime)
 		InitComplete = true;
 	}
 
-	FRotator currRot = Mesh->GetComponentRotation();
+	/*FRotator currRot = Mesh->GetComponentRotation();
 	currRot.Pitch = 0;
 	currRot.Roll = 0;
 	currRot.Yaw += FMath::Fmod(45.f * DeltaTime, 360);
 	Mesh->SetWorldRotation(currRot);
-	Mesh->SetWorldRotation(currRot);
-	Mesh->AddLocalOffset({0, 0, sinf(TimeElapsed)});
+	Mesh->AddLocalOffset({0, 0, sinf(TimeElapsed)});*/
 
 	if (TLComp)
 		TLComp->TickComponent(DeltaTime, LEVELTICK_TimeOnly, nullptr);
@@ -136,7 +135,7 @@ void AItemDrop::Tick(float DeltaTime)
 
 void AItemDrop::SetMesh(const TArray<FVector>& Verts, const TArray<int32>& Tris, const TArray<FVector2D>& UVs, const TArray<FVector>& Normals, UMaterialInstanceDynamic* Material)
 {
-	Mesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FProcMeshTangent>(), false);
+	Mesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
 	Mesh->SetMaterial(0, Material);
 }
 

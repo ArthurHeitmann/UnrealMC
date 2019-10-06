@@ -7,6 +7,7 @@
 #include "HorizontalBoxSlot.h"
 #include "CanvasPanel.h"
 #include "CanvasPanelSlot.h"
+#include "../Items/I_NoItem.h"
 
 void UItemSlotsHUD::NativeConstruct()
 {
@@ -33,26 +34,18 @@ void UItemSlotsHUD::SetSize(int32 Count)
 	ContentSlot->SetAutoSize(true);
 	Slots.Empty();
 	Slots.Reserve(Count);
-	FVector2D screenSize;
 	for (int i = 0; i < Count; ++i)
 	{
 		FString SlotName("Slot ");
 		SlotName += FString::FromInt(i);
-		UItemSlot* NewSlot = CreateWidget<UItemSlot>(GetWorld(), UItemSlot::StaticClass(), *SlotName);
-		NewSlot->SetItemStack({});
+		UUI_ItemSlot* NewSlot = CreateWidget<UUI_ItemSlot>(GetWorld(), UUI_ItemSlot::StaticClass(), *SlotName);
+		NewSlot->SetItemStack({ new I_NoItem(), 0 });
 		Slots.Add(NewSlot);
 		UHorizontalBoxSlot* HSlot = SlotContainer->AddChildToHorizontalBox(NewSlot);
-		HSlot->SetPadding(FMargin(10));
-		FGeometry geom = NewSlot->GetCachedGeometry();
-		FVector2D locSize = geom.GetLocalSize();
-		FVector2D screenPos = geom.LocalToAbsolute(FVector2D(0, 0));
-		screenSize = geom.LocalToAbsolute(locSize) - screenPos;
+		//HSlot->SetPadding(FMargin(10));
 	}
-	
 
-	FVector2D Dimensions = ContentSlot->GetSize();
-	//ContentSlot->SetAutoSize(false);
-	ContentSlot->SetPosition({ -500, -150.f });
+	ContentSlot->SetPosition({ Count * (-75.f), -150.f });
 }
 
 void UItemSlotsHUD::SetSlotItemStack(int32 SlotId, const FItemStack& NewItemStack)

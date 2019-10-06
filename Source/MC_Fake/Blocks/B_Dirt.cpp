@@ -18,13 +18,6 @@ B_Dirt::B_Dirt()
 	Texture = TextureObj.Object;
 }
 
-UMaterialInstanceDynamic* B_Dirt::GetMaterial(UObject* UObj)
-{
-	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
-	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
-	return OutMat;
-}
-
 Block* B_Dirt::Clone()
 {
 	return new B_Dirt();

@@ -19,4 +19,6 @@ public:
 
 	virtual void GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TArray<FVector2D>& UVs, 
 		TArray<int32>& Tris, TArray<FVector>& Normals, UMaterial*& Mat) override;
+
+	virtual ~I_BlockItem() override;
 };

@@ -7,10 +7,6 @@
 void AMC_FakeGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ItemSlotWidget = CreateWidget<UItemSlotsHUD>(GetWorld());
-	ItemSlotWidget->SetSize(10);
-	ItemSlotWidget->AddToViewport();
 }
 
 AMC_FakeGameModeBase::AMC_FakeGameModeBase()

@@ -29,6 +29,9 @@ Block::Block()
 		static ConstructorHelpers::FObjectFinder<UMaterial> MaterialInstanceObj(TEXT("Material'/Game/Materials/Blocks/M_BlockDefault.M_BlockDefault'"));
 		Block::BlockMaterial = MaterialInstanceObj.Object;
 	}
+
+	Texture = nullptr;
+	TextureBMP = nullptr;
 }
 
 Block::~Block()
@@ -161,12 +164,22 @@ TEnumAsByte<EItemActions> Block::GetBreakingAction()
 
 UMaterialInstanceDynamic* Block::GetMaterial(UObject* UObj)
 {
-	return UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
+	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
+	if (Texture)
+		OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
+	if (TextureBMP)
+		OutMat->SetTextureParameterValue(TEXT("Bump Texture"), TextureBMP);
+	return OutMat;
 }
 
 UTexture* Block::GetTexture()
 {
 	return Texture;
+}
+
+UTexture* Block::GetTextureBMP()
+{
+	return TextureBMP;
 }
 
 TArray<FVector> Block::GetTopVertecies(float x, float y, float z)

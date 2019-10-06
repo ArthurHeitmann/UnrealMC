@@ -18,13 +18,6 @@ B_Leaves::B_Leaves()
 	Texture = TextureObj.Object;
 }
 
-UMaterialInstanceDynamic* B_Leaves::GetMaterial(UObject* UObj)
-{
-	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
-	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
-	return OutMat;
-}
-
 bool B_Leaves::IsBlockOpaque()
 {
 	return false;

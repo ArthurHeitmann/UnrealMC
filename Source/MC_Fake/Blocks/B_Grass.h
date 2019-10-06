@@ -8,6 +8,7 @@
  */
 class MC_FAKE_API B_Grass : public Block
 {
+	
 //protected:
 	//static UMaterialInstanceDynamic* GrassBlockMaterial;
 
@@ -23,7 +24,6 @@ public:
 
 	TArray<FVector2D> GetAllUVs() override;
 
-	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
 
 	virtual Block* Clone() override;
 };

@@ -75,3 +75,9 @@ void I_BlockItem::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TA
 	Normals = BlockRef->GetAllNormals();
 	Mat = (UMaterial*) BlockRef->GetMaterial(Base);
 }
+
+I_BlockItem::~I_BlockItem()
+{
+	if (BlockRef->GetBlockEnum() != BAir)
+		delete BlockRef;
+}

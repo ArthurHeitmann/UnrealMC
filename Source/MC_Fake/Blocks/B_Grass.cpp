@@ -19,7 +19,9 @@ B_Grass::B_Grass()
 	BreakingAction = ABreakPlant;
 	BreakTime = 0.9f;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/grass.grass'"));
+	//static ConstructorHelpers::FObjectFinder<UTexture> TextureBMPObj(TEXT("Texture2D'/Game/Materials/Textures/grass_texture_BMP.grass_texture_BMP'"));
 	Texture = TextureObj.Object;
+	//TextureBMP = TextureBMPObj.Object;
 }
 
 TArray<FVector2D> B_Grass::GetTopUVs()
@@ -112,12 +114,6 @@ TArray<FVector2D> B_Grass::GetAllUVs()
 	};
 }
 
-UMaterialInstanceDynamic* B_Grass::GetMaterial(UObject* UObj)
-{
-	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
-	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
-	return OutMat;
-}
 
 Block* B_Grass::Clone()
 {

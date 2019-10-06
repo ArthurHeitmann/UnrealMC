@@ -1,5 +1,4 @@
 #include "LineTraceingInteractions.h"
-#include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
 #include "RuntimeMeshComponent.h"
 #include "Engine/World.h"
 #include "World/Chunk.h"
@@ -119,7 +118,7 @@ void ULineTraceingInteractions::SetCamera(UCameraComponent* Cam)
 	RayShootingCamera = Cam;
 }
 
-void ULineTraceingInteractions::SetSelectedItemPointer(FItemStack** NewPointer)
+void ULineTraceingInteractions::SetSelectedItemPointer(FItemStack ** NewPointer)
 {
 	CurrentItem = NewPointer;
 }

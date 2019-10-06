@@ -2,10 +2,10 @@
 
 
 #include "ItemSlots.h"
-#include "../Items/Item.h"
-#include "../MC_FakeGameModeBase.h"
+#include "../../Items/Item.h"
+#include "../../MC_FakeGameModeBase.h"
 #include "Engine/World.h"
-#include "../UI/ItemSlotsHUD.h"
+#include "../../UI/ItemSlotsHUD.h"
 
 UItemSlots::UItemSlots()
 {
@@ -22,7 +22,21 @@ FItemStack& UItemSlots::GetStackAt(int x)
 
 void UItemSlots::SetNumSlots(int Num)
 {
+	for (FItemStack& IS : Slots)
+	{
+		if (IS.ItemS)
+			delete IS.ItemS;
+	}
 	Slots.SetNum(Num);
+	for (FItemStack& IS : Slots)
+	{
+		IS.ItemS = new I_NoItem();
+	}
+}
+
+int32 UItemSlots::GetNumSlots()
+{
+	return Slots.Num();
 }
 
 FItemStack UItemSlots::PickupItemStack(FItemStack Items)
@@ -56,7 +70,11 @@ FItemStack UItemSlots::PickupItemStack(FItemStack Items)
 
 void UItemSlots::UpdateSlotsUI(UWorld* world)
 {
+
 	AMC_FakeGameModeBase* GM = Cast<AMC_FakeGameModeBase>(world->GetAuthGameMode());
+	if (!GM || !GM->ItemSlotWidget)
+		return;
+	
 	for (int i = 0; i < Slots.Num(); i++)
 	{
 		GM->ItemSlotWidget->SetSlotItemStack(i, Slots[i]);

@@ -423,6 +423,11 @@ void AChunk::SetWestChunk(AChunk* c)
 	bHasDataChanged = true;
 }
 
+void AChunk::ToggleChunkBorders()
+{
+	ChunkEnterTriggerBox->SetVisibility(!ChunkEnterTriggerBox->IsVisible());
+}
+
 uint64 AChunk::GetLastTimeUpdated()
 {
 	return LastTimeUpdated;

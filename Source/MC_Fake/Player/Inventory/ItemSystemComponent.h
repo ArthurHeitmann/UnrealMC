@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "../Items/ItemStack.h"
+#include "../../Items/ItemStack.h"
 #include "ItemSystemComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -19,22 +19,27 @@ public:
 	FItemStack AddItemStackToInventory(FItemStack Items);
 	void InitPickUpBox(const FVector& BoxExtent);
 	void InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform & Offset1 = FTransform(), const FTransform & Offset2 = FTransform());
-	void InitQuickAccessSlots(int32 Num);
+	void InitItemSlots(int32 Num);
+	void InitUI(AGameModeBase* Gamemode);
 
 	void SelectItemSlot(int32 num);
 	void SelectNextItem();
 	void SelectPreviousItem();
 
-	void SetSelectedItemPointer(FItemStack** NewISPointer);
+	void SetSelectedItemPointer(FItemStack const ** NewISPointer);
 
 protected:
-	UPROPERTY()
-	class UQuickAccesSlots* Slot_QuickAcces;
 	UPROPERTY(EditAnywhere)
-		class UBoxComponent* ItemPickupBox;
+	class UItemSlots* Slot_BasicInventory;
 	UPROPERTY(EditAnywhere)
-		class UItemMeshComponent* SelectedItemMesh;
-	FItemStack** SelectedItemRef;
+	class UUI_QuickAccessSlots* QuickAccessSlots;
+	//UPROPERTY(EditAnywhere)
+	//class UItemSlotsHUD* ItemSlotsHUD;
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* ItemPickupBox;
+	UPROPERTY(EditAnywhere)
+	class UItemMeshComponent* SelectedItemMesh;
+	FItemStack const ** SelectedItemRef;
 
 	virtual void BeginPlay() override;
 

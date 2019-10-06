@@ -10,12 +10,12 @@
  */
 class MC_FAKE_API B_Stone : public Block
 {
+	
 protected:
 	//static UTexture* StoneTexture;
 
 public:
 	B_Stone();
-	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
 
 	virtual Block* Clone() override;
 };

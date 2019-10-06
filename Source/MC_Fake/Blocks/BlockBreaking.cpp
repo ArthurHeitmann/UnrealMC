@@ -2,7 +2,6 @@
 
 
 #include "BlockBreaking.h"
-#include "ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
 #include "RuntimeMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Block.h"

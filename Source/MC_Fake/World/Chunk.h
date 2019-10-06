@@ -44,6 +44,7 @@ public:
 	void SetEastChunk(AChunk* c);
 	void SetSouthChunk(AChunk* c);
 	void SetWestChunk(AChunk* c);
+	void ToggleChunkBorders();
 
 	uint64 GetLastTimeUpdated();
 	void SetLastTimeUpdated(float NewTime);
@@ -62,7 +63,6 @@ private:
 	class UBoxComponent* ChunkEnterTriggerBox;
 	UPROPERTY(EditAnywhere)
 	class URuntimeMeshComponent* ChunkMesh;
-	//class UProceduralMeshComponent* ChunkMesh;
 	TArray<TArray<TArray<Block*>>> ChunkBlockData;
 	int NextGenerationStage = 0;
 	class AMcWorld* McFWorld;
