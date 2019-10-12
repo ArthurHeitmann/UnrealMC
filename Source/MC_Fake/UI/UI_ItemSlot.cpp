@@ -21,8 +21,8 @@ bool UUI_ItemSlot::Initialize()
 	WidgetTree->RootWidget = Root;
 	UOverlay* Root2 = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass(), FName("Second Root"));
 	//
-	UBorder* Root1_2 = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
-	Root1_2->SetBrushColor(FLinearColor(0.f, 0.f, 0.f, 0.1f));
+	Root1_2 = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
+	MarkUnselected();
 	UCanvasPanelSlot* CanvasSlot = Root->AddChildToCanvas(Root1_2);
 	Root1_2->AddChild(Root2);
 	//
@@ -45,30 +45,52 @@ bool UUI_ItemSlot::Initialize()
 	return true;
 }
 
-void UUI_ItemSlot::NativeConstruct()
+void UUI_ItemSlot::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 {
-	Super::NativeConstruct();
-}
+	Super::NativeTick(MyGeometry, DeltaTime);
 
-void UUI_ItemSlot::SetItemStack(const FItemStack& NewItemStack)
-{
-	if (NewItemStack.ItemS)
-		NameText->SetText(FText::FromName(NewItemStack.ItemS->GetName()));
+	if (ItemStackC->ItemS)
+		NameText->SetText(FText::FromName(ItemStackC->ItemS->GetName()));
 	else
 		NameText->SetText(FText::FromString(""));
-	NumberText->SetText(FText::AsNumber(NewItemStack.ItemCount));
+	NumberText->SetText(FText::AsNumber(ItemStackC->ItemCount));
+}
 
-	if (ItemStackC.ItemS)
-		delete ItemStackC.ItemS;
+//
+//void UUI_ItemSlot::NativeConstruct()
+//{
+//	Super::NativeConstruct();
+//}
+
+void UUI_ItemSlot::SetItemStack(FItemStack* NewItemStack)
+{
+	if (NewItemStack->ItemS)
+		NameText->SetText(FText::FromName(NewItemStack->ItemS->GetName()));
+	else
+		NameText->SetText(FText::FromString(""));
+	NumberText->SetText(FText::AsNumber(NewItemStack->ItemCount));
+
+	if (ItemStackC && ItemStackC->ItemS)
+		delete ItemStackC->ItemS;
 	ItemStackC = NewItemStack;
 
 	if (!ItemRenderer)
 	{
 		ItemRenderer = GetWorld()->SpawnActor<AItemRenderer>();
 	}
-	ItemRenderer->InitWithItemStack(NewItemStack);
+	ItemRenderer->InitWithItemStack(*NewItemStack);
 	TestMat = ItemRenderer->GetUIMaterial(this);
 	RenderedImage->SetBrushFromMaterial(Cast<UMaterialInterface>(ItemRenderer->GetUIMaterial(this)));
+}
+
+void UUI_ItemSlot::MarkSelected()
+{
+	Root1_2->SetBrushColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.1f));
+}
+
+void UUI_ItemSlot::MarkUnselected()
+{
+	Root1_2->SetBrushColor(FLinearColor(0.f, 0.f, 0.f, 0.1f));
 }
 
 UUI_ItemSlot::~UUI_ItemSlot()

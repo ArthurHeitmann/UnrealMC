@@ -70,6 +70,26 @@ void ADebugQuickCharacter::RightClick()
 	LineTracer->RightClickStart();
 }
 
+void ADebugQuickCharacter::ToggleItemWheel()
+{
+	if (UGameplayStatics::IsGamePaused(GetWorld()) || !ItemSystem)
+		return;
+
+	ItemSystem->ToggleItemWheel();
+}
+
+void ADebugQuickCharacter::ScrollUp()
+{
+	if (ItemSystem)
+		ItemSystem->SelectNextItem();
+}
+
+void ADebugQuickCharacter::ScrollDown()
+{
+	if (ItemSystem)
+		ItemSystem->SelectPreviousItem();
+}
+
 void ADebugQuickCharacter::Save()
 {
 	TArray<AActor*> FoundActors;
@@ -116,7 +136,9 @@ void ADebugQuickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ItemSystem->InitItemSlots(5);
+	FItemStack ** SelectedItemPointer = new FItemStack*;
+	ItemSystem->SetSelectedItemPointer(const_cast<FItemStack const **>(SelectedItemPointer));
+	ItemSystem->InitItemSlots(10);
 	ItemSystem->InitUI(GetWorld()->GetAuthGameMode());
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
 
@@ -128,7 +150,6 @@ void ADebugQuickCharacter::BeginPlay()
 	FRotator RotOffset2(0, 315, 0);
 	FVector ScaleTr2(0.25, 0.25, 0.25);
 	//ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset1, TransOffset1, ScaleTr1), FTransform(RotOffset2, TransOffset2, ScaleTr2));
-	FItemStack ** SelectedItemPointer = new FItemStack*;
 	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
 	LineTracer->SetSelectedItemPointer(SelectedItemPointer);
 }
@@ -165,6 +186,10 @@ void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ADebugQuickCharacter::StartCrouch);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ADebugQuickCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("ShowChunkBoarders"), IE_Pressed, this, &ADebugQuickCharacter::ToggleChunkBoarders);
+	PlayerInputComponent->BindAction(TEXT("ScrollUp"), IE_Pressed, this, &ADebugQuickCharacter::ScrollUp);
+	PlayerInputComponent->BindAction(TEXT("ScrollDown"), IE_Pressed, this, &ADebugQuickCharacter::ScrollDown);
+	PlayerInputComponent->BindAction(TEXT("ToggleItemWheel"), IE_Pressed, this, &ADebugQuickCharacter::ToggleItemWheel);
+	PlayerInputComponent->BindAction(TEXT("ToggleItemWheel"), IE_Released, this, &ADebugQuickCharacter::ToggleItemWheel);
 
 	PlayerInputComponent->BindAxis(TEXT("Move Forward"), this, &ADebugQuickCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("Move Right"), this, &ADebugQuickCharacter::MoveRight);

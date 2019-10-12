@@ -25,17 +25,16 @@ class MC_FAKE_API UItemSlots : public UObject
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditAnywhere)
-	TArray<FItemStack> Slots;
+	//UPROPERTY(EditAnywhere)
+	TArray<FItemStack*> Slots;    //TODO Check whether undeleted pointers can occur
 
 public:
 	UItemSlots();
 
-	virtual FItemStack& GetStackAt(int x);
+	virtual FItemStack* GetStackAt(int x);
 	virtual void SetNumSlots(int Num);
 	virtual int32 GetNumSlots();
 	FItemStack PickupItemStack(FItemStack Items);
-	void UpdateSlotsUI(UWorld* world);
 
 	virtual ~UItemSlots() override;
 };

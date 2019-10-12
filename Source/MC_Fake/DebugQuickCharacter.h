@@ -32,6 +32,9 @@ private:
 	void LeftClickEnd();
 	void RightClick();
 	void RightClickEnd();
+	void ToggleItemWheel();
+	void ScrollUp();
+	void ScrollDown();
 	void Save();
 	void Load();
 	void SelectItem(int32 numb);

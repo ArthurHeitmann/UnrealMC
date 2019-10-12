@@ -77,7 +77,9 @@ void UItemSystemComponent::InitUI(AGameModeBase * Gamemode)
 		return;
 	//Check if getWorld works and Remove Gamemode Parameter
 	QuickAccessSlots = CreateWidget<UUI_QuickAccessSlots>(GetWorld(), UUI_QuickAccessSlots::StaticClass(), TEXT("Quick Access Slots"));
-	QuickAccessSlots->SetInventorySlots(Slot_BasicInventory);
+	QuickAccessSlots->SetInventorySlots(Slot_BasicInventory, 10);
+	if (SelectedItemRef)
+		QuickAccessSlots->SetSelectedItemPointer(SelectedItemRef);
 	QuickAccessSlots->AddToViewport();
 }
 
@@ -89,14 +91,14 @@ void UItemSystemComponent::SelectItemSlot(int32 num)
 
 void UItemSystemComponent::SelectNextItem()
 {
-	/*FItemStack& ItemS = QuickAccessSlots->NextSelectedItem();
-	*SelectedItemRef = &ItemS;*/
+	if (QuickAccessSlots)
+		QuickAccessSlots->SelectNextItem();
 }
 
 void UItemSystemComponent::SelectPreviousItem()
 {
-	/*FItemStack& ItemS = QuickAccessSlots->PreviousSelectedItem();
-	*SelectedItemRef = &ItemS;*/
+	if (QuickAccessSlots)
+		QuickAccessSlots->SelectPreviousItem();
 }
 
 void UItemSystemComponent::SetSelectedItemPointer(FItemStack const ** NewISPointer)
@@ -104,11 +106,16 @@ void UItemSystemComponent::SetSelectedItemPointer(FItemStack const ** NewISPoint
 	SelectedItemRef = NewISPointer;
 	if (QuickAccessSlots)
 	{
-		FItemStack& FISR = Slot_BasicInventory->GetStackAt(0);
-		*SelectedItemRef = &FISR;
+		FItemStack* FISR = Slot_BasicInventory->GetStackAt(0);
+		*SelectedItemRef = FISR;
 	}
 	if (SelectedItemMesh)
 		SelectedItemMesh->SetItem(SelectedItemRef);
+}
+
+void UItemSystemComponent::ToggleItemWheel()
+{
+	QuickAccessSlots->ToggleVisibility();
 }
 
 void UItemSystemComponent::ItemPickBoxTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
