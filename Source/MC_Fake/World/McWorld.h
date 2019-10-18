@@ -74,7 +74,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
-	TMap<FIntPoint, class AChunk*> CurrentlyLoadedChunks;
+	TMap<FIntPoint, class UChunkCube*> LoadedChunkCubes;
 	TArray<ChunkGenerator*> GeneratorThreads;
 	TQueue<ChunkGenBufferElement> ChunkGenBuffer;
 	TMap<FIntPoint, TArray<BlockSetBufferElement>> BlockSetTasks;

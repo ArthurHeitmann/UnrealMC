@@ -14,6 +14,7 @@
 #include "ChunkSaveGame.h"
 #include "../Misc/FileIO.h"
 #include "GameFramework/Character.h"
+#include "ChunkCube.h"
 
 AChunk::AChunk()
 {
@@ -78,6 +79,14 @@ void AChunk::EndPlay(EEndPlayReason::Type Reason)
 	SaveName += "_Y_";
 	SaveName += FString::FromInt(PosY / 16);*/
 	//UGameplayStatics::SaveGameToSlot(ChunkSave, SaveName, 0);
+}
+
+void AChunk::LoadChunkCube(int8 Pos)
+{
+	UChunkCube* NewCube = NewObject<UChunkCube>(this);
+	NewCube->RegisterComponent();
+	NewCube->AttachTo(GetRootComponent());
+	NewCube->SetWorldLocation({ PosX * 1600.f, PosY * 1600.f, 0.f });
 }
 
 bool AChunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EFaceDirection> Side)
@@ -239,6 +248,15 @@ void AChunk::SetMeshLifeStage(int Stage)
 		Destroy();
 	}
 	LifeStage = Stage;
+}
+
+void AChunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp)
+{
+	for (int8 z = -RangeDown; z <= RangeUp; z++)
+	{
+		if (!ChunkCubes.Contains(BaseHeight + z))
+			LoadChunkCube(BaseHeight + z);
+	}
 }
 
 Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)

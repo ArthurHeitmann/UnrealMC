@@ -53,7 +53,7 @@ void AMcWorld::Tick(float DeltaTime)
 	if (b)
 	{
 		int x = 0, y = 0;
-		CurrentlyLoadedChunks[{x, y}]->Destroy();
+		LoadedChunkCubes[{x, y}]->Destroy();
 	}
 }
 
@@ -148,48 +148,48 @@ void AMcWorld::FinalizeChunkGen(AChunk* FinishedChunk, int32 ChunkX, int32 Chunk
 	}
 
 	key = { ChunkX - 1, ChunkY };
-	if (CurrentlyLoadedChunks.Contains(key)) 
+	if (LoadedChunkCubes.Contains(key)) 
 	{
-		if (CurrentlyLoadedChunks[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
 		{
-			CurrentlyLoadedChunks[key]->SetNorthChunk(FinishedChunk);
-			FinishedChunk->SetSouthChunk(CurrentlyLoadedChunks[key]);
+			LoadedChunkCubes[key]->SetNorthChunk(FinishedChunk);
+			FinishedChunk->SetSouthChunk(LoadedChunkCubes[key]);
 		}
 		else
-			NeighbourUpdateTasks.Add(CurrentlyLoadedChunks[key], { FinishedChunk, 0, 0, 0 });
+			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], { FinishedChunk, 0, 0, 0 });
 	}
 	key = { ChunkX + 1, ChunkY };
-	if (CurrentlyLoadedChunks.Contains(key))
+	if (LoadedChunkCubes.Contains(key))
 	{
-		if (CurrentlyLoadedChunks[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
 		{
-			CurrentlyLoadedChunks[key]->SetSouthChunk(FinishedChunk);
-			FinishedChunk->SetNorthChunk(CurrentlyLoadedChunks[key]);
+			LoadedChunkCubes[key]->SetSouthChunk(FinishedChunk);
+			FinishedChunk->SetNorthChunk(LoadedChunkCubes[key]);
 		}
 		else
-			NeighbourUpdateTasks.Add(CurrentlyLoadedChunks[key], { 0, 0, FinishedChunk, 0 });
+			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], { 0, 0, FinishedChunk, 0 });
 	}
 	key = { ChunkX, ChunkY - 1 };
-	if (CurrentlyLoadedChunks.Contains(key))
+	if (LoadedChunkCubes.Contains(key))
 	{
-		if (CurrentlyLoadedChunks[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
 		{
-			CurrentlyLoadedChunks[key]->SetEastChunk(FinishedChunk);
-			FinishedChunk->SetWestChunk(CurrentlyLoadedChunks[key]);
+			LoadedChunkCubes[key]->SetEastChunk(FinishedChunk);
+			FinishedChunk->SetWestChunk(LoadedChunkCubes[key]);
 		}
 		else
-			NeighbourUpdateTasks.Add(CurrentlyLoadedChunks[key], { 0, FinishedChunk, 0, 0 });
+			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], { 0, FinishedChunk, 0, 0 });
 	}
 	key = { ChunkX, ChunkY + 1 };
-	if (CurrentlyLoadedChunks.Contains(key))
+	if (LoadedChunkCubes.Contains(key))
 	{
-		if (CurrentlyLoadedChunks[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
 		{
-			CurrentlyLoadedChunks[key]->SetWestChunk(FinishedChunk);
-			FinishedChunk->SetEastChunk(CurrentlyLoadedChunks[key]);
+			LoadedChunkCubes[key]->SetWestChunk(FinishedChunk);
+			FinishedChunk->SetEastChunk(LoadedChunkCubes[key]);
 		}
 		else
-			NeighbourUpdateTasks.Add(CurrentlyLoadedChunks[key], { 0, 0, 0, FinishedChunk });
+			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], { 0, 0, 0, FinishedChunk });
 	}
 }
 
@@ -218,8 +218,8 @@ Block* AMcWorld::GetBlock(TEnumAsByte<EAllBlocks> Block)
 
 AChunk* AMcWorld::GetChunkAt(FIntPoint Location)
 {
-	if (CurrentlyLoadedChunks.Contains(Location))
-		return CurrentlyLoadedChunks[Location];
+	if (LoadedChunkCubes.Contains(Location))
+		return LoadedChunkCubes[Location];
 	else
 		return nullptr;
 }
@@ -257,17 +257,17 @@ AChunk* AMcWorld::SpawnChunk(FVector2D Location)
 		ChunkGenBuffer.Enqueue({ (int) Location.X / 100, (int) Location.Y / 100, Chunk, 0 }); 
 	}
 	
-	CurrentlyLoadedChunks.Add({ (int32) Location.X / 1600, (int32) Location.Y / 1600 }, Chunk);
+	LoadedChunkCubes.Add({ (int32) Location.X / 1600, (int32) Location.Y / 1600 }, Chunk);
 	return Chunk;
 }
 
 void AMcWorld::RemoveLoadedChunk(AChunk* Chunk)
 {
-	for (const auto& ChunkPair : CurrentlyLoadedChunks)
+	for (const auto& ChunkPair : LoadedChunkCubes)
 	{
 		if (ChunkPair.Value == Chunk)
 		{
-			CurrentlyLoadedChunks.Remove(ChunkPair.Key);
+			LoadedChunkCubes.Remove(ChunkPair.Key);
 			return;
 		}
 	}
@@ -275,7 +275,7 @@ void AMcWorld::RemoveLoadedChunk(AChunk* Chunk)
 
 void AMcWorld::QuickSave()
 {
-	for (auto ChunkPair : CurrentlyLoadedChunks)
+	for (auto ChunkPair : LoadedChunkCubes)
 	{
 		if (ChunkPair.Value)
 			FileIO::SaveChunk(ChunkPair.Value, "Debug_World");
@@ -366,9 +366,9 @@ Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool ForceSuccess, int Mi
 		relX += 16;
 	if (relY < 0)
 		relY += 16;
-	if (CurrentlyLoadedChunks.Contains({ ChunkX, ChunkY }))
+	if (LoadedChunkCubes.Contains({ ChunkX, ChunkY }))
 	{
-		auto data = CurrentlyLoadedChunks[{ ChunkX, ChunkY }]->GetChunkBlockData();
+		auto data = LoadedChunkCubes[{ ChunkX, ChunkY }]->GetChunkBlockData();
 		return (*data)[relX][relY][z];
 	}
 	else if (ForceSuccess && FileIO::DoesChunkExist("Debug_World", ChunkX, ChunkY))
@@ -379,7 +379,7 @@ Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool ForceSuccess, int Mi
 	else if (ForceSuccess)
 	{
 		AChunk* Chunk = GetWorld()->SpawnActor<AChunk>({ (float) x - relX, (float) y - relY, 0 }, FRotator::ZeroRotator);
-		CurrentlyLoadedChunks.Add({ ChunkX, ChunkY }, Chunk);
+		LoadedChunkCubes.Add({ ChunkX, ChunkY }, Chunk);
 		ChunkGenerator Generator;
 		Generator.SetWorld(this);
 		Generator.Reset(x - relX, y - relY, Chunk, MinGenStage, maxGenStage, false);
@@ -397,11 +397,11 @@ void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class Block* NewBlock,
 	auto b = dynamic_cast<B_Stone*>(NewBlock);
 	BlockSetBufferElement e(x, y, z, NewBlock, MinGenStage);
 	FIntPoint key(e.ChunkX, e.ChunkY);
-	if (CurrentlyLoadedChunks.Contains(key) && CurrentlyLoadedChunks[key]->GetNextGenerationStage() >= MinGenStage)
+	if (LoadedChunkCubes.Contains(key) && LoadedChunkCubes[key]->GetNextGenerationStage() >= MinGenStage)
 	{
-		auto BlockData = CurrentlyLoadedChunks[key]->GetChunkBlockData();
+		auto BlockData = LoadedChunkCubes[key]->GetChunkBlockData();
 		(*BlockData)[e.RelX][e.RelY][z] = NewBlock;
-		CurrentlyLoadedChunks[key]->SetHasDataChanged(true);
+		LoadedChunkCubes[key]->SetHasDataChanged(true);
 	}
 	else
 	{

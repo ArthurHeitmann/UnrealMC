@@ -48,8 +48,6 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		LoadChunk(NewChunk);
 	}
 
-	//UpdateChunkAngleVisibilities();
-
 	FVector ChunkCoordinatesNew3D = Player->GetActorLocation();
 	FVector2D ChunkCoordinatesNew(ChunkCoordinatesNew3D.X, ChunkCoordinatesNew3D.Y);
 	ChunkCoordinatesNew.X = FGenericPlatformMath::FloorToInt(ChunkCoordinatesNew.X / 1600);
@@ -91,6 +89,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		}
 	}
 
+	//Enqueue new chunks, that are now within the render distance/ChunkLoadingDistance   
 	for (int layer = 0; layer <= ChunkLoadingDistance - 1; layer++)
 	{
 		for (int x = -layer; x <= layer; x++)
@@ -98,66 +97,36 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			if (abs(x) == layer)
 			{
 				for (int y = -layer; y <= layer; y++)
-					ChunkLoadingBuffer.Enqueue({ x, y, CurrentChunkCoordinates });
+					ProcessChunkDistanceUpdate({ x, y, CurrentChunkCoordinates });
 			}
 			else
 			{
-				ChunkLoadingBuffer.Enqueue({ x, layer, CurrentChunkCoordinates });
-				ChunkLoadingBuffer.Enqueue({ x, -layer, CurrentChunkCoordinates });
+				ProcessChunkDistanceUpdate({ x, layer, CurrentChunkCoordinates });
+				ProcessChunkDistanceUpdate({ x, -layer, CurrentChunkCoordinates });
 			}
 		}
 	}
 }
 
-void UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
+void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData)
 {
-	if (AChunk * NewChunk = McFWorld->SpawnChunk({ (Data.x + Data.RelLocation.X) * 1600.f, (Data.y + Data.RelLocation.Y) * 1600.f }))
-		PlayerChunks.Add({(float) Data.x, (float) Data.y});
-}
-
-void UWorldLoadingComponent::UpdateChunkAngleVisibilities()
-{
-	if (APawn * PawnOwner = Cast<APawn>(GetOwner()))
+	FVector2D ChunkAbsLoc = FVector2D{ (float) ChunkPosData.x, (float) ChunkPosData.y };
+	if (!PlayerChunks.Contains(ChunkAbsLoc))
+		ChunkLoadingBuffer.Enqueue(ChunkPosData);
+	else
 	{
-		float ControllerYaw = FMath::DegreesToRadians(PawnOwner->GetControlRotation().Yaw);
-		FVector2D ForwardVec(cos(ControllerYaw), sin(ControllerYaw));
-		for (FVector2D RelLoc : PlayerChunks)
-		{
-			AChunk* Chunk = McFWorld->GetChunkAt(CurrentChunkCoordinates + RelLoc);
-			if (!Chunk)
-				continue;
+		int8 RangeDown, RangeUp;
+		CalcCubeRangeFromDist(ChunkPosData, RangeDown, RangeUp);
+		int8 Height = (int8) floorf(Player->GetActorLocation().Z);
 
-			if (!RelLoc.SizeSquared() || RelLoc.SizeSquared() < 2.1)
-			{
-				Chunk->SetMeshLifeStage(0);
-				continue;
-			}
-			FVector2D RelLoc1 = RelLoc;
-			FVector2D RelLoc2(RelLoc.X + 1, RelLoc.Y);
-			FVector2D RelLoc3(RelLoc.X, RelLoc.Y + 1);
-			FVector2D RelLoc4(RelLoc.X + 1, RelLoc.Y + 1);
-			float angle1 = FMath::Acos((RelLoc1.X * ForwardVec.X + RelLoc1.Y * ForwardVec.Y) / (RelLoc1.Size() * ForwardVec.Size()));
-			float angle2 = FMath::Acos((RelLoc2.X * ForwardVec.X + RelLoc2.Y * ForwardVec.Y) / (RelLoc2.Size() * ForwardVec.Size()));
-			float angle3 = FMath::Acos((RelLoc3.X * ForwardVec.X + RelLoc3.Y * ForwardVec.Y) / (RelLoc3.Size() * ForwardVec.Size()));
-			float angle4 = FMath::Acos((RelLoc4.X * ForwardVec.X + RelLoc4.Y * ForwardVec.Y) / (RelLoc4.Size() * ForwardVec.Size()));
-			float MinAngle = min4(angle1, angle2, angle3, angle4);
-
-			if (MinAngle < FMath::DegreesToRadians(90))			//TODO change to actual fov angle
-			{
-				Chunk->SetMeshLifeStage(0);
-			}
-			else
-			{
-				Chunk->SetMeshLifeStage(1);
-			}
-		}
+		McFWorld->GetChunkAt(ChunkAbsLoc)
+			->UpdateChunkCubesLoading(Height, RangeDown, RangeUp);
 	}
 }
 
-
-
-float UWorldLoadingComponent::min4(float v1, float v2, float v3, float v4)
+bool UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
 {
-	
-	return FMath::Min(FMath::Min(v1, v2), FMath::Min(v3, v4));
+	FVector2D ChunkCoords = { (float) Data.x, (float) Data.y };
+	if (AChunk * NewChunk = McFWorld->SpawnChunk({ (Data.x + Data.RelLocation.X) * 1600.f, (Data.y + Data.RelLocation.Y) * 1600.f }))
+		PlayerChunks.Add(ChunkCoords);
 }

@@ -16,12 +16,13 @@ class MC_FAKE_API UWorldLoadingComponent : public UActorComponent
 
 	GENERATED_BODY()
 
-	struct ChunkLoadBufferElement { int32 x; int32 y; FVector2D RelLocation; };
+		struct ChunkLoadBufferElement { int32 x; int32 y; FVector2D RelLocation; };
 
 private:	
 	AActor* Player;
 	UPROPERTY(EditAnywhere)
 	int ChunkLoadingDistance;
+	/* Absolute coordinates (in Chunk Form) where the player/component currently is */
 	FVector2D CurrentChunkCoordinates;
 	TArray<FVector2D> PlayerChunks;
 	TQueue<ChunkLoadBufferElement> ChunkLoadingBuffer;
@@ -29,9 +30,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bIsEnabled;
 
-	float min4(float v1, float v2, float v3, float v4);
-	void LoadChunk(ChunkLoadBufferElement Data);
-	void UpdateChunkAngleVisibilities();
+	/**
+	 Input: Absolute Coordinates (Chunk form) of new chunk
+	 If the Chunk doesn't exist yet it gets added to the ChunkBuffer Queue
+	*/
+	void ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData);
+	bool LoadChunk(ChunkLoadBufferElement Data);
+	/*  */
+	void CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp);
 
 protected:
 	virtual void BeginPlay() override;
