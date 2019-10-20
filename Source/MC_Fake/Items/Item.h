@@ -14,15 +14,15 @@ class MC_FAKE_API Item
 
 public:
 	struct PostUseTask {
-		TEnumAsByte<EPostItemUseTask> Tasks;
+		EPostItemUseTask Tasks;
 		int32 Count;
 	};
 
 protected:
 	FName ItemName;
 	int32 Id;
-	TEnumAsByte<EAllItems> ItemEnum;
-	TSet<TEnumAsByte<EItemActions>> ItemActions;
+	EAllItems ItemEnum;
+	TSet<EItemActions> ItemActions;
 	float AttackDamage;
 	float BreakingSpeed;
 	int32 Strength;
@@ -36,8 +36,8 @@ public:
 
 	FName GetName();
 	int32 GetId();
-	TSet<TEnumAsByte<EItemActions>> GetItemActions();
-	TEnumAsByte<EAllItems> GetItemEnum();
+	TSet<EItemActions> GetItemActions();
+	EAllItems GetItemEnum();
 	float GetAttackDamage();
 	float GetBreakingSpeed();
 	int GetStrength();

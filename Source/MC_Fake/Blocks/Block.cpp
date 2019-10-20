@@ -29,7 +29,7 @@ Block::Block()
 		static ConstructorHelpers::FObjectFinder<UMaterial> MaterialInstanceObj(TEXT("Material'/Game/Materials/Blocks/M_BlockDefault.M_BlockDefault'"));
 		Block::BlockMaterial = MaterialInstanceObj.Object;
 	}
-
+	bCustomCollisionMesh = false;
 	Texture = nullptr;
 	TextureBMP = nullptr;
 }
@@ -67,7 +67,7 @@ void Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
 	Drop->SetMesh(GetAllVertecies(-50, -50, -50), GetAllTrainglesFrom(0), GetAllUVs(), GetAllNormals(), GetMaterial(Drop));
 }
 
-bool Block::IsSideOptimizable(TEnumAsByte<EFaceDirection> Direction)
+bool Block::IsSideOptimizable(EFaceDirection Direction)
 {
 	return true;
 }
@@ -147,17 +147,17 @@ void Block::OnBreak(class UWorld* World, FVector Location)
 	DropItem(World, Location, new I_BlockItem(this));
 }
 
-TEnumAsByte<EBlockModelType> Block::GetBlockModelType()
+EBlockModelType Block::GetBlockModelType()
 {
 	return BlockModelType;
 }
 
-TEnumAsByte<EAllBlocks> Block::GetBlockEnum()
+EAllBlocks Block::GetBlockEnum()
 {
 	return BlockEnum;
 }
 
-TEnumAsByte<EItemActions> Block::GetBreakingAction()
+EItemActions Block::GetBreakingAction()
 {
 	return BreakingAction;
 }

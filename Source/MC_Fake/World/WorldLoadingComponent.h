@@ -35,7 +35,7 @@ private:
 	 If the Chunk doesn't exist yet it gets added to the ChunkBuffer Queue
 	*/
 	void ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData);
-	bool LoadChunk(ChunkLoadBufferElement Data);
+	void LoadChunk(ChunkLoadBufferElement Data);
 	/*  */
 	void CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp);
 

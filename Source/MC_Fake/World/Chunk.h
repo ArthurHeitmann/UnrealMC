@@ -5,6 +5,13 @@
 #include "Blocks/Block.h"
 #include "Chunk.generated.h"
 
+struct ChunkGenMaps {
+	TArray<TArray<int32>> HeightMap;
+	TArray<TArray<float>> TemperatureMap;
+	TArray<TArray<float>> PrecipitationMap;
+	//River & etc. data
+};
+
 UCLASS()
 class MC_FAKE_API AChunk : public AActor
 {
@@ -24,13 +31,10 @@ class MC_FAKE_API AChunk : public AActor
 
 private:
 	UPROPERTY(EditAnywhere)
-		USceneComponent* Root;
+	USceneComponent* Root;
 	class UBoxComponent* ChunkEnterTriggerBox;
-	UPROPERTY(EditAnywhere)
-		class URuntimeMeshComponent* ChunkMesh;
-	TMap<int8, class UChunkCube> ChunkCubes;
-	TArray<TArray<TArray<Block*>>> ChunkBlockData;
-	int NextGenerationStage = 0;
+	TMap<int8, class UChunkCube*> ChunkCubes;
+	ChunkGenMaps ChunkDataMaps;
 	class AMcWorld* McFWorld;
 	int32 PosX, PosY;
 	int LifeStage = 0;		//0: normal (visible), 1: Only shadows; no Mesh, 2: Hidden, 3: to be destroyed
@@ -46,7 +50,7 @@ private:
 	TArray<BlockBreakingData> BreakingBlocks;
 
 	void LoadChunkCube(int8 Pos);
-	bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EFaceDirection> Side);
+	//bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EFaceDirection Side);
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,19 +63,20 @@ public:
 	UFUNCTION()
 	void ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	void SetData(const TArray<TArray<TArray<Block*>>>& NewData, bool bUpdateMesh);
+	//void SetData(const TArray<TArray<TArray<Block*>>>& NewData, bool bUpdateMesh);
 	void SetHasDataChanged(bool state = true);
 	void SetHasFinishedGenerating(bool state);
-	void UpdateMesh();
+	//void UpdateMesh();
 	void SetMeshLifeStage(int Stage);
+	/* Loads new ChunkCubes if they now are in range */
 	void UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp);
 	Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);
 	bool ContinueHit(class ABlockBreaking* Block, class Item* Item);
 	void CancelBreaking(class Block* Block);
-	int GetNextGenerationStage();
-	void SetNextGenerationStage(int NewStage);
-	TArray<TArray<TArray<Block*>>>* GetChunkBlockData();
+	TMap<int8, class UChunkCube*>& GetChunkCubes();
 	Block* GetBlockAt(int x, int y, int z);
+	Block*& GetBlockAtAsRef(int x, int y, int z);
+	ChunkGenMaps& GetChunkGenMaps();
 	void SetNorthChunk(AChunk* c);
 	void SetEastChunk(AChunk* c);
 	void SetSouthChunk(AChunk* c);

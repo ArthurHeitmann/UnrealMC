@@ -25,12 +25,12 @@ int32 Item::GetId()
 	return Id;
 }
 
-TSet<TEnumAsByte<EItemActions>> Item::GetItemActions()
+TSet<EItemActions> Item::GetItemActions()
 {
 	return ItemActions;
 }
 
-TEnumAsByte<EAllItems> Item::GetItemEnum()
+EAllItems Item::GetItemEnum()
 {
 	return ItemEnum;
 }

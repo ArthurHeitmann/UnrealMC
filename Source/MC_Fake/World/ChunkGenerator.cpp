@@ -2,40 +2,106 @@
 #include "PerlinNoise.h"
 #include "McWorld.h"
 #include "Chunk.h"
+#include "ChunkCube.h"
 #include "Engine/Texture.h"
 #include "Enums.h"
 #include "FastNoise/FastNoise.h"
 
-
-ChunkGenerator::~ChunkGenerator()
-{
-	if (bUsesThread)
-		delete ThisThread;
-}
 
 uint32 ChunkGenerator::Run()
 {
 	while (bRun)
 	{
 		wait();
-		Generate();
+
+		if (bGenerateChunk)
+			GenerateChunkData();
+		if (bGenerateChunkCube)
+			GenerateChunkCubes();
 	}
 
-
+	
 	return 0;
 }
 
-void ChunkGenerator::Reset(int x, int y, AChunk * WorkingChunk, int NewGenerationStage, int MaxGenStage, bool bUseThread)
+void ChunkGenerator::GenerateChunkData()
+{
+	GenHeightMap();
+}
+
+void ChunkGenerator::GenerateChunkCubes()
+{
+	while (!CubeGenerationQueue.IsEmpty())
+	{
+		CubeGenerationQueue.Dequeue(CurrentCube);
+		GenerateChunkCube();
+	}
+}
+
+void ChunkGenerator::GenerateChunkCube()
+{
+	Stage_BaseStoneTerrain();
+	Stage_DirtGrass();
+
+}
+
+void ChunkGenerator::GenHeightMap()
+{
+	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+
+	//Noise setup
+		//Height
+	UFastNoise* HeightNoise = NewObject<UFastNoise>();
+	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
+	HeightNoise->SetFractalOctaves(6);
+	HeightNoise->SetFrequency(1.f / 600.f);
+	//Turbulence for height
+	UFastNoise* TurbulenceNoise = NewObject<UFastNoise>();
+	TurbulenceNoise->SetFrequency(1.f / 40.f);
+	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
+	TurbulenceNoise->SetFractalOctaves(2);
+
+	//Height map generation
+		//26 x 26 Array (base = 16 x 16; + 5 on each side)
+	Maps.HeightMap.SetNum(16);
+	for (int x = 0; x < 16; x++)
+	{
+		Maps.HeightMap[x].SetNum(16);
+		for (int y = 0; y < 26; y++)
+		{
+			float xOffset = TurbulenceNoise->GetNoise(x, 0) * 13.f;
+			float yOffset = TurbulenceNoise->GetNoise(0, y) * 13.f;
+			Maps.HeightMap[x][y] = HeightNoise->GetNoise(PosX + x + xOffset, PosY + y + yOffset);
+		}
+	}
+
+}
+
+void ChunkGenerator::SetChunkData(int x, int y, AChunk* WorkingChunk)
 {
 	PosX = x;
 	PosY = y;
 	Chunk = WorkingChunk;
+
+	bGenerateChunk = true;
+}
+
+void ChunkGenerator::SetCubesData(const TArray<UChunkCube*>& Cubes, int NewGenerationStage, int MaxGenStage)
+{
+	for (UChunkCube* cube : Cubes)
+		CubeGenerationQueue.Enqueue(cube);
+
 	NextGenerationStage = NewGenerationStage;
 	LastGenerationStage = MaxGenStage;
-	bUsesThread = bUseThread;
-	if (bUseThread)
-		bIsDone = false;
+
+	bGenerateChunkCube = true;
 }
+
+//void ChunkGenerator::Reset(int x, int y, AChunk * WorkingChunk, int NewGenerationStage, int MaxGenStage, bool bUseThread)
+//{
+//	if (bUseThread)
+//		bIsDone = false;
+//}
 
 void ChunkGenerator::SetWorld(AMcWorld* NewWorld)
 {
@@ -43,57 +109,60 @@ void ChunkGenerator::SetWorld(AMcWorld* NewWorld)
 }
 
 
-void ChunkGenerator::Generate()
+//void ChunkGenerator::Generate()
+//{
+//	bool HasDataBeenChanged = false;
+//	ChunkBlockData = Chunk->GetChunkBlockData();
+//	int32 ChunkX = PosX / 16;
+//	int32 ChunkY = PosY / 16;
+//
+//	while (NextGenerationStage <= LastGenerationStage)
+//	{
+//		switch (NextGenerationStage)
+//		{
+//		case 0:
+//			Stage_BaseStoneTerrain();
+//			HasDataBeenChanged = true;
+//			break;
+//		case 1:
+//			Stage_DirtGrass();
+//			HasDataBeenChanged = true;
+//			break;
+//		case 2:
+//			Stage_CaveCarving();
+//			HasDataBeenChanged = true;
+//			break;
+//		case 5:
+//			Stage_Trees();
+//			HasDataBeenChanged = true;
+//			break;
+//		case 6:
+//			NextGenerationStage = 244;
+//			Chunk->SetHasFinishedGenerating(true);
+//			break;
+//		}
+//		Chunk->SetNextGenerationStage(++NextGenerationStage);
+//		World->CompleteBlockSetTasks(Chunk, ChunkX, ChunkY);
+//
+//	}
+//
+//	if (HasDataBeenChanged)
+//	{
+//		Chunk->SetHasDataChanged();
+//		Chunk->SetNextGenerationStage(255);
+//	}
+//	World->CompleteBlockSetTasks(Chunk, PosX / 16, PosY / 16);
+//	World->FinalizeChunkGen(Chunk, ChunkX, ChunkY);
+//	bIsDone = true;
+//}
+
+void ChunkGenerator::Stage_BaseStoneTerrain()
 {
-	bool HasDataBeenChanged = false;
-	ChunkBlockData = Chunk->GetChunkBlockData();
-	int32 ChunkX = PosX / 16;
-	int32 ChunkY = PosY / 16;
+	auto& BlockData = CurrentCube->GetBlockData();
+	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
 
-	while (NextGenerationStage <= LastGenerationStage)
-	{
-		switch (NextGenerationStage)
-		{
-		case 0:
-			Stage0();
-			HasDataBeenChanged = true;
-			break;
-		case 1:
-			Stage1();
-			HasDataBeenChanged = true;
-			break;
-		case 2:
-			Stage2();
-			HasDataBeenChanged = true;
-			break;
-		case 5:
-			Stage5();
-			HasDataBeenChanged = true;
-			break;
-		case 6:
-			NextGenerationStage = 244;
-			Chunk->SetHasFinishedGenerating(true);
-			break;
-		}
-		Chunk->SetNextGenerationStage(++NextGenerationStage);
-		World->CompleteBlockSetTasks(Chunk, ChunkX, ChunkY);
-
-	}
-
-	if (HasDataBeenChanged)
-	{
-		Chunk->SetHasDataChanged();
-		Chunk->SetNextGenerationStage(255);
-	}
-	World->CompleteBlockSetTasks(Chunk, PosX / 16, PosY / 16);
-	World->FinalizeChunkGen(Chunk, ChunkX, ChunkY);
-	bIsDone = true;
-}
-
-void ChunkGenerator::Stage0()
-{
 	//Noise setup
-		//Height
+		//HeightMap Noise
 	UFastNoise* HeightNoise = NewObject<UFastNoise>();
 	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
 	HeightNoise->SetFractalOctaves(6);
@@ -103,98 +172,77 @@ void ChunkGenerator::Stage0()
 	TurbulenceNoise->SetFrequency(1.f / 40.f);
 	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
 	TurbulenceNoise->SetFractalOctaves(2);
-		//Ocean/Lake noise
-	UFastNoise* WaterNoise = NewObject<UFastNoise>();
-	WaterNoise->SetFractalOctaves(3);
-	WaterNoise->SetFrequency(1.f / 1500.f);
-	WaterNoise->SetNoiseType(ENoiseType::SimplexFractal);
-
-	//Height map generation
-		//26 x 26 Array (base = 16 x 16; + 5 on each side)
-	TArray<TArray<float>> HeightMap;
-	HeightMap.SetNum(26);
-	for (int x = 0; x < 26; x++)
-	{
-		HeightMap[x].SetNumZeroed(26);
-		for (int y = 0; y < 26; y++)
-			HeightMap[x][y] = HeightNoise->GetNoise(PosX + x - 5, PosY + y - 5);
-	}
 
 	//Terrain generation
 	int WaterLow = 28;
 	float minCaveNoise = 0;
-	if (ChunkBlockData->Num() != 16)
-		ChunkBlockData->SetNum(16);
+	if (BlockData.Num() != 16)
+		BlockData.SetNum(16);
 	for (int x = 0; x < 16; x++)
 	{
-		if ((*ChunkBlockData)[x].Num() != 16)
-			(*ChunkBlockData)[x].SetNum(16);
+		if (BlockData[x].Num() != 16)
+			BlockData[x].SetNum(16);
 		for (int y = 0; y < 16; y++)
 		{
-			if ((*ChunkBlockData)[x][y].Num() != 256)
-				(*ChunkBlockData)[x][y].SetNum(256);
+			if (BlockData[x][y].Num() != 16)
+				BlockData[x][y].SetNum(16);
 			
-			float wNoise = WaterNoise->GetNoise(x + PosX, y + PosY) * 3;
 
-			for (int z = 0; z < 256; z++)
+			for (int z = 0; z < 16; z++)
 			{
 				int RelX = x + TurbulenceNoise->GetNoise(x + PosX, z) * 13.f;
 				int RelY = y + TurbulenceNoise->GetNoise(y + PosY, z) * 13.f;
 				float HeightMapValue;
-				if (RelX >= -5 && RelX <= 20 && RelY >= -5 && RelY <= 20)
-					HeightMapValue = HeightMap[RelX + 5][RelY + 5];
-				else
+				if (RelX >= 0 && RelX <= 16 && RelY >= -5 && RelY <= 20)
+					HeightMapValue = Maps.HeightMap[RelX + 5][RelY + 5];
+				else //TODO increase height map seize?
 					HeightMapValue = HeightNoise->GetNoise(PosX + RelX, PosY + RelY);
 
 				HeightMapValue = HeightMapValue * 40.f + 50;
-
-				if (wNoise < -.5f)
-				{
-					float factor = FMath::Clamp<float>(wNoise * (-2.f) - 1, 0.f, 1.f);
-					HeightMapValue -= factor * (HeightMapValue - WaterLow);
-				}
-
 				
 				if (z <= HeightMapValue)
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BStone));
+					BlockData[x][y][z] = World->GetBlockFromEnum(BStone);
 				/*else if (z < 44)
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BWater));*/
+					BlockData[x][y][z] = World->GetBlock(BWater);*/
 				else
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BAir));
+					BlockData[x][y][z] = World->GetBlockFromEnum(BAir);
 			}
 		}
 	}
 }
 
-void ChunkGenerator::Stage1()
+void ChunkGenerator::Stage_DirtGrass()
 {
+	auto& BlockData = CurrentCube->GetBlockData();
+	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+
 	for (int x = 0; x < 16; x++)
 	{
 		for (int y = 0; y < 16; y++)
 		{
-			for (int z = 0; z < 256; z++)
+			for (int z = 0; z < 16; z++)
 			{
-				EAllBlocks b = (*ChunkBlockData)[x][y][z]->GetBlockEnum();
-				EAllBlocks b1 = z < 255 ? (*ChunkBlockData)[x][y][z + 1]->GetBlockEnum() : BAir;
-				EAllBlocks b2 = z < 254 ? (*ChunkBlockData)[x][y][z + 2]->GetBlockEnum() : BAir;
-				EAllBlocks b3 = z < 253 ? (*ChunkBlockData)[x][y][z + 3]->GetBlockEnum() : BAir;
-				EAllBlocks b4 = z < 252 ? (*ChunkBlockData)[x][y][z + 4]->GetBlockEnum() : BAir;
-				EAllBlocks b5 = z < 251 ? (*ChunkBlockData)[x][y][z + 5]->GetBlockEnum() : BAir;
-				EAllBlocks b6 = z < 250 ? (*ChunkBlockData)[x][y][z + 6]->GetBlockEnum() : BAir;
+				EAllBlocks b = BlockData[x][y][z]->GetBlockEnum();
+				EAllBlocks b1 = z < 255 ? BlockData[x][y][z + 1]->GetBlockEnum() : BAir;
+				EAllBlocks b2 = z < 254 ? BlockData[x][y][z + 2]->GetBlockEnum() : BAir;
+				EAllBlocks b3 = z < 253 ? BlockData[x][y][z + 3]->GetBlockEnum() : BAir;
+				EAllBlocks b4 = z < 252 ? BlockData[x][y][z + 4]->GetBlockEnum() : BAir;
+				EAllBlocks b5 = z < 251 ? BlockData[x][y][z + 5]->GetBlockEnum() : BAir;
+				EAllBlocks b6 = z < 250 ? BlockData[x][y][z + 6]->GetBlockEnum() : BAir;
 				
 				if (b == BStone && (b2 == BAir || b3 == BAir || b4 == BAir || b5 == BAir || b6 == BAir))
 				{
 					if (b1 != BAir)
 					{
 						if (b != BAir)
-							delete (*ChunkBlockData)[x][y][z];
-						(*ChunkBlockData)[x][y][z] = World->GetBlock(BDirt);
+							delete BlockData[x][y][z];
+						BlockData[x][y][z] = World->GetBlockFromEnum(BDirt);
 					}
 					else
 					{
 						if (b != BAir)
-							delete (*ChunkBlockData)[x][y][z];
-						(*ChunkBlockData)[x][y][z] = World->GetBlock(BGrass);
+							delete BlockData[x][y][z];
+						BlockData[x][y][z] = World->GetBlockFromEnum(BGrass);
 					}
 				}
 			}
@@ -202,8 +250,11 @@ void ChunkGenerator::Stage1()
 	}
 }
 
-void ChunkGenerator::Stage2()
+void ChunkGenerator::Stage_CaveCarving()
 {
+	auto& BlockData = CurrentCube->GetBlockData();
+	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+
 	//Cave noise 1
 	UFastNoise* CaveNoise1 = NewObject<UFastNoise>();
 	CaveNoise1->SetFractalOctaves(4);
@@ -214,31 +265,26 @@ void ChunkGenerator::Stage2()
 	{
 		for (int y = 0; y < 16; y++)
 		{
-			for (int z = 0; z < 256; z++)
+			for (int z = 0; z < 16; z++)
 			{
 				float CaveNoiseValue = abs(CaveNoise1->GetNoise(PosX + x, PosY + y, z));
 
 				if (CaveNoiseValue < .035)
 				{
-					if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() != BAir)
-						delete (*ChunkBlockData)[x][y][z];
-					(*ChunkBlockData)[x][y][z] = World->GetBlock(TEnumAsByte<EAllBlocks>(BAir));
+					if (BlockData[x][y][z]->GetBlockEnum() != BAir)
+						delete BlockData[x][y][z];
+					BlockData[x][y][z] = World->GetBlockFromEnum(BAir);
 				}
 			}
 		}
 	}
 }
 
-void ChunkGenerator::Stage3()
+void ChunkGenerator::Stage_Trees()
 {
-}
+	auto& BlockData = CurrentCube->GetBlockData();
+	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
 
-void ChunkGenerator::Stage4()
-{
-}
-
-void ChunkGenerator::Stage5()
-{
 	FRandomStream Rand;
 	for (int x = 0; x < 16; x++)
 	{
@@ -252,12 +298,12 @@ void ChunkGenerator::Stage5()
 			{
 				for (int z = 200; z > 0; z--)
 				{
-					if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == BGrass)
+					if (BlockData[x][y][z]->GetBlockEnum() == BGrass)
 					{
 						int TreeHeight = Rand.RandRange(6, 10);
 						for (int zT = z + 1; zT <= z + TreeHeight; zT++)
 						{
-							(*ChunkBlockData)[x][y][zT] = World->GetBlock(BLog_Oak);
+							BlockData[x][y][zT] = World->GetBlockFromEnum(BLog_Oak);
 						}
 
 						for (int zt = z + TreeHeight - 3; zt <= z + TreeHeight; zt++)
@@ -272,13 +318,13 @@ void ChunkGenerator::Stage5()
 										|| Rand.RandRange(0,6) == 5)
 										continue;
 									if (xt > -1 && xt < 16 && yt > -1 && yt < 16)			//Within chunkBoundaries
-										(*ChunkBlockData)[xt][yt][zt] = World->GetBlock(BLeaves_Oak);
+										BlockData[xt][yt][zt] = World->GetBlockFromEnum(BLeaves_Oak);
 									else
-										World->AddBlockSetTask(PosX + xt, PosY + yt, zt, World->GetBlock(BLeaves_Oak), 1);
+										World->AddBlockSetTask(PosX + xt, PosY + yt, zt, World->GetBlockFromEnum(BLeaves_Oak), 1);
 								}
 							}
 						}
-						(*ChunkBlockData)[x][y][z + TreeHeight + 1] = World->GetBlock(BLeaves_Oak);
+						BlockData[x][y][z + TreeHeight + 1] = World->GetBlockFromEnum(BLeaves_Oak);
 						
 						break;
 					}
@@ -288,14 +334,16 @@ void ChunkGenerator::Stage5()
 	}
 }
 
-void ChunkGenerator::Stage6()
-{
-}
-
 void ChunkGenerator::wait()
 {
-	while (bIsDone)
+	while (!bGenerateChunk && !bGenerateChunkCube)
 	{
-		FPlatformProcess::Sleep(.1);	// wait
+		FPlatformProcess::Sleep(.05);	// wait
 	}
+}
+
+ChunkGenerator::~ChunkGenerator()
+{
+	if (ThisThread)
+		delete ThisThread;
 }

@@ -14,7 +14,11 @@ class MC_FAKE_API AMcWorld : public AActor
 	GENERATED_BODY()
 
 	struct ChunkGenBufferElement {
-		int32 x; int32 y; class AChunk* Chunk; int NextGenStage; FRunnableThread* Thread = nullptr;
+		int32 x;
+		int32 y;
+		class AChunk* Chunk;
+		int NextGenStage;
+		FRunnableThread* Thread = nullptr;
 	};
 
 	struct BlockSetBufferElement {
@@ -56,7 +60,7 @@ public:
 	AMcWorld();
 	virtual void Tick(float DeltaTime) override;
 
-	class Block* GetBlock(TEnumAsByte<EAllBlocks> Block);
+	class Block* GetBlockFromEnum(EAllBlocks Block);
 	class AChunk* GetChunkAt(FIntPoint Location);
 	class AChunk* GetChunkAt(FVector2D Location);
 	class AChunk* SpawnChunk(FVector2D Location);
@@ -74,9 +78,13 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
-	TMap<FIntPoint, class UChunkCube*> LoadedChunkCubes;
+	TMap<FIntPoint, class AChunk*> LoadedChunks;
 	TArray<ChunkGenerator*> GeneratorThreads;
 	TQueue<ChunkGenBufferElement> ChunkGenBuffer;
+	/* 
+		Key: Chunk Coordinates (Chunk Form)
+		Value: Blocks that should be set to the Chunk, once it is loaded.
+	*/
 	TMap<FIntPoint, TArray<BlockSetBufferElement>> BlockSetTasks;
 	TMap<AChunk*, ChunkNeighbourUpdates> NeighbourUpdateTasks;
 

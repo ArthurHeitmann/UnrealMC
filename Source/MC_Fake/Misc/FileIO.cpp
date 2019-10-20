@@ -15,7 +15,7 @@
 
 
 ChunkData FileIO::LoadChunk(const FString& WorldName, int PosX, int PosY)
-{
+{/*
 	FString ChunkPath(FPaths::ProjectSavedDir());
 	ChunkPath += "Worlds/";
 	ChunkPath += WorldName;
@@ -29,10 +29,10 @@ ChunkData FileIO::LoadChunk(const FString& WorldName, int PosX, int PosY)
 		return ChunkData();
 	IFileHandle* FileHandle = PlatformFile.OpenRead(*ChunkPath);
 	if (!FileHandle)
-		return ChunkData();
+		return ChunkData();*/
 
 	ChunkData OutData;
-	uint8* Bytes = (uint8*) FMemory::Malloc(PlatformFile.FileSize(*ChunkPath));
+	/*uint8* Bytes = (uint8*) FMemory::Malloc(PlatformFile.FileSize(*ChunkPath));
 	FileHandle->Read(Bytes, PlatformFile.FileSize(*ChunkPath));
 	OutData.LastTimeUpdated = *reinterpret_cast<uint64*>(Bytes);
 	OutData.GeneratorVersion = *reinterpret_cast<uint8*>(Bytes + 8);
@@ -73,14 +73,14 @@ ChunkData FileIO::LoadChunk(const FString& WorldName, int PosX, int PosY)
 	}
 
 	delete FileHandle;
-	FMemory::Free(Bytes);
+	FMemory::Free(Bytes);*/
 
 	return OutData;
 }
 
 void FileIO::SaveChunk(AChunk* Chunk, const FString& Worldname)
 {
-	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	/*IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 	FString WorldPath(FPaths::ProjectSavedDir());
 	WorldPath += "Worlds/";
 	WorldPath += Worldname;
@@ -108,48 +108,48 @@ void FileIO::SaveChunk(AChunk* Chunk, const FString& Worldname)
 	{
 		FileHandle->Write(Bytes.GetData(), Bytes.Num());
 		delete FileHandle;
-	}
+	}*/
 }
 
 TArray<uint8> FileIO::ChunkToBytes(AChunk* Chunk)
 {
 	TArray<uint8> Bytes;
-	Bytes.Reserve(20000);
+	//Bytes.Reserve(20000);
+	////int64 LastTimeUpdated = Chunk->GetLastTimeUpdated();
 	//int64 LastTimeUpdated = Chunk->GetLastTimeUpdated();
-	int64 LastTimeUpdated = Chunk->GetLastTimeUpdated();
-	uint8* TimeBytes = (uint8*) FMemory::Malloc(sizeof(int64));
-	TimeBytes = reinterpret_cast<uint8*>(&LastTimeUpdated);
-	for (int byte = 0; byte < 8; byte++)
-		Bytes.Add(TimeBytes[byte]);
-	Bytes.Add(0);	//Gen Version
-	Bytes.Add((uint8) Chunk->GetNextGenerationStage());
+	//uint8* TimeBytes = (uint8*) FMemory::Malloc(sizeof(int64));
+	//TimeBytes = reinterpret_cast<uint8*>(&LastTimeUpdated);
+	//for (int byte = 0; byte < 8; byte++)
+	//	Bytes.Add(TimeBytes[byte]);
+	//Bytes.Add(0);	//Gen Version
+	//Bytes.Add((uint8) Chunk->GetNextGenerationStage());
 
-	TArray<TArray<TArray<Block*>>>* ChunkBlockData = Chunk->GetChunkBlockData();
-	int LastAirIter = -1;
+	//TArray<TArray<TArray<Block*>>>* ChunkBlockData = Chunk->GetChunkBlockData();
+	//int LastAirIter = -1;
 
-	for (int z = 0; z < 256; z++)
-	{
-		for (int x = 0; x < 16; x++)
-		{
-			for (int y = 0; y < 16; y++)
-			{
-				if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == BAir && LastAirIter < 0)
-					LastAirIter = Bytes.Num();
-				else if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() != BAir && LastAirIter != -1)
-					LastAirIter = -1;
-				Bytes.Append((*ChunkBlockData)[x][y][z]->GetBinaryData());
-			}
-		}
-	}
-	Bytes[LastAirIter] = 255;
-	Bytes.SetNum(LastAirIter + 1, true);
+	//for (int z = 0; z < 256; z++)
+	//{
+	//	for (int x = 0; x < 16; x++)
+	//	{
+	//		for (int y = 0; y < 16; y++)
+	//		{
+	//			if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() == BAir && LastAirIter < 0)
+	//				LastAirIter = Bytes.Num();
+	//			else if ((*ChunkBlockData)[x][y][z]->GetBlockEnum() != BAir && LastAirIter != -1)
+	//				LastAirIter = -1;
+	//			Bytes.Append((*ChunkBlockData)[x][y][z]->GetBinaryData());
+	//		}
+	//	}
+	//}
+	//Bytes[LastAirIter] = 255;
+	//Bytes.SetNum(LastAirIter + 1, true);
 
 	return Bytes;
 }
 
 bool FileIO::DoesChunkExist(const FString& WorldName, int PosX, int PosY)
 {
-	FString WorldPath(FPaths::ProjectSavedDir());
+	/*FString WorldPath(FPaths::ProjectSavedDir());
 	WorldPath += "Worlds/";
 	WorldPath += WorldName;
 	WorldPath += "/";
@@ -160,5 +160,6 @@ bool FileIO::DoesChunkExist(const FString& WorldName, int PosX, int PosY)
 	FilePath += FString::FromInt(PosY);
 
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-	return PlatformFile.FileExists(*FilePath);
+	return PlatformFile.FileExists(*FilePath);*/
+	return false;
 }

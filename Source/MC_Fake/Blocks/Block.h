@@ -17,13 +17,14 @@ protected:
 	uint16 BlockID;
 	uint8 SubID;
 	FName BlockName;
-	TEnumAsByte<EBlockModelType> BlockModelType;
-	TEnumAsByte<EItemActions> BreakingAction;
-	TEnumAsByte<EAllBlocks> BlockEnum;
+	EBlockModelType BlockModelType;
+	EItemActions BreakingAction;
+	EAllBlocks BlockEnum;
 	class UTexture* Texture;
 	class UTexture* TextureBMP;
 	float BreakTime;
 	TArray<ItemDrops> PossibleItemDrops;
+	bool bCustomCollisionMesh;
 
 	void DropItem(class UWorld* World, FVector Location, class Item* DropItem);
 
@@ -33,14 +34,14 @@ public:
 
 	static Block* GetBlockFromBytes(uint8* Bytes);
 
-	virtual bool IsSideOptimizable(TEnumAsByte<EFaceDirection> Direction);
+	virtual bool IsSideOptimizable(EFaceDirection Direction);
 	virtual bool IsBlockOpaque();
 	virtual bool UsesCustomModel();
 	virtual bool HasConstantMaterial();	//Actually use this method
 	virtual FName GetName();
-	virtual TEnumAsByte<EBlockModelType> GetBlockModelType();
-	virtual TEnumAsByte<EAllBlocks> GetBlockEnum();
-	virtual TEnumAsByte<EItemActions> GetBreakingAction();
+	virtual EBlockModelType GetBlockModelType();
+	virtual EAllBlocks GetBlockEnum();
+	virtual EItemActions GetBreakingAction();
 	virtual class UMaterialInstanceDynamic* GetMaterial(UObject* UObj);
 	virtual UTexture* GetTexture();
 	virtual UTexture* GetTextureBMP();

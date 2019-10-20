@@ -52,10 +52,6 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FVector2D ChunkCoordinatesNew(ChunkCoordinatesNew3D.X, ChunkCoordinatesNew3D.Y);
 	ChunkCoordinatesNew.X = FGenericPlatformMath::FloorToInt(ChunkCoordinatesNew.X / 1600);
 	ChunkCoordinatesNew.Y = FGenericPlatformMath::FloorToInt(ChunkCoordinatesNew.Y / 1600);
-	/*if (ChunkCoordinatesNew3D.X < 0)
-		ChunkCoordinatesNew.X -= 1;
-	if (ChunkCoordinatesNew3D.Y < 0)
-		ChunkCoordinatesNew.Y -= 1;*/
 
 	if (CurrentChunkCoordinates == ChunkCoordinatesNew)
 		return;
@@ -124,9 +120,29 @@ void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferEle
 	}
 }
 
-bool UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
+void UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
 {
 	FVector2D ChunkCoords = { (float) Data.x, (float) Data.y };
 	if (AChunk * NewChunk = McFWorld->SpawnChunk({ (Data.x + Data.RelLocation.X) * 1600.f, (Data.y + Data.RelLocation.Y) * 1600.f }))
 		PlayerChunks.Add(ChunkCoords);
+}
+
+void UWorldLoadingComponent::CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp)
+{
+	//TODO scale with Loading Distance and environment (Cave, Hills, Structure, etc.)
+	float MaxDist = fmaxf(ChunkPosData.x, ChunkPosData.y);
+	if (MaxDist <= 5)
+	{
+		OutRangeDown = 2;
+		OutRangeUp = 16;
+	}
+	else
+	{
+		OutRangeDown = 1;
+
+		if (MaxDist <= 9)
+			OutRangeUp = 3;
+		else
+			OutRangeUp = 2;
+	}
 }
