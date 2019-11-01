@@ -8,8 +8,8 @@ enum EAllItems {
 	INoItem, IStone, IDirt, IGrass, ILog_Oak, ILeaves_Oak, IPickaxe_Stone
 };
 
-enum EFaceDirection {
-	TOP, RIGHT, BOTTOM, LEFT, SOUTH, NORTH
+enum EDirection {
+	TOP, EAST, BOTTOM, WEST, SOUTH, NORTH
 };
 
 enum EBlockModelType {

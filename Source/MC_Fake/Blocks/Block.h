@@ -34,7 +34,7 @@ public:
 
 	static Block* GetBlockFromBytes(uint8* Bytes);
 
-	virtual bool IsSideOptimizable(EFaceDirection Direction);
+	virtual bool IsSideOptimizable(EDirection Direction);
 	virtual bool IsBlockOpaque();
 	virtual bool UsesCustomModel();
 	virtual bool HasConstantMaterial();	//Actually use this method

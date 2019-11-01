@@ -67,7 +67,7 @@ void Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
 	Drop->SetMesh(GetAllVertecies(-50, -50, -50), GetAllTrainglesFrom(0), GetAllUVs(), GetAllNormals(), GetMaterial(Drop));
 }
 
-bool Block::IsSideOptimizable(EFaceDirection Direction)
+bool Block::IsSideOptimizable(EDirection Direction)
 {
 	return true;
 }

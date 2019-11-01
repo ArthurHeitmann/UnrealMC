@@ -106,7 +106,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData)
 {
-	FVector2D ChunkAbsLoc = FVector2D{ (float) ChunkPosData.x, (float) ChunkPosData.y };
+	AMcWorld::ChunkFormCoords2D ChunkAbsLoc = AMcWorld::ChunkFormCoords2D{ (float) ChunkPosData.x, (float) ChunkPosData.y };
 	if (!PlayerChunks.Contains(ChunkAbsLoc))
 		ChunkLoadingBuffer.Enqueue(ChunkPosData);
 	else
@@ -123,7 +123,7 @@ void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferEle
 void UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
 {
 	FVector2D ChunkCoords = { (float) Data.x, (float) Data.y };
-	if (AChunk * NewChunk = McFWorld->SpawnChunk({ (Data.x + Data.RelLocation.X) * 1600.f, (Data.y + Data.RelLocation.Y) * 1600.f }))
+	if (AChunk * NewChunk = McFWorld->SpawnChunk({ (Data.x + Data.RelLocation.X), (Data.y + Data.RelLocation.Y) }))
 		PlayerChunks.Add(ChunkCoords);
 }
 

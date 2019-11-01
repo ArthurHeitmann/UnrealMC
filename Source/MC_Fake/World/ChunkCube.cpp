@@ -11,6 +11,13 @@ UChunkCube::UChunkCube()
 	CustomCollisionMesh->SetupAttachment(this);
 }
 
+void UChunkCube::BeginPlay()
+{
+	FVector Location = GetComponentLocation();
+	Location /= 1600.f;
+	Pos = { floorf(Location.X), floorf(Location.Y), floorf(Location.Z) };
+}
+
 void UChunkCube::TickComponent(float Delta, ELevelTick Type, FActorComponentTickFunction* TickFunction)
 {
 	if (bHasDataChanged)
@@ -30,6 +37,19 @@ void UChunkCube::EndPlay(EEndPlayReason::Type Reason)
 			}
 		}
 	}
+
+	if (CubeNeighbours.North)
+		CubeNeighbours.North->UpdateCubeNeighbour(SOUTH, nullptr, false);
+	if (CubeNeighbours.East)
+		CubeNeighbours.East->UpdateCubeNeighbour(WEST, nullptr, false);
+	if (CubeNeighbours.South)
+		CubeNeighbours.South->UpdateCubeNeighbour(NORTH, nullptr, false);
+	if (CubeNeighbours.West)
+		CubeNeighbours.West->UpdateCubeNeighbour(EAST, nullptr, false);
+	if (CubeNeighbours.Top)
+		CubeNeighbours.Top->UpdateCubeNeighbour(BOTTOM, nullptr, false);
+	if (CubeNeighbours.Bottom)
+		CubeNeighbours.Bottom->UpdateCubeNeighbour(TOP, nullptr, false);
 }
 
 void UChunkCube::UpdateMesh()
@@ -83,18 +103,18 @@ void UChunkCube::UpdateMesh()
 						UVs[cbe].Append(BlockData[x][y][z]->GetBottomUVs());
 						Normals[cbe].Append(BlockData[x][y][z]->GetBottomNormals());
 					}
-					if (y != 15 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y + 1][z], RIGHT)
+					if (y != 15 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y + 1][z], EAST)
 						||
-						y == 15 && CubeNeighbours.East && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbours.East->GetBlockAt(x, 0, z), RIGHT))
+						y == 15 && CubeNeighbours.East && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbours.East->GetBlockAt(x, 0, z), EAST))
 					{
 						Triangles[cbe].Append(BlockData[x][y][z]->GetRightTrianglesFrom(Vertecies[cbe].Num()));
 						Vertecies[cbe].Append(BlockData[x][y][z]->GetRightVertecies(x * 100, y * 100, z * 100));
 						UVs[cbe].Append(BlockData[x][y][z]->GetRightUVs());
 						Normals[cbe].Append(BlockData[x][y][z]->GetRightNormals());
 					}
-					if (y && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y - 1][z], LEFT)
+					if (y && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y - 1][z], WEST)
 						||
-						y == 0 && CubeNeighbours.West && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbours.West->GetBlockAt(x, 15, z), LEFT))
+						y == 0 && CubeNeighbours.West && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbours.West->GetBlockAt(x, 15, z), WEST))
 					{
 						Triangles[cbe].Append(BlockData[x][y][z]->GetLeftTrianglesFrom(Vertecies[cbe].Num()));
 						Vertecies[cbe].Append(BlockData[x][y][z]->GetLeftVertecies(x * 100, y * 100, z * 100));
@@ -134,11 +154,16 @@ void UChunkCube::UpdateMesh()
 	bHasDataChanged = false;
 }
 
-bool UChunkCube::ShouldFaceBePlacedBetween(Block* b1, Block* b2, EFaceDirection Side)
+bool UChunkCube::ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side)
 {
 	return b2->IsSideOptimizable(Side)
 		&& b2->GetBlockModelType() != BLOCK
 		|| !b2->IsBlockOpaque();
+}
+
+ChunkFormCoords3D UChunkCube::GetPos()
+{
+	return Pos;
 }
 
 TArray<TArray<TArray<class Block*>>>& UChunkCube::GetBlockData()
@@ -166,6 +191,11 @@ void UChunkCube::SetHeight(int8 Height)
 	this->Height = Height;
 }
 
+void UChunkCube::SetHasDataChanged(bool val)
+{
+	bHasDataChanged = val;
+}
+
 Block*& UChunkCube::GetBlockAt(int x, int y, int z)
 {
 	return BlockData[x][y][z];
@@ -179,4 +209,32 @@ ChunkCubeGenData& UChunkCube::GetChunkCubeGenData()
 ChunkCubeNeighbours& UChunkCube::GetChunkCubeNeighbours()
 {
 	return CubeNeighbours;
+}
+
+void UChunkCube::UpdateCubeNeighbour(EDirection NeighbourSide, UChunkCube* NewNeighbour, bool bUpdateMesh)
+{
+	switch (NeighbourSide)
+	{
+	case NORTH:
+		CubeNeighbours.North = NewNeighbour;
+		break;
+	case EAST:
+		CubeNeighbours.East = NewNeighbour;
+		break;
+	case SOUTH:
+		CubeNeighbours.South = NewNeighbour;
+		break;
+	case WEST:
+		CubeNeighbours.West = NewNeighbour;
+		break;
+	case TOP:
+		CubeNeighbours.Top = NewNeighbour;
+		break;
+	case BOTTOM:
+		CubeNeighbours.Bottom = NewNeighbour;
+		break;
+	}
+	
+	if (bUpdateMesh)
+		bHasDataChanged = true;
 }

@@ -16,15 +16,15 @@ class MC_FAKE_API UWorldLoadingComponent : public UActorComponent
 
 	GENERATED_BODY()
 
-		struct ChunkLoadBufferElement { int32 x; int32 y; FVector2D RelLocation; };
+	struct ChunkLoadBufferElement { int32 x; int32 y; FVector2D RelLocation; };
 
 private:	
 	AActor* Player;
 	UPROPERTY(EditAnywhere)
 	int ChunkLoadingDistance;
 	/* Absolute coordinates (in Chunk Form) where the player/component currently is */
-	FVector2D CurrentChunkCoordinates;
-	TArray<FVector2D> PlayerChunks;
+	ChunkFormCoords2D CurrentChunkCoordinates;
+	TArray<ChunkFormCoords2D> PlayerChunks;
 	TQueue<ChunkLoadBufferElement> ChunkLoadingBuffer;
 	class AMcWorld* McFWorld;
 	UPROPERTY(EditAnywhere)

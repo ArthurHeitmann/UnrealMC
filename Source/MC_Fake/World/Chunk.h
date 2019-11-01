@@ -38,19 +38,19 @@ private:
 	class AMcWorld* McFWorld;
 	int32 PosX, PosY;
 	int LifeStage = 0;		//0: normal (visible), 1: Only shadows; no Mesh, 2: Hidden, 3: to be destroyed
-	bool bHasDataChanged = false;
+	//bool bHasDataChanged = false;
 	bool bHasFinishedGenerating = false;
-	double LastTimeUpdated = 0;
-	AChunk* NorthChunk;
+	//double LastTimeUpdated = 0;
+	/*AChunk* NorthChunk;
 	AChunk* EastChunk;
 	AChunk* SouthChunk;
-	AChunk* WestChunk;
+	AChunk* WestChunk;*/
 
 
 	TArray<BlockBreakingData> BreakingBlocks;
 
 	void LoadChunkCube(int8 Pos);
-	//bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EFaceDirection Side);
+	//bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side);
 
 protected:
 	virtual void BeginPlay() override;
@@ -77,14 +77,14 @@ public:
 	Block* GetBlockAt(int x, int y, int z);
 	Block*& GetBlockAtAsRef(int x, int y, int z);
 	ChunkGenMaps& GetChunkGenMaps();
-	void SetNorthChunk(AChunk* c);
+	/*void SetNorthChunk(AChunk* c);
 	void SetEastChunk(AChunk* c);
 	void SetSouthChunk(AChunk* c);
-	void SetWestChunk(AChunk* c);
+	void SetWestChunk(AChunk* c);*/
 	void ToggleChunkBorders();
 
-	uint64 GetLastTimeUpdated();
-	void SetLastTimeUpdated(float NewTime);
+	//uint64 GetLastTimeUpdated();
+	//void SetLastTimeUpdated(float NewTime);
 	
 
 	virtual void Tick(float Delta) override;

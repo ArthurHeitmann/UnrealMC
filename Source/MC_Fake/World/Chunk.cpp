@@ -49,14 +49,6 @@ void AChunk::BeginPlay()
 
 void AChunk::EndPlay(EEndPlayReason::Type Reason)
 {
-	if (NorthChunk)
-		NorthChunk->SetSouthChunk(nullptr);
-	if (SouthChunk)
-		SouthChunk->SetNorthChunk(nullptr);
-	if (EastChunk)
-		EastChunk->SetWestChunk(nullptr);
-	if (WestChunk)
-		WestChunk->SetEastChunk(nullptr);
 	/*UChunkSaveGame* ChunkSave = Cast<UChunkSaveGame>(UGameplayStatics::CreateSaveGameObject(UChunkSaveGame::StaticClass()));
 	ChunkSave->PosX = PosX / 16;
 	ChunkSave->PosY = PosY / 16;
@@ -71,55 +63,6 @@ void AChunk::EndPlay(EEndPlayReason::Type Reason)
 void AChunk::LoadChunkCube(int8 Pos)
 {
 	UChunkCube* NewCube = NewObject<UChunkCube>(this);
-	
-	ChunkCubeNeighbours& n = NewCube->GetChunkCubeNeighbours();
-	if (auto c = ChunkCubes.Find(Pos + 1))
-	{
-		n.Top = *c;
-		(*c)->GetChunkCubeNeighbours().Bottom = NewCube;
-	}
-	if (auto c = ChunkCubes.Find(Pos - 1))
-	{
-		n.Top = *c;
-		(*c)->GetChunkCubeNeighbours().Bottom = NewCube;
-	}
-	
-	if (NorthChunk)
-	{
-		UChunkCube** c = NorthChunk->GetChunkCubes().Find(Pos);
-		if (c)
-		{
-			n.North = *c;
-			(*c)->GetChunkCubeNeighbours().South = NewCube;
-		}
-	}
-	if (EastChunk)
-	{
-		UChunkCube** c = EastChunk->GetChunkCubes().Find(Pos);
-		if (c)
-		{
-			n.East = *c;
-			(*c)->GetChunkCubeNeighbours().West = NewCube;
-		}
-	}
-	if (SouthChunk)
-	{
-		UChunkCube** c = SouthChunk->GetChunkCubes().Find(Pos);
-		if (c)
-		{
-			n.South = *c;
-			(*c)->GetChunkCubeNeighbours().North = NewCube;
-		}
-	}
-	if (WestChunk)
-	{
-		UChunkCube** c = WestChunk->GetChunkCubes().Find(Pos);
-		if (c)
-		{
-			n.West = *c;
-			(*c)->GetChunkCubeNeighbours().East = NewCube;
-		}
-	}
 
 	NewCube->RegisterComponent();
 	NewCube->AttachToComponent(GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
@@ -127,7 +70,7 @@ void AChunk::LoadChunkCube(int8 Pos)
 	//NewCube->SetWorldLocation({ PosX * 1600.f, PosY * 1600.f, 0.f });
 }
 
-//bool AChunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EFaceDirection> Side)
+//bool AChunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EDirection> Side)
 //{
 //	return b2->IsSideOptimizable(Side)
 //			&& b2->GetBlockModelType() != BLOCK
@@ -140,10 +83,10 @@ void AChunk::ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	
 }
 
-void AChunk::SetHasDataChanged(bool state)
-{
-	bHasDataChanged = state;
-}
+//void AChunk::SetHasDataChanged(bool state)
+//{
+//	bHasDataChanged = state;
+//}
 
 void AChunk::SetHasFinishedGenerating(bool state = true)
 {
@@ -197,18 +140,18 @@ void AChunk::SetHasFinishedGenerating(bool state = true)
 //						UVs[cbe].Append(ChunkBlockData[x][y][z]->GetBottomUVs());
 //						Normals[cbe].Append(ChunkBlockData[x][y][z]->GetBottomNormals());
 //					}
-//					if (y != 15 && ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], ChunkBlockData[x][y + 1][z], RIGHT)
+//					if (y != 15 && ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], ChunkBlockData[x][y + 1][z], EAST)
 //						|| 
-//						y == 15 && EastChunk &&  ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], EastChunk->GetBlockAt(x, 0, z), RIGHT))
+//						y == 15 && EastChunk &&  ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], EastChunk->GetBlockAt(x, 0, z), EAST))
 //					{
 //						Triangles[cbe].Append(ChunkBlockData[x][y][z]->GetRightTrianglesFrom(Vertecies[cbe].Num()));
 //						Vertecies[cbe].Append(ChunkBlockData[x][y][z]->GetRightVertecies(x * 100, y * 100, z * 100));
 //						UVs[cbe].Append(ChunkBlockData[x][y][z]->GetRightUVs());
 //						Normals[cbe].Append(ChunkBlockData[x][y][z]->GetRightNormals());
 //					}
-//					if (y && ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], ChunkBlockData[x][y - 1][z], LEFT)
+//					if (y && ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], ChunkBlockData[x][y - 1][z], WEST)
 //						||
-//						y == 0 && WestChunk && ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], WestChunk->GetBlockAt(x, 15, z), LEFT))
+//						y == 0 && WestChunk && ShouldFaceBePlacedBetween(ChunkBlockData[x][y][z], WestChunk->GetBlockAt(x, 15, z), WEST))
 //					{
 //						Triangles[cbe].Append(ChunkBlockData[x][y][z]->GetLeftTrianglesFrom(Vertecies[cbe].Num()));
 //						Vertecies[cbe].Append(ChunkBlockData[x][y][z]->GetLeftVertecies(x * 100, y * 100, z * 100));
@@ -464,49 +407,45 @@ ChunkGenMaps& AChunk::GetChunkGenMaps()
 	return ChunkDataMaps;
 }
 
-void AChunk::SetNorthChunk(AChunk* c)
-{
-	NorthChunk = c;
-	bHasDataChanged = true;
-}
-
-void AChunk::SetEastChunk(AChunk* c)
-{
-	EastChunk = c;
-	bHasDataChanged = true;
-}
-
-void AChunk::SetSouthChunk(AChunk* c)
-{
-	SouthChunk = c;
-	bHasDataChanged = true;
-}
-
-void AChunk::SetWestChunk(AChunk* c)
-{
-	WestChunk = c;
-	bHasDataChanged = true;
-}
+//void AChunk::SetNorthChunk(AChunk* c)
+//{
+//	NorthChunk = c;
+//	bHasDataChanged = true;
+//}
+//
+//void AChunk::SetEastChunk(AChunk* c)
+//{
+//	EastChunk = c;
+//	bHasDataChanged = true;
+//}
+//
+//void AChunk::SetSouthChunk(AChunk* c)
+//{
+//	SouthChunk = c;
+//	bHasDataChanged = true;
+//}
+//
+//void AChunk::SetWestChunk(AChunk* c)
+//{
+//	WestChunk = c;
+//	bHasDataChanged = true;
+//}
 
 void AChunk::ToggleChunkBorders()
 {
 	ChunkEnterTriggerBox->SetVisibility(!ChunkEnterTriggerBox->IsVisible());
 }
 
-uint64 AChunk::GetLastTimeUpdated()
-{
-	return LastTimeUpdated;
-}
+//uint64 AChunk::GetLastTimeUpdated()
+//{
+//	return LastTimeUpdated;
+//}
 
-void AChunk::SetLastTimeUpdated(float NewTime)
-{
-	LastTimeUpdated = NewTime;
-}
+//void AChunk::SetLastTimeUpdated(float NewTime)
+//{
+//	LastTimeUpdated = NewTime;
+//}
 
 void AChunk::Tick(float Delta)
 {
-	if (bHasDataChanged)
-		UpdateMesh();
-
-	LastTimeUpdated += Delta;
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Core/Public/HAL/Runnable.h"
 #include "Queue.h"
+#include "McWorld.h"
 
 /**
  * 
@@ -16,8 +17,8 @@ private:
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
 	int PosX, PosY;
-	TQueue<class UChunkCube*> CubeGenerationQueue;
-	class UChunkCube* CurrentCube;
+	TArray<AMcWorld::ChunkCubeGenBufferElement> CubeGenerationList;
+	class AMcWorld::ChunkCubeGenBufferElement CurrentCubeElement;
 	//TArray<TArray<TArray<class Block*>>>* ChunkBlockData;
 	class AChunk* Chunk;
 	class AMcWorld* World;
@@ -39,14 +40,14 @@ private:
 
 public:
 	bool bRun = true;
-	//bool bUsesThread;
+	bool bIsBusy;
 	FRunnableThread* ThisThread;
 
 	~ChunkGenerator();
 	virtual uint32 Run();
 	//void Reset(int x, int y, class AChunk* WorkingChunk, int NewGenerationStage, int MaxGenStage = 255, bool bUseThread = true);
 	void SetChunkData(int x, int y, class AChunk* WorkingChunk);
-	void SetCubesData(const TArray<class UChunkCube*>& Cubes, int NewGenerationStage, int MaxGenStage = 255);
+	void SetCubesData(const TArray<AMcWorld::ChunkCubeGenBufferElement>& Cubes);
 	void SetWorld(class AMcWorld* NewWorld);
 	//void Generate();
 
