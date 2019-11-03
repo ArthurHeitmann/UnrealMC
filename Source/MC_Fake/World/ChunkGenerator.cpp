@@ -5,6 +5,7 @@
 #include "Engine/Texture.h"
 #include "Enums.h"
 #include "FastNoise/FastNoise.h"
+#include "McWorld.h"
 
 
 uint32 ChunkGenerator::Run()
@@ -38,7 +39,7 @@ void ChunkGenerator::GenerateChunkCubes()
 	{
 		CurrentCubeElement = CubeGenerationList[0];
 		GenerateChunkCube();
-		World->FinalizeCubeGen(CurrentCubeElement.Cube,)
+		World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
 		CubeGenerationList.RemoveAtSwap(0);
 	}
 }
@@ -72,7 +73,7 @@ void ChunkGenerator::GenHeightMap()
 	for (int x = 0; x < 16; x++)
 	{
 		Maps.HeightMap[x].SetNum(16);
-		for (int y = 0; y < 26; y++)
+		for (int y = 0; y < 16; y++)
 		{
 			float xOffset = TurbulenceNoise->GetNoise(x, 0) * 13.f;
 			float yOffset = TurbulenceNoise->GetNoise(0, y) * 13.f;
@@ -91,7 +92,7 @@ void ChunkGenerator::SetChunkData(int x, int y, AChunk* WorkingChunk)
 	bGenerateChunk = true;
 }
 
-void ChunkGenerator::SetCubesData(const TArray<AMcWorld::ChunkCubeGenBufferElement>& Cubes)
+void ChunkGenerator::SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes)
 {
 	CubeGenerationList = Cubes;
 

@@ -4,12 +4,15 @@
 #include "Components/PrimitiveComponent.h"
 #include "Enums.h"
 #include "McWorld.h"
+//#include "McWorldStructs.h"
+#include "ChunkFormCoords.h"
 #include "ChunkCube.generated.h"
 
 struct ChunkCubeGenData {
 	bool bIsAboveSurface;
 	bool bHasGrass;
 };
+
 
 
 struct ChunkCubeNeighbours {

@@ -2,6 +2,7 @@
 #include "../Blocks/Block.h"
 #include "RuntimeMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "McWorld.h"
 
 UChunkCube::UChunkCube()
 {
@@ -15,7 +16,7 @@ void UChunkCube::BeginPlay()
 {
 	FVector Location = GetComponentLocation();
 	Location /= 1600.f;
-	Pos = { floorf(Location.X), floorf(Location.Y), floorf(Location.Z) };
+	Pos = { (int32) floorf(Location.X), (int32) floorf(Location.Y), (int32) floorf(Location.Z) };
 }
 
 void UChunkCube::TickComponent(float Delta, ELevelTick Type, FActorComponentTickFunction* TickFunction)

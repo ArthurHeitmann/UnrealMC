@@ -76,7 +76,12 @@ void AMcWorld::DequeueGenTasks()
 				ChunkGenBufferElement Element;
 				ChunkGenBuffer.Dequeue(Element);
 				Thread->SetChunkData(Element.x, Element.y, Element.Chunk);
-				//Thread->Reset(Element.x, Element.y, Element.Chunk, Element.NextGenStage);
+				ChunkFormCoords2D key2D = { Element.x, Element.y };
+				if (ChunkCubeGenBuffer.Contains(key2D))
+				{
+					Thread->SetCubesData(*ChunkCubeGenBuffer.Find(key2D));
+					ChunkCubeGenBuffer.Remove(key2D);
+				}
 				break;
 			}
 		}
@@ -92,8 +97,6 @@ void AMcWorld::DequeueGenTasks()
 			Thread->SetCubesData(ChunkCubesBElement);
 			ChunkCubeGenBuffer.Remove(CubeKeys[0]);
 			CubeKeys.RemoveAtSwap(0);
-			//Thread->Reset(Element.x, Element.y, Element.Chunk, Element.NextGenStage);
-			//break;
 		}
 	}
 }
@@ -112,7 +115,7 @@ void AMcWorld::CompleteBlockSetTasks(UChunkCube * ChunkCube, int32 ChunkX, int32
 	{
 		if (Tasks[0].MinGenStage <= ChunkNextGenStage)
 		{
-			BlockData[Tasks[0].RelX][Tasks[0].RelY][Tasks[0].RelZ] = Tasks[0].Block;
+			BlockData[Tasks[0].RelX][Tasks[0].RelY][Tasks[0].RelZ] = Tasks[0].BlockS;
 			bDataChanged = true;
 			Tasks.RemoveAtSwap(0);
 		}
@@ -122,7 +125,7 @@ void AMcWorld::CompleteBlockSetTasks(UChunkCube * ChunkCube, int32 ChunkX, int32
 
 }
 
-void AMcWorld::FinalizeCubeGen(UChunkCube* FinishedChunkCube, ChunkFormCoords3D ChunkPos)
+void AMcWorld::FinalizeCubeGen(UChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos)
 {
 	if (NeighbourUpdateTasks.Contains(FinishedChunkCube))
 	{
@@ -166,7 +169,7 @@ void AMcWorld::FinalizeCubeGen(UChunkCube* FinishedChunkCube, ChunkFormCoords3D 
 
 		NeighbourUpdateTasks.Remove(FinishedChunkCube);
 	}
-	ChunkFormCoords3D key = ChunkPos;
+	ChunkFormCoords3D key = CurrChunkPos;
 	key.x--;
 	if (LoadedChunkCubes.Contains(key)) 
 	{
@@ -291,21 +294,21 @@ AChunk* AMcWorld::SpawnChunk(ChunkFormCoords2D Location)
 	//else
 	//{
 		Chunk = GetWorld()->SpawnActor<AChunk>({Location.x * 1600.f, Location.y * 1600.f, 0.f}, FRotator::ZeroRotator);
-		ChunkGenBuffer.Enqueue({ (int32) Location.x, (int32) Location.y, Chunk, 0 }); 
+		ChunkGenBuffer.Enqueue({ Location.x, Location.y, Chunk, 0 }); 
 	//}
 	
 	LoadedChunks.Add(Location, Chunk);
 	return Chunk;
 }
 
-void AMcWorld::AddLoadedChunkCube(UChunkCube* Cube, ChunkFormCoords3D ChunkPos)
+void AMcWorld::AddLoadedChunkCube(UChunkCube* Cube, ChunkFormCoords3D CurrChunkPos)
 {
-	LoadedChunkCubes.Add(ChunkPos, Cube);
+	LoadedChunkCubes.Add(CurrChunkPos, Cube);
 }
 
-void AMcWorld::RemoveLoadedChunkCube(ChunkFormCoords3D ChunkPos)
+void AMcWorld::RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos)
 {
-	LoadedChunkCubes.FindAndRemoveChecked(ChunkPos);
+	LoadedChunkCubes.FindAndRemoveChecked(CurrChunkPos);
 }
 
 void AMcWorld::RemoveLoadedChunk(AChunk* Chunk)
@@ -443,17 +446,17 @@ Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded = 
 void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class Block* NewBlock, uint8 MinGenStage)
 {
 	BlockSetBufferElement e(x, y, z, NewBlock, MinGenStage);
-	if (LoadedChunkCubes.Contains(e.ChunkPos) && LoadedChunkCubes[e.ChunkPos]->GetNextGenerationStage() >= MinGenStage)
+	if (LoadedChunkCubes.Contains(e.CurrChunkPos) && LoadedChunkCubes[e.CurrChunkPos]->GetNextGenerationStage() >= MinGenStage)
 	{
-		auto& BlockData = LoadedChunkCubes[e.ChunkPos]->GetBlockData();
+		auto& BlockData = LoadedChunkCubes[e.CurrChunkPos]->GetBlockData();
 		BlockData[e.RelX][e.RelY][e.RelZ] = NewBlock;
-		LoadedChunkCubes[e.ChunkPos]->SetHasDataChanged(true);
+		LoadedChunkCubes[e.CurrChunkPos]->SetHasDataChanged(true);
 	}
 	else
 	{
-		if (!BlockSetTasks.Contains(e.ChunkPos))
-			BlockSetTasks.Add(e.ChunkPos, TArray<BlockSetBufferElement>());
-		BlockSetTasks[e.ChunkPos].Add(e);
+		if (!BlockSetTasks.Contains(e.CurrChunkPos))
+			BlockSetTasks.Add(e.CurrChunkPos, TArray<BlockSetBufferElement>());
+		BlockSetTasks[e.CurrChunkPos].Add(e);
 	}
 }
 

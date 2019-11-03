@@ -6,24 +6,26 @@
 #include "Components/ActorComponent.h"
 #include "Chunk.h"
 #include "Containers/Queue.h"
+#include "McWorld.h"
+#include "ChunkFormCoords.h"
+//#include "McWorldStructs.h"
 #include "WorldLoadingComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MC_FAKE_API UWorldLoadingComponent : public UActorComponent
+class MC_FAKE_API UWorldLoadingComponent : public USceneComponent
 {
-	struct ChunkPair { FVector2D Loc; AChunk* chunk; };
+	//struct ChunkPair { FVector2D Loc; AChunk* chunk; };
 
 	GENERATED_BODY()
 
-	struct ChunkLoadBufferElement { int32 x; int32 y; FVector2D RelLocation; };
+	struct ChunkLoadBufferElement { ChunkFormCoords3D CurrChunkPos ; ChunkFormCoords2D LocRelToCurrentChunk; };
 
-private:	
-	AActor* Player;
+private:
 	UPROPERTY(EditAnywhere)
 	int ChunkLoadingDistance;
 	/* Absolute coordinates (in Chunk Form) where the player/component currently is */
-	ChunkFormCoords2D CurrentChunkCoordinates;
+	ChunkFormCoords3D CurrentChunkCoordinates;
 	TArray<ChunkFormCoords2D> PlayerChunks;
 	TQueue<ChunkLoadBufferElement> ChunkLoadingBuffer;
 	class AMcWorld* McFWorld;
