@@ -22,19 +22,17 @@ struct ChunkCubeNeighbours {
 /**
  * 
  */
-UCLASS()
-class MC_FAKE_API UChunkCube : public UPrimitiveComponent
+class MC_FAKE_API UChunkCube
 {
-	GENERATED_BODY()
 
 private:
 	ChunkFormCoords3D Pos;
 	TArray<TArray<TArray<class Block*>>> BlockData;
 	ChunkCubeGenData CubeData;
 	ChunkCubeNeighbours CubeNeighbours;
-	UPROPERTY(EditAnywhere)
+	UBoxComponent* tmpBox;
+	UStaticMeshComponent* tmpStatMesh;
 	class URuntimeMeshComponent* ChunkMesh;
-	UPROPERTY(EditAnywhere)
 	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
 	class AChunk* ParentChunk;

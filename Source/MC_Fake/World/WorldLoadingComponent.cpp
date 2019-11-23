@@ -111,20 +111,29 @@ void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferEle
 		ChunkLoadingBuffer.Enqueue(ChunkPosData);
 	else
 	{
-		int8 RangeDown, RangeUp;
-		CalcCubeRangeFromDist(ChunkPosData, RangeDown, RangeUp);
-		int8 Height = ChunkPosData.CurrChunkPos.z;
-
-		McFWorld->GetChunkAt(ChunkPosData.CurrChunkPos.To2D() + ChunkPosData.LocRelToCurrentChunk)
-			->UpdateChunkCubesLoading(Height, RangeDown, RangeUp);
+		LoadChunkCubes(ChunkPosData);
 	}
 }
 
 void UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
 {
 	//FVector ChunkCoords {  Data.x, Data.y };
-	if (AChunk * NewChunk = McFWorld->SpawnChunk(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk))
+	if (AChunk* NewChunk = McFWorld->SpawnChunk(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk))
+	{
 		PlayerChunks.Add(Data.LocRelToCurrentChunk);
+
+		LoadChunkCubes(Data);
+	}
+
+}
+
+void UWorldLoadingComponent::LoadChunkCubes(ChunkLoadBufferElement Data)
+{
+	int8 RangeDown, RangeUp;
+	CalcCubeRangeFromDist(Data, RangeDown, RangeUp);
+	int8 Height = Data.CurrChunkPos.z;
+	McFWorld->GetChunkAt(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk)
+		->UpdateChunkCubesLoading(Height, RangeDown, RangeUp);
 }
 
 void UWorldLoadingComponent::CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp)

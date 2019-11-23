@@ -17,9 +17,15 @@ uint32 ChunkGenerator::Run()
 		bIsBusy = true;
 
 		if (bGenerateChunk)
+		{
 			GenerateChunkData();
+			bGenerateChunk = false;
+		}
 		if (bGenerateChunkCube)
+		{
 			GenerateChunkCubes();
+			bGenerateChunkCube = false;
+		}
 		
 		bIsBusy = false;
 	}
@@ -31,6 +37,7 @@ uint32 ChunkGenerator::Run()
 void ChunkGenerator::GenerateChunkData()
 {
 	GenHeightMap();
+	World->FinalizeChunkGen(Chunk);
 }
 
 void ChunkGenerator::GenerateChunkCubes()
@@ -195,8 +202,8 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 				int RelX = x + TurbulenceNoise->GetNoise(x + PosX, z) * 13.f;
 				int RelY = y + TurbulenceNoise->GetNoise(y + PosY, z) * 13.f;
 				float HeightMapValue;
-				if (RelX >= 0 && RelX <= 16 && RelY >= -5 && RelY <= 20)
-					HeightMapValue = Maps.HeightMap[RelX + 5][RelY + 5];
+				if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
+					HeightMapValue = Maps.HeightMap[RelX][RelY];
 				else //TODO increase height map seize?
 					HeightMapValue = HeightNoise->GetNoise(PosX + RelX, PosY + RelY);
 
@@ -225,12 +232,12 @@ void ChunkGenerator::Stage_DirtGrass()
 			for (int z = 0; z < 16; z++)
 			{
 				EAllBlocks b = BlockData[x][y][z]->GetBlockEnum();
-				EAllBlocks b1 = z < 255 ? BlockData[x][y][z + 1]->GetBlockEnum() : BAir;
-				EAllBlocks b2 = z < 254 ? BlockData[x][y][z + 2]->GetBlockEnum() : BAir;
-				EAllBlocks b3 = z < 253 ? BlockData[x][y][z + 3]->GetBlockEnum() : BAir;
-				EAllBlocks b4 = z < 252 ? BlockData[x][y][z + 4]->GetBlockEnum() : BAir;
-				EAllBlocks b5 = z < 251 ? BlockData[x][y][z + 5]->GetBlockEnum() : BAir;
-				EAllBlocks b6 = z < 250 ? BlockData[x][y][z + 6]->GetBlockEnum() : BAir;
+				EAllBlocks b1 = z < 15 ? BlockData[x][y][z + 1]->GetBlockEnum() : BAir;
+				EAllBlocks b2 = z < 14 ? BlockData[x][y][z + 2]->GetBlockEnum() : BAir;
+				EAllBlocks b3 = z < 13 ? BlockData[x][y][z + 3]->GetBlockEnum() : BAir;
+				EAllBlocks b4 = z < 12 ? BlockData[x][y][z + 4]->GetBlockEnum() : BAir;
+				EAllBlocks b5 = z < 11 ? BlockData[x][y][z + 5]->GetBlockEnum() : BAir;
+				EAllBlocks b6 = z < 10 ? BlockData[x][y][z + 6]->GetBlockEnum() : BAir;
 				
 				if (b == BStone && (b2 == BAir || b3 == BAir || b4 == BAir || b5 == BAir || b6 == BAir))
 				{

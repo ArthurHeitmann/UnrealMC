@@ -15,6 +15,7 @@
 #include "../Misc/FileIO.h"
 #include "GameFramework/Character.h"
 #include "ChunkCube.h"
+#include "ChunkFormCoords.h"
 
 AChunk::AChunk()
 {
@@ -22,11 +23,19 @@ AChunk::AChunk()
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
+	CubesRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Chunk Cubes Root"));
+	CubesRoot->AddLocalOffset({ 0.f, 0.f, 300.f });
+	CubesRoot->SetupAttachment(GetRootComponent());
 	ChunkEnterTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Chunk Enter Trigger Box"));
-	ChunkEnterTriggerBox->SetBoxExtent(FVector(799, 799, 12800));
-	ChunkEnterTriggerBox->AddLocalOffset({800, 800, 12800});
+	ChunkEnterTriggerBox->SetBoxExtent(FVector(799, 799, 50));
+	ChunkEnterTriggerBox->AddLocalOffset({800, 800, 50});
 	ChunkEnterTriggerBox->SetupAttachment(GetRootComponent());
 	//ChunkEnterTriggerBox->bHiddenInGame = false;	
+}
+
+ChunkFormCoords2D AChunk::GetPos()
+{
+	return Pos;
 }
 
 void AChunk::BeginPlay()
@@ -34,8 +43,7 @@ void AChunk::BeginPlay()
 	Super::BeginPlay();
 	
 	FVector TmpLoc = GetActorLocation();
-	PosX = TmpLoc.X / 100;
-	PosY = TmpLoc.Y / 100;
+	Pos = { (int32) TmpLoc.X / 1600, (int32) TmpLoc.X / 1600 };
 	ChunkEnterTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AChunk::ChunkEntered);
 	
 	TArray<AActor*> FoundActors;
@@ -49,6 +57,8 @@ void AChunk::BeginPlay()
 
 void AChunk::EndPlay(EEndPlayReason::Type Reason)
 {
+	Super::EndPlay(Reason);
+
 	/*UChunkSaveGame* ChunkSave = Cast<UChunkSaveGame>(UGameplayStatics::CreateSaveGameObject(UChunkSaveGame::StaticClass()));
 	ChunkSave->PosX = PosX / 16;
 	ChunkSave->PosY = PosY / 16;
@@ -60,14 +70,28 @@ void AChunk::EndPlay(EEndPlayReason::Type Reason)
 	//UGameplayStatics::SaveGameToSlot(ChunkSave, SaveName, 0);
 }
 
-void AChunk::LoadChunkCube(int8 Pos)
+void AChunk::LoadChunkCube(int8 PosZ)
 {
-	UChunkCube* NewCube = NewObject<UChunkCube>(this);
-
+	FString CubeName("ChunkCube_");
+	CubeName += FString::FromInt(PosZ);
+	UChunkCube* NewCube = NewObject<UChunkCube>(this, FName(*CubeName));
 	NewCube->RegisterComponent();
-	NewCube->AttachToComponent(GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
-	ChunkCubes.Add(Pos, NewCube);
-	//NewCube->SetWorldLocation({ PosX * 1600.f, PosY * 1600.f, 0.f });
+	//NewCube->SetupAttachment(CubesRoot);
+	NewCube->AttachToComponent(CubesRoot, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	ChunkCubes.Add(PosZ, NewCube);
+	McFWorld->AddLoadedChunkCube(NewCube, NewCube->GetPos());
+	McFWorld->AddChunkGenTask(NewCube);
+	NewCube->SetWorldLocation(GetActorLocation() + FVector{ Pos.x * 1600.f, Pos.y * 1600.f, PosZ * 1600.f });
+}
+
+void AChunk::DequeueChunkCubes()
+{
+	while (!ChunkCubesCreatingBuffer.IsEmpty())
+	{
+		int8 PosZ;
+		ChunkCubesCreatingBuffer.Dequeue(PosZ);
+		LoadChunkCube(PosZ);
+	}
 }
 
 //bool AChunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EDirection> Side)
@@ -91,6 +115,11 @@ void AChunk::ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 void AChunk::SetHasFinishedGenerating(bool state = true)
 {
 	bHasFinishedGenerating = state;
+}
+
+bool AChunk::GetHasFinishedGenerating()
+{
+	return bHasFinishedGenerating;
 }
 
 //void AChunk::UpdateMesh()
@@ -233,7 +262,8 @@ void AChunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 Range
 	{
 		int8 PosZ = BaseHeight + z;
 		if (PosZ >= 0 && PosZ < 16 && !ChunkCubes.Contains(PosZ))
-			LoadChunkCube(PosZ);
+			ChunkCubesCreatingBuffer.Enqueue(PosZ);
+			//LoadChunkCube(PosZ);
 	}
 }
 
@@ -448,4 +478,7 @@ void AChunk::ToggleChunkBorders()
 
 void AChunk::Tick(float Delta)
 {
+	Super::Tick(Delta);
+
+	DequeueChunkCubes();
 }

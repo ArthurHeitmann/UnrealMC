@@ -3,6 +3,9 @@
 #include "RuntimeMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "McWorld.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 
 UChunkCube::UChunkCube()
 {
@@ -10,10 +13,23 @@ UChunkCube::UChunkCube()
 	ChunkMesh->SetupAttachment(this);
 	CustomCollisionMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Custom Collision Mesh"));
 	CustomCollisionMesh->SetupAttachment(this);
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+
+	tmpBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Tmp Box"));
+	tmpBox->SetBoxExtent({ 800.f, 800.f, 800.f });
+	tmpBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
+	tmpBox->SetupAttachment(this);
+	tmpStatMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Tmp Mesh Visualizer"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeFinder(TEXT("StaticMesh'/Game/Meshes/Misc/cube.cube'"));
+	tmpStatMesh->SetStaticMesh(CubeFinder.Object);
+	tmpStatMesh->SetupAttachment(this);
 }
 
 void UChunkCube::BeginPlay()
 {
+	Super::BeginPlay();
+
 	FVector Location = GetComponentLocation();
 	Location /= 1600.f;
 	Pos = { (int32) floorf(Location.X), (int32) floorf(Location.Y), (int32) floorf(Location.Z) };
@@ -21,12 +37,23 @@ void UChunkCube::BeginPlay()
 
 void UChunkCube::TickComponent(float Delta, ELevelTick Type, FActorComponentTickFunction* TickFunction)
 {
+	Super::TickComponent(Delta, Type, TickFunction);
+
 	if (bHasDataChanged)
 		UpdateMesh();
+
+	bool t = false;
+	if (t)
+	{
+		FString s = GetComponentLocation().ToString();
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *s);
+	}
 }
 
 void UChunkCube::EndPlay(EEndPlayReason::Type Reason)
 {
+	Super::EndPlay(Reason);
+
 	for (int x = 0; x < BlockData.Num(); x++)
 	{
 		for (int y = 0; y < BlockData[x].Num(); y++)

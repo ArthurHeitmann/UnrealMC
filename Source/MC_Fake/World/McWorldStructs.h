@@ -6,8 +6,6 @@
 //#include "ChunkCube.h"
 
 struct ChunkCubeGenBufferElement {
-	int32 x;
-	int32 y;
 	class UChunkCube* Cube;
 	int NextGenStage;
 	FRunnableThread* Thread = nullptr;
