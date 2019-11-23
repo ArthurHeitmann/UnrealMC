@@ -32,11 +32,13 @@ class MC_FAKE_API AChunk : public AActor
 private:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* Root;
+	UPROPERTY(EditAnywhere)
+	USceneComponent* CubesRoot;
 	class UBoxComponent* ChunkEnterTriggerBox;
 	TMap<int8, class UChunkCube*> ChunkCubes;
+	ChunkFormCoords2D Pos;
 	ChunkGenMaps ChunkDataMaps;
 	class AMcWorld* McFWorld;
-	int32 PosX, PosY;
 	int LifeStage = 0;		//0: normal (visible), 1: Only shadows; no Mesh, 2: Hidden, 3: to be destroyed
 	//bool bHasDataChanged = false;
 	bool bHasFinishedGenerating = false;
@@ -58,14 +60,15 @@ protected:
 
 
 public:	
-
 	AChunk();
+	ChunkFormCoords2D GetPos();
 	UFUNCTION()
 	void ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//void SetData(const TArray<TArray<TArray<Block*>>>& NewData, bool bUpdateMesh);
-	void SetHasDataChanged(bool state = true);
+	//void SetHasDataChanged(bool state = true);
 	void SetHasFinishedGenerating(bool state);
+	bool GetHasFinishedGenerating();
 	//void UpdateMesh();
 	void SetMeshLifeStage(int Stage);
 	/* Loads new ChunkCubes if they now are in range */

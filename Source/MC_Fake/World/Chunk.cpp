@@ -22,6 +22,8 @@ AChunk::AChunk()
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
+	CubesRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Chunk Cubes Root"));
+	CubesRoot->SetupAttachment(GetRootComponent());
 	ChunkEnterTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Chunk Enter Trigger Box"));
 	ChunkEnterTriggerBox->SetBoxExtent(FVector(799, 799, 12800));
 	ChunkEnterTriggerBox->AddLocalOffset({800, 800, 12800});
@@ -29,13 +31,17 @@ AChunk::AChunk()
 	//ChunkEnterTriggerBox->bHiddenInGame = false;	
 }
 
+ChunkFormCoords2D AChunk::GetPos()
+{
+	return Pos;
+}
+
 void AChunk::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	FVector TmpLoc = GetActorLocation();
-	PosX = TmpLoc.X / 100;
-	PosY = TmpLoc.Y / 100;
+	Pos = { (int32) TmpLoc.X / 1600, (int32) TmpLoc.X / 1600 };
 	ChunkEnterTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AChunk::ChunkEntered);
 	
 	TArray<AActor*> FoundActors;
@@ -64,9 +70,11 @@ void AChunk::LoadChunkCube(int8 Pos)
 {
 	UChunkCube* NewCube = NewObject<UChunkCube>(this);
 
-	NewCube->RegisterComponent();
-	NewCube->AttachToComponent(GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	NewCube->AttachToComponent(CubesRoot, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	//NewCube->RegisterComponent();
 	ChunkCubes.Add(Pos, NewCube);
+	McFWorld->AddLoadedChunkCube(NewCube, NewCube->GetPos());
+	McFWorld->AddChunkGenTask(NewCube);
 	//NewCube->SetWorldLocation({ PosX * 1600.f, PosY * 1600.f, 0.f });
 }
 
@@ -91,6 +99,11 @@ void AChunk::ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 void AChunk::SetHasFinishedGenerating(bool state = true)
 {
 	bHasFinishedGenerating = state;
+}
+
+bool AChunk::GetHasFinishedGenerating()
+{
+	return bHasFinishedGenerating;
 }
 
 //void AChunk::UpdateMesh()

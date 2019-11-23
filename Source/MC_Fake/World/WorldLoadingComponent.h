@@ -38,6 +38,7 @@ private:
 	*/
 	void ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData);
 	void LoadChunk(ChunkLoadBufferElement Data);
+	void LoadChunkCubes(ChunkLoadBufferElement Data);
 	/*  */
 	void CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp);
 
