@@ -6,7 +6,6 @@
 #include "McWorld.h"
 //#include "McWorldStructs.h"
 #include "ChunkFormCoords.h"
-#include "ChunkCube.generated.h"
 
 struct ChunkCubeGenData {
 	bool bIsAboveSurface;
@@ -16,50 +15,50 @@ struct ChunkCubeGenData {
 
 
 struct ChunkCubeNeighbours {
-	UChunkCube *North, *East, *South, *West, *Top, *Bottom;
+	ChunkCube *North, *East, *South, *West, *Top, *Bottom;
 };
 
 /**
  * 
  */
-UCLASS()
-class MC_FAKE_API UChunkCube : public UPrimitiveComponent
+class MC_FAKE_API ChunkCube
 {
-	GENERATED_BODY()
 
 private:
+	class AMcWorld* McWorld;
 	ChunkFormCoords3D Pos;
+	class Chunk* ParentChunk;
+	USceneComponent* Root;
+
 	TArray<TArray<TArray<class Block*>>> BlockData;
 	ChunkCubeGenData CubeData;
 	ChunkCubeNeighbours CubeNeighbours;
-	UPROPERTY(EditAnywhere)
+	UBoxComponent* tmpBox;
+	UStaticMeshComponent* tmpStatMesh;
 	class URuntimeMeshComponent* ChunkMesh;
-	UPROPERTY(EditAnywhere)
 	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
-	class AChunk* ParentChunk;
 	int8 Height;
 	bool bHasDataChanged;
 
 	void UpdateMesh();
 	bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side);
 protected:
-	virtual void BeginPlay() override;
-	virtual void TickComponent(float Delta, ELevelTick Type, FActorComponentTickFunction* TickFunction) override;
-	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 public:
-	UChunkCube();
+	ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* ParentChunk);
+	~ChunkCube();
+	void Tick(float Delta);
 
 	ChunkFormCoords3D GetPos();
 	TArray<TArray<TArray<class Block*>>>& GetBlockData();
 	void SetNextGenerationStage(int NewStage);
 	int GetNextGenerationStage();
-	void SetParentChunk(class AChunk*);
+	void SetParentChunk(class Chunk*);
 	void SetHeight(int8 Height);
 	void SetHasDataChanged(bool val = true);
 	Block*& GetBlockAt(int x, int y, int z);
 	ChunkCubeGenData& GetChunkCubeGenData();
 	ChunkCubeNeighbours& GetChunkCubeNeighbours();
-	void UpdateCubeNeighbour(EDirection NeighbourSide, UChunkCube* NewNeighbour, bool bUpdateMesh = false);
+	void UpdateCubeNeighbour(EDirection NeighbourSide, ChunkCube* NewNeighbour, bool bUpdateMesh = false);
 };

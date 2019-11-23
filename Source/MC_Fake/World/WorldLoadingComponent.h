@@ -15,7 +15,7 @@
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MC_FAKE_API UWorldLoadingComponent : public USceneComponent
 {
-	//struct ChunkPair { FVector2D Loc; AChunk* chunk; };
+	//struct ChunkPair { FVector2D Loc; Chunk* chunk; };
 
 	GENERATED_BODY()
 

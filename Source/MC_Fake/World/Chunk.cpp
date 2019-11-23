@@ -15,46 +15,43 @@
 #include "../Misc/FileIO.h"
 #include "GameFramework/Character.h"
 #include "ChunkCube.h"
+#include "ChunkFormCoords.h"
 
-AChunk::AChunk()
+Chunk::Chunk(ChunkFormCoords2D Pos, class AMcWorld* McWorld)
 {
-	PrimaryActorTick.bCanEverTick = true;
+	this->Pos = Pos;
+	this->McWorld = McWorld;
 
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(Root);
-	CubesRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Chunk Cubes Root"));
-	CubesRoot->SetupAttachment(GetRootComponent());
-	ChunkEnterTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Chunk Enter Trigger Box"));
-	ChunkEnterTriggerBox->SetBoxExtent(FVector(799, 799, 12800));
-	ChunkEnterTriggerBox->AddLocalOffset({800, 800, 12800});
-	ChunkEnterTriggerBox->SetupAttachment(GetRootComponent());
+	Root = NewObject<USceneComponent>(McWorld);
+	Root->SetupAttachment(McWorld->ChunksRoot);
+	Root->RegisterComponent();
+	CubesRoot = NewObject<USceneComponent>(McWorld);
+	CubesRoot->SetupAttachment(Root);
+	CubesRoot->RegisterComponent();
+	CubesRoot->AddLocalOffset({ 0.f, 0.f, 300.f });
+	ChunkEnterTriggerBox = NewObject<UBoxComponent>(McWorld);
+	ChunkEnterTriggerBox->SetupAttachment(Root);
+	ChunkEnterTriggerBox->RegisterComponent();
+	ChunkEnterTriggerBox->SetBoxExtent(FVector(799, 799, 50));
+	ChunkEnterTriggerBox->AddLocalOffset({800, 800, 50});
 	//ChunkEnterTriggerBox->bHiddenInGame = false;	
+	//ChunkEnterTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &Chunk::ChunkEntered);
 }
 
-ChunkFormCoords2D AChunk::GetPos()
+ChunkFormCoords2D Chunk::GetPos()
 {
 	return Pos;
 }
 
-void AChunk::BeginPlay()
+Chunk::~Chunk()
 {
-	Super::BeginPlay();
-	
-	FVector TmpLoc = GetActorLocation();
-	Pos = { (int32) TmpLoc.X / 1600, (int32) TmpLoc.X / 1600 };
-	ChunkEnterTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AChunk::ChunkEntered);
-	
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TSubclassOf<AMcWorld>(AMcWorld::StaticClass()), FoundActors);
-	if (FoundActors.Num())
-		McFWorld = Cast<AMcWorld>(FoundActors[0]);
-	else
-		UE_LOG(LogTemp, Warning, TEXT("Shit's about to go real bad..."))
-	//SetMeshLifeStage(1);
-}
+	Root->DestroyComponent();
 
-void AChunk::EndPlay(EEndPlayReason::Type Reason)
-{
+	for (auto& cube : ChunkCubes)
+	{
+		delete cube.Value;
+	}
+
 	/*UChunkSaveGame* ChunkSave = Cast<UChunkSaveGame>(UGameplayStatics::CreateSaveGameObject(UChunkSaveGame::StaticClass()));
 	ChunkSave->PosX = PosX / 16;
 	ChunkSave->PosY = PosY / 16;
@@ -66,47 +63,56 @@ void AChunk::EndPlay(EEndPlayReason::Type Reason)
 	//UGameplayStatics::SaveGameToSlot(ChunkSave, SaveName, 0);
 }
 
-void AChunk::LoadChunkCube(int8 Pos)
+void Chunk::CreateChunkCube(int8 PosZ)
 {
-	UChunkCube* NewCube = NewObject<UChunkCube>(this);
-
-	NewCube->AttachToComponent(CubesRoot, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
-	//NewCube->RegisterComponent();
-	ChunkCubes.Add(Pos, NewCube);
-	McFWorld->AddLoadedChunkCube(NewCube, NewCube->GetPos());
-	McFWorld->AddChunkGenTask(NewCube);
-	//NewCube->SetWorldLocation({ PosX * 1600.f, PosY * 1600.f, 0.f });
+	ChunkCube* NewCube = new ChunkCube({ Pos.x, Pos.y, PosZ }, McWorld, this);
+	//NewCube->SetupAttachment(CubesRoot);
+	//NewCube->AttachToComponent(CubesRoot, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	ChunkCubes.Add(PosZ, NewCube);
+	McWorld->AddLoadedChunkCube(NewCube, NewCube->GetPos());
+	McWorld->AddChunkGenTask(NewCube);
+	//NewCube->SetWorldLocation(GetActorLocation() + FVector{ Pos.x * 1600.f, Pos.y * 1600.f, PosZ * 1600.f });
 }
 
-//bool AChunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EDirection> Side)
+void Chunk::DequeueChunkCubes()
+{
+	while (!ChunkCubesCreatingBuffer.IsEmpty())
+	{
+		int8 PosZ;
+		ChunkCubesCreatingBuffer.Dequeue(PosZ);
+		CreateChunkCube(PosZ);
+	}
+}
+
+//bool Chunk::ShouldFaceBePlacedBetween(Block* b1, Block* b2, TEnumAsByte<EDirection> Side)
 //{
 //	return b2->IsSideOptimizable(Side)
 //			&& b2->GetBlockModelType() != BLOCK
 //		|| !b2->IsBlockOpaque();
 //}
 
-void AChunk::ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void Chunk::ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Chunk Entred by %s"), *FString(OtherActor->GetName()));
 	
 }
 
-//void AChunk::SetHasDataChanged(bool state)
+//void Chunk::SetHasDataChanged(bool state)
 //{
 //	bHasDataChanged = state;
 //}
 
-void AChunk::SetHasFinishedGenerating(bool state = true)
+void Chunk::SetHasFinishedGenerating(bool state = true)
 {
 	bHasFinishedGenerating = state;
 }
 
-bool AChunk::GetHasFinishedGenerating()
+bool Chunk::GetHasFinishedGenerating()
 {
 	return bHasFinishedGenerating;
 }
 
-//void AChunk::UpdateMesh()
+//void Chunk::UpdateMesh()
 //{
 //	if (!bHasDataChanged || !ChunkBlockData.Num() || !bHasFinishedGenerating)
 //		return;
@@ -205,52 +211,57 @@ bool AChunk::GetHasFinishedGenerating()
 //	bHasDataChanged = false;
 //}
 
-void AChunk::SetMeshLifeStage(int Stage)
+void Chunk::SetMeshLifeStage(int Stage)
 {
 	if (LifeStage == 3)
-		Destroy();
+	{
+		delete this;
+		return;
+	}
 	for (auto& Cube : ChunkCubes)
 	{
 		switch (Stage)
 		{
 		case 0:
-			if (LifeStage != 0)
+			if (LifeStage != 0)//TODO CR
 			{
-				Cube.Value->SetVisibility(true);
-				Cube.Value->SetRenderInMainPass(true);
+				//Cube.Value->SetVisibility(true);
+				//Cube.Value->SetRenderInMainPass(true);
 			}
 			break;
 		case 1:
 			if (LifeStage != 1)
 			{
-				Cube.Value->SetVisibility(true);
-				Cube.Value->SetRenderInMainPass(false);
+				//Cube.Value->SetVisibility(true);
+				//Cube.Value->SetRenderInMainPass(false);
 			}
 			break;
 		case 2:
 			if (LifeStage != 2)
 			{
-				Cube.Value->SetVisibility(false);
+				//Cube.Value->SetVisibility(false);
 			}
 			break;
 		case 3:
-			Destroy();
+			delete this;
+			return;
 		}
 	}
 	LifeStage = Stage;
 }
 
-void AChunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp)
+void Chunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp)
 {
 	for (int8 z = -RangeDown; z <= RangeUp; z++)
 	{
 		int8 PosZ = BaseHeight + z;
 		if (PosZ >= 0 && PosZ < 16 && !ChunkCubes.Contains(PosZ))
-			LoadChunkCube(PosZ);
+			ChunkCubesCreatingBuffer.Enqueue(PosZ);
+			//CreateChunkCube(PosZ);
 	}
 }
 
-Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
+Block* Chunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 {
 	////what a mess
 	//Block* HitBlock;
@@ -340,7 +351,7 @@ Block* AChunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 	return nullptr;
 }
 
-bool AChunk::ContinueHit(ABlockBreaking* Block, class Item* Item)
+bool Chunk::ContinueHit(ABlockBreaking* Block, class Item* Item)
 {
 	/*for (BlockBreakingData& BBData : BreakingBlocks)
 	{
@@ -370,7 +381,7 @@ bool AChunk::ContinueHit(ABlockBreaking* Block, class Item* Item)
 	return false;
 }
 
-void AChunk::CancelBreaking(Block* Block)
+void Chunk::CancelBreaking(Block* Block)
 {
 	/*for (int i = 0; i < BreakingBlocks.Num(); i++)
 	{
@@ -395,12 +406,12 @@ void AChunk::CancelBreaking(Block* Block)
 	}*/
 }
 
-TMap<int8, class UChunkCube*>& AChunk::GetChunkCubes()
+TMap<int8, class ChunkCube*>& Chunk::GetChunkCubes()
 {
 	return ChunkCubes;
 }
 
-Block* AChunk::GetBlockAt(int x, int y, int z)
+Block* Chunk::GetBlockAt(int x, int y, int z)
 {
 	int8 Key = z / 16;
 	if (ChunkCubes.Contains(Key))
@@ -409,56 +420,63 @@ Block* AChunk::GetBlockAt(int x, int y, int z)
 		return nullptr;
 }
 
-Block*& AChunk::GetBlockAtAsRef(int x, int y, int z)
+Block*& Chunk::GetBlockAtAsRef(int x, int y, int z)
 {
 	int8 Key = z / 16;
 	return (*ChunkCubes.Find(Key))->GetBlockAt(x, y, Key);
 }
 
-ChunkGenMaps& AChunk::GetChunkGenMaps()
+ChunkGenMaps& Chunk::GetChunkGenMaps()
 {
 	return ChunkDataMaps;
 }
 
-//void AChunk::SetNorthChunk(AChunk* c)
+//void Chunk::SetNorthChunk(Chunk* c)
 //{
 //	NorthChunk = c;
 //	bHasDataChanged = true;
 //}
 //
-//void AChunk::SetEastChunk(AChunk* c)
+//void Chunk::SetEastChunk(Chunk* c)
 //{
 //	EastChunk = c;
 //	bHasDataChanged = true;
 //}
 //
-//void AChunk::SetSouthChunk(AChunk* c)
+//void Chunk::SetSouthChunk(Chunk* c)
 //{
 //	SouthChunk = c;
 //	bHasDataChanged = true;
 //}
 //
-//void AChunk::SetWestChunk(AChunk* c)
+//void Chunk::SetWestChunk(Chunk* c)
 //{
 //	WestChunk = c;
 //	bHasDataChanged = true;
 //}
 
-void AChunk::ToggleChunkBorders()
+void Chunk::ToggleChunkBorders()
 {
 	ChunkEnterTriggerBox->SetVisibility(!ChunkEnterTriggerBox->IsVisible());
 }
 
-//uint64 AChunk::GetLastTimeUpdated()
+//uint64 Chunk::GetLastTimeUpdated()
 //{
 //	return LastTimeUpdated;
 //}
 
-//void AChunk::SetLastTimeUpdated(float NewTime)
+//void Chunk::SetLastTimeUpdated(float NewTime)
 //{
 //	LastTimeUpdated = NewTime;
 //}
 
-void AChunk::Tick(float Delta)
+void Chunk::Tick(float Delta)
 {
+	for (auto& cube : ChunkCubes)
+	{
+		cube.Value->Tick(Delta);
+	}
+	
+	DequeueChunkCubes();
+
 }

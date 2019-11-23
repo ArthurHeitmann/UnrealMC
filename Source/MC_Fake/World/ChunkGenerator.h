@@ -22,7 +22,7 @@ private:
 	TArray<ChunkCubeGenBufferElement> CubeGenerationList;
 	ChunkCubeGenBufferElement CurrentCubeElement;
 	//TArray<TArray<TArray<class Block*>>>* ChunkBlockData;
-	class AChunk* Chunk;
+	class Chunk* CurrentChunk;
 	class AMcWorld* World;
 	int NextGenerationStage;
 	int LastGenerationStage;
@@ -47,8 +47,8 @@ public:
 
 	~ChunkGenerator();
 	virtual uint32 Run();
-	//void Reset(int x, int y, class AChunk* WorkingChunk, int NewGenerationStage, int MaxGenStage = 255, bool bUseThread = true);
-	void SetChunkData(int x, int y, class AChunk* WorkingChunk);
+	//void Reset(int x, int y, class Chunk* WorkingChunk, int NewGenerationStage, int MaxGenStage = 255, bool bUseThread = true);
+	void SetChunkData(int x, int y, class Chunk* WorkingChunk);
 	void SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes);
 	void SetWorld(class AMcWorld* NewWorld);
 	//void Generate();

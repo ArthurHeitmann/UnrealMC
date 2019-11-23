@@ -78,7 +78,7 @@ ChunkData FileIO::LoadChunk(const FString& WorldName, int PosX, int PosY)
 	return OutData;
 }
 
-void FileIO::SaveChunk(AChunk* Chunk, const FString& Worldname)
+void FileIO::SaveChunk(Chunk* Chunk, const FString& Worldname)
 {
 	/*IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 	FString WorldPath(FPaths::ProjectSavedDir());
@@ -111,7 +111,7 @@ void FileIO::SaveChunk(AChunk* Chunk, const FString& Worldname)
 	}*/
 }
 
-TArray<uint8> FileIO::ChunkToBytes(AChunk* Chunk)
+TArray<uint8> FileIO::ChunkToBytes(Chunk* Chunk)
 {
 	TArray<uint8> Bytes;
 	//Bytes.Reserve(20000);

@@ -6,7 +6,7 @@
 //#include "ChunkCube.h"
 
 struct ChunkCubeGenBufferElement {
-	class UChunkCube* Cube;
+	class ChunkCube* Cube;
 	int NextGenStage;
 	FRunnableThread* Thread = nullptr;
 };
@@ -14,7 +14,7 @@ struct ChunkCubeGenBufferElement {
 struct ChunkGenBufferElement {
 	int32 x;
 	int32 y;
-	class AChunk* Chunk;
+	class Chunk* Chunk;
 	FRunnableThread* Thread = nullptr;
 };
 
@@ -45,10 +45,10 @@ struct BlockSetBufferElement {
 
 struct ChunkNeighbourUpdates {
 	//North, East, South, West, Top, Bottom
-	class UChunkCube* NewNChunk;
-	class UChunkCube* NewEChunk;
-	class UChunkCube* NewSChunk;
-	class UChunkCube* NewWChunk;
-	class UChunkCube* NewTChunk;
-	class UChunkCube* NewBChunk;
+	class ChunkCube* NewNChunk;
+	class ChunkCube* NewEChunk;
+	class ChunkCube* NewSChunk;
+	class ChunkCube* NewWChunk;
+	class ChunkCube* NewTChunk;
+	class ChunkCube* NewBChunk;
 };

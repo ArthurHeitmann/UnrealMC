@@ -37,7 +37,7 @@ uint32 ChunkGenerator::Run()
 void ChunkGenerator::GenerateChunkData()
 {
 	GenHeightMap();
-	World->FinalizeChunkGen(Chunk);
+	World->FinalizeChunkGen(CurrentChunk);
 }
 
 void ChunkGenerator::GenerateChunkCubes()
@@ -60,7 +60,7 @@ void ChunkGenerator::GenerateChunkCube()
 
 void ChunkGenerator::GenHeightMap()
 {
-	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	//Noise setup
 		//Height
@@ -89,12 +89,11 @@ void ChunkGenerator::GenHeightMap()
 	}
 
 }
-
-void ChunkGenerator::SetChunkData(int x, int y, AChunk* WorkingChunk)
+void ChunkGenerator::SetChunkData(int x, int y, Chunk* WorkingChunk)
 {
 	PosX = x;
 	PosY = y;
-	Chunk = WorkingChunk;
+	CurrentChunk = WorkingChunk;
 
 	bGenerateChunk = true;
 }
@@ -106,7 +105,7 @@ void ChunkGenerator::SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes)
 	bGenerateChunkCube = true;
 }
 
-//void ChunkGenerator::Reset(int x, int y, AChunk * WorkingChunk, int NewGenerationStage, int MaxGenStage, bool bUseThread)
+//void ChunkGenerator::Reset(int x, int y, Chunk * WorkingChunk, int NewGenerationStage, int MaxGenStage, bool bUseThread)
 //{
 //	if (bUseThread)
 //		bIsDone = false;
@@ -121,7 +120,7 @@ void ChunkGenerator::SetWorld(AMcWorld* NewWorld)
 //void ChunkGenerator::Generate()
 //{
 //	bool HasDataBeenChanged = false;
-//	ChunkBlockData = Chunk->GetChunkBlockData();
+//	ChunkBlockData = CurrentChunk->GetChunkBlockData();
 //	int32 ChunkX = PosX / 16;
 //	int32 ChunkY = PosY / 16;
 //
@@ -147,28 +146,28 @@ void ChunkGenerator::SetWorld(AMcWorld* NewWorld)
 //			break;
 //		case 6:
 //			NextGenerationStage = 244;
-//			Chunk->SetHasFinishedGenerating(true);
+//			CurrentChunk->SetHasFinishedGenerating(true);
 //			break;
 //		}
-//		Chunk->SetNextGenerationStage(++NextGenerationStage);
-//		World->CompleteBlockSetTasks(Chunk, ChunkX, ChunkY);
+//		CurrentChunk->SetNextGenerationStage(++NextGenerationStage);
+//		World->CompleteBlockSetTasks(CurrentChunk, ChunkX, ChunkY);
 //
 //	}
 //
 //	if (HasDataBeenChanged)
 //	{
-//		Chunk->SetHasDataChanged();
-//		Chunk->SetNextGenerationStage(255);
+//		CurrentChunk->SetHasDataChanged();
+//		CurrentChunk->SetNextGenerationStage(255);
 //	}
-//	World->CompleteBlockSetTasks(Chunk, PosX / 16, PosY / 16);
-//	World->FinalizeCubeGen(Chunk, ChunkX, ChunkY);
+//	World->CompleteBlockSetTasks(CurrentChunk, PosX / 16, PosY / 16);
+//	World->FinalizeCubeGen(CurrentChunk, ChunkX, ChunkY);
 //	bIsDone = true;
 //}
 
 void ChunkGenerator::Stage_BaseStoneTerrain()
 {
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
-	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	//Noise setup
 		//HeightMap Noise
@@ -223,7 +222,7 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 void ChunkGenerator::Stage_DirtGrass()
 {
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
-	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	for (int x = 0; x < 16; x++)
 	{
@@ -262,7 +261,7 @@ void ChunkGenerator::Stage_DirtGrass()
 void ChunkGenerator::Stage_CaveCarving()
 {
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
-	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	//Cave noise 1
 	UFastNoise* CaveNoise1 = NewObject<UFastNoise>();
@@ -292,7 +291,7 @@ void ChunkGenerator::Stage_CaveCarving()
 void ChunkGenerator::Stage_Trees()
 {
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
-	ChunkGenMaps& Maps = Chunk->GetChunkGenMaps();
+	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	FRandomStream Rand;
 	for (int x = 0; x < 16; x++)

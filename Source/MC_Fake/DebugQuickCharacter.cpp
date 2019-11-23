@@ -121,15 +121,16 @@ void ADebugQuickCharacter::EndCrouch()
 
 void ADebugQuickCharacter::ToggleChunkBoarders()
 {
-	UWorld* W = GetWorld();
+	UE_LOG(LogTemp, Error, TEXT("Feature currently unsupported"));
+	/*UWorld* W = GetWorld();
 	if (!W)
 		return;
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(W, AChunk::StaticClass(), FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(W, Chunk::StaticClass(), FoundActors);
 	for (AActor* Chunk : FoundActors)
 	{
-		Cast<AChunk>(Chunk)->ToggleChunkBorders();
-	}
+		Cast<Chunk>(Chunk)->ToggleChunkBorders();
+	}*/
 }
 
 void ADebugQuickCharacter::BeginPlay()

@@ -67,21 +67,21 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		int MaxDistance = FMath::Max(abs(PlayerChunks[i].x), abs(PlayerChunks[i].y));
 		if (MaxDistance < ChunkLoadingDistance)
 		{
-			if (AChunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
+			if (Chunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
 				Chunk->SetMeshLifeStage(0);
 		}
 		else if (MaxDistance < ChunkLoadingDistance + 3)
 		{
-			if (AChunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
+			if (Chunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
 				Chunk->SetMeshLifeStage(1);
 		}
 		else
 		{
-			if (AChunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
+			if (Chunk* chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
 			{
 				PlayerChunks.Remove(CurrentChunkCoordinates.To2D() + PlayerChunks[i]);
-				McFWorld->RemoveLoadedChunk(Chunk);
-				Chunk->Destroy();
+				McFWorld->RemoveLoadedChunk(chunk);
+				delete chunk;
 			}
 		}
 	}
@@ -118,7 +118,7 @@ void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferEle
 void UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
 {
 	//FVector ChunkCoords {  Data.x, Data.y };
-	if (AChunk* NewChunk = McFWorld->SpawnChunk(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk))
+	if (Chunk* NewChunk = McFWorld->CreateChunk(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk))
 	{
 		PlayerChunks.Add(Data.LocRelToCurrentChunk);
 

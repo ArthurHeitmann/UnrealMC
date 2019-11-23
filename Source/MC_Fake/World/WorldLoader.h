@@ -16,7 +16,7 @@ class MC_FAKE_API UWorldLoader : public UObject
 
 private:
 	/*UWorld* World;
-	TMap<FVector2D, class AChunk*> LoadedChunks;*/
+	TMap<FVector2D, class Chunk*> LoadedChunks;*/
 
 public:
 	/*void CheckOrSpawnChunk(int32 x, int32 y);

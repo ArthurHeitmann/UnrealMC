@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Blocks/Block.h"
-#include "Chunk.generated.h"
 
 struct ChunkGenMaps {
 	TArray<TArray<int32>> HeightMap;
@@ -12,11 +11,8 @@ struct ChunkGenMaps {
 	//River & etc. data
 };
 
-UCLASS()
-class MC_FAKE_API AChunk : public AActor
+class MC_FAKE_API Chunk
 {
-	GENERATED_BODY()
-
 	struct BlockBreakingData {
 		class ABlockBreaking* Block;
 		float HitTime;
@@ -30,37 +26,37 @@ class MC_FAKE_API AChunk : public AActor
 	};
 
 private:
-	UPROPERTY(EditAnywhere)
-	USceneComponent* Root;
-	UPROPERTY(EditAnywhere)
+	class AMcWorld* McWorld;
 	USceneComponent* CubesRoot;
 	class UBoxComponent* ChunkEnterTriggerBox;
-	TMap<int8, class UChunkCube*> ChunkCubes;
+	TMap<int8, class ChunkCube*> ChunkCubes;
 	ChunkFormCoords2D Pos;
 	ChunkGenMaps ChunkDataMaps;
-	class AMcWorld* McFWorld;
 	int LifeStage = 0;		//0: normal (visible), 1: Only shadows; no Mesh, 2: Hidden, 3: to be destroyed
 	//bool bHasDataChanged = false;
 	bool bHasFinishedGenerating = false;
+	TQueue<int8> ChunkCubesCreatingBuffer;
 	//double LastTimeUpdated = 0;
-	/*AChunk* NorthChunk;
-	AChunk* EastChunk;
-	AChunk* SouthChunk;
-	AChunk* WestChunk;*/
+	/*Chunk* NorthChunk;
+	Chunk* EastChunk;
+	Chunk* SouthChunk;
+	Chunk* WestChunk;*/
 
 
 	TArray<BlockBreakingData> BreakingBlocks;
 
-	void LoadChunkCube(int8 Pos);
+	void CreateChunkCube(int8 Pos);
+	void DequeueChunkCubes();
 	//bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side);
 
 protected:
-	virtual void BeginPlay() override;
-	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 
-public:	
-	AChunk();
+public:
+	USceneComponent* Root;
+
+	Chunk(ChunkFormCoords2D Pos, class AMcWorld* McWorld);
+	~Chunk();
 	ChunkFormCoords2D GetPos();
 	UFUNCTION()
 	void ChunkEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
@@ -76,21 +72,21 @@ public:
 	Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);
 	bool ContinueHit(class ABlockBreaking* Block, class Item* Item);
 	void CancelBreaking(class Block* Block);
-	TMap<int8, class UChunkCube*>& GetChunkCubes();
+	TMap<int8, class ChunkCube*>& GetChunkCubes();
 	Block* GetBlockAt(int x, int y, int z);
 	Block*& GetBlockAtAsRef(int x, int y, int z);
 	ChunkGenMaps& GetChunkGenMaps();
-	/*void SetNorthChunk(AChunk* c);
-	void SetEastChunk(AChunk* c);
-	void SetSouthChunk(AChunk* c);
-	void SetWestChunk(AChunk* c);*/
+	/*void SetNorthChunk(Chunk* c);
+	void SetEastChunk(Chunk* c);
+	void SetSouthChunk(Chunk* c);
+	void SetWestChunk(Chunk* c);*/
 	void ToggleChunkBorders();
 
 	//uint64 GetLastTimeUpdated();
 	//void SetLastTimeUpdated(float NewTime);
 	
 
-	virtual void Tick(float Delta) override;
+	void Tick(float Delta);
 
 
 };

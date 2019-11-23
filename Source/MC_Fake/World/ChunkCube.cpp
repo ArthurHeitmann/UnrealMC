@@ -3,30 +3,46 @@
 #include "RuntimeMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "McWorld.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 
-UChunkCube::UChunkCube()
+ChunkCube::ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* ParentChunk)
 {
-	ChunkMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("ChunkCube Mesh"));
-	ChunkMesh->SetupAttachment(this);
-	CustomCollisionMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Custom Collision Mesh"));
-	CustomCollisionMesh->SetupAttachment(this);
+	this->Pos = Pos;
+	this->McWorld = McWorld;
+	this->ParentChunk = ParentChunk;
+
+	Root = NewObject<USceneComponent>(McWorld);
+	Root->SetupAttachment(ParentChunk->Root);
+	Root->RegisterComponent();
+	ChunkMesh = NewObject<URuntimeMeshComponent>(McWorld);
+	ChunkMesh->SetupAttachment(Root);
+	ChunkMesh->RegisterComponent();
+	CustomCollisionMesh = NewObject<URuntimeMeshComponent>(McWorld);
+	CustomCollisionMesh->SetupAttachment(Root);
+	CustomCollisionMesh->RegisterComponent();
+
+	tmpBox = NewObject<UBoxComponent>(McWorld);
+	tmpBox->SetupAttachment(Root);
+	tmpBox->RegisterComponent();
+	tmpBox->SetBoxExtent({ 800.f, 800.f, 800.f });
+	tmpBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
 }
 
-void UChunkCube::BeginPlay()
+void ChunkCube::Tick(float Delta)
 {
-	FVector Location = GetComponentLocation();
-	Location /= 1600.f;
-	Pos = { (int32) floorf(Location.X), (int32) floorf(Location.Y), (int32) floorf(Location.Z) };
-}
+	//Super::TickComponent(Delta, Type, TickFunction); TODO RC
 
-void UChunkCube::TickComponent(float Delta, ELevelTick Type, FActorComponentTickFunction* TickFunction)
-{
 	if (bHasDataChanged)
 		UpdateMesh();
+
 }
 
-void UChunkCube::EndPlay(EEndPlayReason::Type Reason)
+ChunkCube::~ChunkCube()
 {
+
+
 	for (int x = 0; x < BlockData.Num(); x++)
 	{
 		for (int y = 0; y < BlockData[x].Num(); y++)
@@ -53,7 +69,7 @@ void UChunkCube::EndPlay(EEndPlayReason::Type Reason)
 		CubeNeighbours.Bottom->UpdateCubeNeighbour(TOP, nullptr, false);
 }
 
-void UChunkCube::UpdateMesh()
+void ChunkCube::UpdateMesh()
 {
 	TMap<EAllBlocks, TArray<FVector>> Vertecies;
 	TMap<EAllBlocks, TArray<FVector2D>> UVs;
@@ -144,75 +160,76 @@ void UChunkCube::UpdateMesh()
 			}
 		}
 	}
+	
 	for (auto i = Vertecies.CreateConstIterator(); i; ++i)
 	{
 		EAllBlocks key = i.Key();
 		ChunkMesh->CreateMeshSection(key, i.Value(), Triangles[key], Normals[key], UVs[key], TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
-		ChunkMesh->SetMaterial(key, Materials[key]->GetMaterial(this));
+		ChunkMesh->SetMaterial(key, Materials[key]->GetMaterial(ChunkMesh));
 	}
 
 
 	bHasDataChanged = false;
 }
 
-bool UChunkCube::ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side)
+bool ChunkCube::ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side)
 {
 	return b2->IsSideOptimizable(Side)
 		&& b2->GetBlockModelType() != BLOCK
 		|| !b2->IsBlockOpaque();
 }
 
-ChunkFormCoords3D UChunkCube::GetPos()
+ChunkFormCoords3D ChunkCube::GetPos()
 {
 	return Pos;
 }
 
-TArray<TArray<TArray<class Block*>>>& UChunkCube::GetBlockData()
+TArray<TArray<TArray<class Block*>>>& ChunkCube::GetBlockData()
 {
 	return BlockData;
 }
 
-void UChunkCube::SetNextGenerationStage(int NewStage)
+void ChunkCube::SetNextGenerationStage(int NewStage)
 {
 	NextGenerationStage = NewStage;
 }
 
-int UChunkCube::GetNextGenerationStage()
+int ChunkCube::GetNextGenerationStage()
 {
 	return NextGenerationStage;
 }
 
-void UChunkCube::SetParentChunk(AChunk* PChunk)
+void ChunkCube::SetParentChunk(Chunk* PChunk)
 {
 	ParentChunk = PChunk;
 }
 
-void UChunkCube::SetHeight(int8 Height)
+void ChunkCube::SetHeight(int8 Height)
 {
 	this->Height = Height;
 }
 
-void UChunkCube::SetHasDataChanged(bool val)
+void ChunkCube::SetHasDataChanged(bool val)
 {
 	bHasDataChanged = val;
 }
 
-Block*& UChunkCube::GetBlockAt(int x, int y, int z)
+Block*& ChunkCube::GetBlockAt(int x, int y, int z)
 {
 	return BlockData[x][y][z];
 }
 
-ChunkCubeGenData& UChunkCube::GetChunkCubeGenData()
+ChunkCubeGenData& ChunkCube::GetChunkCubeGenData()
 {
 	return CubeData;
 }
 
-ChunkCubeNeighbours& UChunkCube::GetChunkCubeNeighbours()
+ChunkCubeNeighbours& ChunkCube::GetChunkCubeNeighbours()
 {
 	return CubeNeighbours;
 }
 
-void UChunkCube::UpdateCubeNeighbour(EDirection NeighbourSide, UChunkCube* NewNeighbour, bool bUpdateMesh)
+void ChunkCube::UpdateCubeNeighbour(EDirection NeighbourSide, ChunkCube* NewNeighbour, bool bUpdateMesh)
 {
 	switch (NeighbourSide)
 	{

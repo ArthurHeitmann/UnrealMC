@@ -19,7 +19,7 @@ private:
 	FHitResult LeftClickResult;
 	FHitResult RightClickResult;
 	class Block* HittingBlock;
-	class AChunk* HittingChunk;
+	class Chunk* HittingChunk;
 	class UCameraComponent* RayShootingCamera;
 	bool bIsHitting;
 	FItemStack ** CurrentItem;

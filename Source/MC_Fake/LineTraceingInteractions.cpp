@@ -54,7 +54,9 @@ void ULineTraceingInteractions::LeftClickStart()
 	{
 		if (Cast<URuntimeMeshComponent>(Result.Component))
 		{
-			if (AChunk * Chunk = Cast<AChunk>(Result.Actor))
+
+			UE_LOG(LogTemp, Error, TEXT("Feature currently unsupported"));
+			/*if (Chunk* Chunk = Cast<AMcWorld>(Result.Actor))
 			{
 				Block* NewHittingBlock = Chunk->RegisterHitAt(Result, (*CurrentItem)->ItemS);
 				if (HittingBlock && NewHittingBlock != HittingBlock)
@@ -69,7 +71,7 @@ void ULineTraceingInteractions::LeftClickStart()
 					HittingBlock = nullptr;
 					HittingChunk = nullptr;
 				}
-			}
+			}*/
 		}
 	}
 }
