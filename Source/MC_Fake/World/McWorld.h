@@ -28,7 +28,7 @@ public:
 	void AddChunkGenTask(class ChunkCube* Cube);
 	void AddLoadedChunkCube(class ChunkCube*, ChunkFormCoords3D CurrChunkPos);
 	void RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos);
-	void RemoveLoadedChunk(class Chunk* Chunk);
+	void RemoveLoadedChunk(ChunkFormCoords2D Pos);
 	void QuickSave();
 	void QuickLoad();
 	class Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded, int MinGenStage = 0, int maxGenStae = 255);

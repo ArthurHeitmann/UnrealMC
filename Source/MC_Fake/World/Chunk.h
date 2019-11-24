@@ -5,7 +5,7 @@
 #include "Blocks/Block.h"
 
 struct ChunkGenMaps {
-	TArray<TArray<int32>> HeightMap;
+	TArray<TArray<float>> HeightMap;
 	TArray<TArray<float>> TemperatureMap;
 	TArray<TArray<float>> PrecipitationMap;
 	//River & etc. data

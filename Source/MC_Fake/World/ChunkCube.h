@@ -15,7 +15,12 @@ struct ChunkCubeGenData {
 
 
 struct ChunkCubeNeighbours {
-	ChunkCube *North, *East, *South, *West, *Top, *Bottom;
+	ChunkCube* North = nullptr;
+	ChunkCube* East = nullptr;
+	ChunkCube* South = nullptr;
+	ChunkCube* West = nullptr;
+	ChunkCube* Top = nullptr;
+	ChunkCube* Bottom = nullptr;
 };
 
 /**
@@ -38,8 +43,9 @@ private:
 	class URuntimeMeshComponent* ChunkMesh;
 	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
-	int8 Height;
-	bool bHasDataChanged;
+	//int8 Height; TODO CR
+	bool bHasDataChanged = false;
+	bool bHasFinishedGenerating = false;
 
 	void UpdateMesh();
 	bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side);
@@ -54,9 +60,11 @@ public:
 	TArray<TArray<TArray<class Block*>>>& GetBlockData();
 	void SetNextGenerationStage(int NewStage);
 	int GetNextGenerationStage();
+	class Chunk* GetParentChunk();
 	void SetParentChunk(class Chunk*);
-	void SetHeight(int8 Height);
+	//void SetHeight(int8 Height);
 	void SetHasDataChanged(bool val = true);
+	void SetHasFinishedGenerating(bool val = true);
 	Block*& GetBlockAt(int x, int y, int z);
 	ChunkCubeGenData& GetChunkCubeGenData();
 	ChunkCubeNeighbours& GetChunkCubeNeighbours();

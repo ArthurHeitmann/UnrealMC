@@ -25,6 +25,7 @@ Chunk::Chunk(ChunkFormCoords2D Pos, class AMcWorld* McWorld)
 	Root = NewObject<USceneComponent>(McWorld);
 	Root->SetupAttachment(McWorld->ChunksRoot);
 	Root->RegisterComponent();
+	Root->AddWorldOffset({ Pos.x * 1600.f, Pos.y * 1600.f, 0.f });
 	CubesRoot = NewObject<USceneComponent>(McWorld);
 	CubesRoot->SetupAttachment(Root);
 	CubesRoot->RegisterComponent();
@@ -45,6 +46,15 @@ ChunkFormCoords2D Chunk::GetPos()
 
 Chunk::~Chunk()
 {
+	McWorld->RemoveLoadedChunk(Pos);
+
+	TArray<USceneComponent*> comps;
+	Root->GetChildrenComponents(true, comps);
+	for (auto& comp : comps)
+	{
+		comp->DestroyComponent();
+	}
+
 	Root->DestroyComponent();
 
 	for (auto& cube : ChunkCubes)
@@ -256,8 +266,8 @@ void Chunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeU
 	{
 		int8 PosZ = BaseHeight + z;
 		if (PosZ >= 0 && PosZ < 16 && !ChunkCubes.Contains(PosZ))
-			ChunkCubesCreatingBuffer.Enqueue(PosZ);
-			//CreateChunkCube(PosZ);
+			//ChunkCubesCreatingBuffer.Enqueue(PosZ);
+			CreateChunkCube(PosZ);
 	}
 }
 
@@ -477,6 +487,6 @@ void Chunk::Tick(float Delta)
 		cube.Value->Tick(Delta);
 	}
 	
-	DequeueChunkCubes();
+	//DequeueChunkCubes();
 
 }

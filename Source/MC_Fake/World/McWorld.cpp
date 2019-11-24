@@ -82,8 +82,8 @@ void AMcWorld::DequeueChunkGenTasks()
 		{
 			ChunkGenBufferElement Element;
 			ChunkGenBuffer.Dequeue(Element);
-			Thread->SetChunkData(Element.x, Element.y, Element.Chunk);
-			ChunkFormCoords2D key2D = { Element.x, Element.y };
+			Thread->SetChunkData(Element.Chunk);
+			ChunkFormCoords2D key2D = { Element.x, Element.y };//TODO CR what is this
 		}
 	}
 }
@@ -136,6 +136,9 @@ void AMcWorld::FinalizeChunkGen(Chunk* Chunk)
 
 void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos)
 {
+	FinishedChunkCube->SetHasFinishedGenerating();
+	FinishedChunkCube->SetHasDataChanged();
+
 	if (NeighbourUpdateTasks.Contains(FinishedChunkCube))
 	{
 		ChunkNeighbourUpdates& updates = NeighbourUpdateTasks[FinishedChunkCube];
@@ -329,16 +332,9 @@ void AMcWorld::RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos)
 	LoadedChunkCubes.FindAndRemoveChecked(CurrChunkPos);
 }
 
-void AMcWorld::RemoveLoadedChunk(Chunk* Chunk)
+void AMcWorld::RemoveLoadedChunk(ChunkFormCoords2D Pos)
 {
-	for (const auto& ChunkPair : LoadedChunks)
-	{
-		if (ChunkPair.Value == Chunk)
-		{
-			LoadedChunks.Remove(ChunkPair.Key);
-			return;
-		}
-	}
+	LoadedChunks.Remove(Pos);
 }
 
 void AMcWorld::QuickSave()

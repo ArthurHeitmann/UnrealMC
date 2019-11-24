@@ -31,6 +31,11 @@ struct ChunkFormCoords2D {
 struct ChunkFormCoords3D {
 	int32 x, y, z;
 
+	ChunkFormCoords3D() {}
+	ChunkFormCoords3D(int32 X, int32 Y, int32 Z) : x(X), y(Y), z(Z) {}
+	ChunkFormCoords3D(float X, float Y, float Z) : x((int32) X), y((int32) Y), z((int32) Z) {}
+	ChunkFormCoords3D(const ChunkFormCoords2D& c, int32 Z) : x(c.x), y(c.y), z(Z) {}
+
 	ChunkFormCoords2D To2D() const {
 		return ChunkFormCoords2D{ x, y };
 	}
@@ -54,6 +59,9 @@ struct ChunkFormCoords3D {
 	}
 	ChunkFormCoords3D operator-=(const ChunkFormCoords3D& c) {
 		return { x - c.x, y - c.y, z - c.z };
+	}
+	ChunkFormCoords3D operator*(int32 i) {
+		return {x * i, y * i, z * i};
 	}
 };
 

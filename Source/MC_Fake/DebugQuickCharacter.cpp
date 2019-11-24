@@ -28,6 +28,7 @@ ADebugQuickCharacter::ADebugQuickCharacter()
 	Camera->AddLocalOffset({-25, 0, 55});
 	Camera->bUsePawnControlRotation = true;
 	WorldLoader = CreateDefaultSubobject<UWorldLoadingComponent>(TEXT("World Loader"));
+	WorldLoader->SetupAttachment(GetRootComponent());
 	LineTracer = CreateDefaultSubobject<ULineTraceingInteractions>(TEXT("Line Tracing Component"));
 	LineTracer->SetCamera(Camera);
 

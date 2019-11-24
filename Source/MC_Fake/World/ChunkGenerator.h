@@ -18,7 +18,9 @@ private:
 	//bool bIsDone = true;
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
-	int PosX, PosY;
+	//int PosX, PosY;		TODO CR
+	ChunkFormCoords3D Pos;
+	ChunkFormCoords2D Pos2D;
 	TArray<ChunkCubeGenBufferElement> CubeGenerationList;
 	ChunkCubeGenBufferElement CurrentCubeElement;
 	//TArray<TArray<TArray<class Block*>>>* ChunkBlockData;
@@ -48,7 +50,7 @@ public:
 	~ChunkGenerator();
 	virtual uint32 Run();
 	//void Reset(int x, int y, class Chunk* WorkingChunk, int NewGenerationStage, int MaxGenStage = 255, bool bUseThread = true);
-	void SetChunkData(int x, int y, class Chunk* WorkingChunk);
+	void SetChunkData(class Chunk* WorkingChunk);
 	void SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes);
 	void SetWorld(class AMcWorld* NewWorld);
 	//void Generate();

@@ -19,7 +19,7 @@ class MC_FAKE_API UWorldLoadingComponent : public USceneComponent
 
 	GENERATED_BODY()
 
-	struct ChunkLoadBufferElement { ChunkFormCoords3D CurrChunkPos ; ChunkFormCoords2D LocRelToCurrentChunk; };
+	//struct ChunkLoadBufferElement { ChunkFormCoords3D CurrChunkPos ; ChunkFormCoords2D LocRelToCurrentChunk; };
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -27,7 +27,7 @@ private:
 	/* Absolute coordinates (in Chunk Form) where the player/component currently is */
 	ChunkFormCoords3D CurrentChunkCoordinates;
 	TArray<ChunkFormCoords2D> PlayerChunks;
-	TQueue<ChunkLoadBufferElement> ChunkLoadingBuffer;
+	TQueue<ChunkFormCoords3D> ChunkLoadingBuffer;
 	class AMcWorld* McFWorld;
 	UPROPERTY(EditAnywhere)
 	bool bIsEnabled;
@@ -36,11 +36,11 @@ private:
 	 Input: Absolute Coordinates (Chunk form) of new chunk
 	 If the Chunk doesn't exist yet it gets added to the ChunkBuffer Queue
 	*/
-	void ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData);
-	void LoadChunk(ChunkLoadBufferElement Data);
-	void LoadChunkCubes(ChunkLoadBufferElement Data);
+	void ProcessChunkDistanceUpdate(const ChunkFormCoords3D& Pos3D);
+	void LoadChunk(ChunkFormCoords3D Pos3D);
+	void LoadChunkCubes(ChunkFormCoords3D Pos3D);
 	/*  */
-	void CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp);
+	void CalcCubeRangeFromDist(const ChunkFormCoords2D& Pos2D, int8& OutRangeDown, int8& OutRangeUp);
 
 protected:
 	virtual void BeginPlay() override;

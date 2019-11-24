@@ -16,6 +16,7 @@ ChunkCube::ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* Pare
 	Root = NewObject<USceneComponent>(McWorld);
 	Root->SetupAttachment(ParentChunk->Root);
 	Root->RegisterComponent();
+	Root->AddWorldOffset({ 0.f, 0.f, Pos.z * 1600.f });
 	ChunkMesh = NewObject<URuntimeMeshComponent>(McWorld);
 	ChunkMesh->SetupAttachment(Root);
 	ChunkMesh->RegisterComponent();
@@ -41,7 +42,7 @@ void ChunkCube::Tick(float Delta)
 
 ChunkCube::~ChunkCube()
 {
-
+	McWorld->RemoveLoadedChunkCube(Pos);
 
 	for (int x = 0; x < BlockData.Num(); x++)
 	{
@@ -71,6 +72,9 @@ ChunkCube::~ChunkCube()
 
 void ChunkCube::UpdateMesh()
 {
+	if (!bHasFinishedGenerating || !BlockData.Num())
+		return;
+
 	TMap<EAllBlocks, TArray<FVector>> Vertecies;
 	TMap<EAllBlocks, TArray<FVector2D>> UVs;
 	TMap<EAllBlocks, TArray<int32>> Triangles;
@@ -111,9 +115,9 @@ void ChunkCube::UpdateMesh()
 						UVs[cbe].Append(BlockData[x][y][z]->GetTopUVs());
 						Normals[cbe].Append(BlockData[x][y][z]->GetTopNormals());
 					}
-					if (z != 0 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y][z + 1], BOTTOM)
+					if (z != 0 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y][z - 1], BOTTOM)
 						||
-						z == 0 && CubeNeighbours.Top && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbours.Top->GetBlockAt(x, y, 15), BOTTOM))
+						z == 0 && CubeNeighbours.Bottom && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbours.Bottom->GetBlockAt(x, y, 15), BOTTOM))
 					{
 						Triangles[cbe].Append(BlockData[x][y][z]->GetBottomTrianglesFrom(Vertecies[cbe].Num()));
 						Vertecies[cbe].Append(BlockData[x][y][z]->GetBottomVertecies(x * 100, y * 100, z * 100));
@@ -199,19 +203,30 @@ int ChunkCube::GetNextGenerationStage()
 	return NextGenerationStage;
 }
 
+Chunk* ChunkCube::GetParentChunk()
+{
+	return ParentChunk;
+}
+
 void ChunkCube::SetParentChunk(Chunk* PChunk)
 {
 	ParentChunk = PChunk;
 }
 
-void ChunkCube::SetHeight(int8 Height)
-{
-	this->Height = Height;
-}
+//void ChunkCube::SetHeight(int8 Height)
+//{
+//	this->Height = Height;
+//}
 
 void ChunkCube::SetHasDataChanged(bool val)
 {
-	bHasDataChanged = val;
+	if (bHasFinishedGenerating)
+		bHasDataChanged = val;
+}
+
+void ChunkCube::SetHasFinishedGenerating(bool val)
+{
+	bHasFinishedGenerating = val;
 }
 
 Block*& ChunkCube::GetBlockAt(int x, int y, int z)

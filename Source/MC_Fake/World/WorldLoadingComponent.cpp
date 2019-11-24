@@ -29,10 +29,13 @@ void UWorldLoadingComponent::BeginPlay()
 	else
 		McFWorld = GetWorld()->SpawnActor<AMcWorld>();
 
-	FVector ChunkCoordinatesNew3D = GetComponentLocation();
-	ChunkFormCoords3D ChunkCoordinatesNew{ floorf(ChunkCoordinatesNew3D.X / 1600),
+	/*FVector ChunkCoordinatesNew3D = GetComponentLocation();
+	CurrentChunkCoordinates = { 
+		floorf(ChunkCoordinatesNew3D.X / 1600),
 		floorf(ChunkCoordinatesNew3D.Y / 1600),
-		floorf(ChunkCoordinatesNew3D.Z / 1600) };
+		floorf(ChunkCoordinatesNew3D.Z / 1600) 
+	};			TODO CR  */
+
 }
 
 void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -44,7 +47,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (!ChunkLoadingBuffer.IsEmpty())
 	{
-		ChunkLoadBufferElement NewChunk;
+		ChunkFormCoords3D NewChunk;
 		ChunkLoadingBuffer.Dequeue(NewChunk);
 		LoadChunk(NewChunk);
 	}
@@ -57,30 +60,32 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	if (CurrentChunkCoordinates == ChunkCoordinatesNew)
 		return;
 
-	ChunkFormCoords3D ChunkLocDifference = CurrentChunkCoordinates - ChunkCoordinatesNew;
+	//ChunkFormCoords3D ChunkLocDifference = ChunkCoordinatesNew - CurrentChunkCoordinates;		TODO CR
 	CurrentChunkCoordinates = ChunkCoordinatesNew;
+	ChunkFormCoords2D ChunkCoords2D = CurrentChunkCoordinates.To2D();
 
 	//Update life stages
 	for (int i = 0; i < PlayerChunks.Num(); i++)
 	{
-		PlayerChunks[i] += ChunkLocDifference.To2D();
-		int MaxDistance = FMath::Max(abs(PlayerChunks[i].x), abs(PlayerChunks[i].y));
+		ChunkFormCoords2D LocDiff = ChunkCoords2D - PlayerChunks[i];
+		//PlayerChunks[i] += LocDiff;		TODO CR
+		int MaxDistance = FMath::Max(abs(LocDiff.x), abs(LocDiff.y));
 		if (MaxDistance < ChunkLoadingDistance)
 		{
-			if (Chunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
+			if (Chunk* Chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 				Chunk->SetMeshLifeStage(0);
 		}
-		else if (MaxDistance < ChunkLoadingDistance + 3)
+		else if (MaxDistance < ChunkLoadingDistance + 3 && false)//		TODO CR
 		{
-			if (Chunk * Chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
+			if (Chunk* Chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 				Chunk->SetMeshLifeStage(1);
 		}
 		else
 		{
-			if (Chunk* chunk = McFWorld->GetChunkAt({ CurrentChunkCoordinates.To2D() + PlayerChunks[i] }))
+			if (Chunk* chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 			{
-				PlayerChunks.Remove(CurrentChunkCoordinates.To2D() + PlayerChunks[i]);
-				McFWorld->RemoveLoadedChunk(chunk);
+				ChunkFormCoords2D tmpCoords = PlayerChunks[i];
+				PlayerChunks.Remove(tmpCoords);
 				delete chunk;
 			}
 		}
@@ -94,52 +99,53 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			if (abs(x) == layer)
 			{
 				for (int y = -layer; y <= layer; y++)
-					ProcessChunkDistanceUpdate({ CurrentChunkCoordinates, { x, y } });
+					ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, y }, CurrentChunkCoordinates.z });
 			}
 			else
 			{
-				ProcessChunkDistanceUpdate({ CurrentChunkCoordinates, { x, layer } });
-				ProcessChunkDistanceUpdate({ CurrentChunkCoordinates, { x, -layer } });
+				ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, layer }, CurrentChunkCoordinates.z });
+				ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, -layer }, CurrentChunkCoordinates.z });
 			}
 		}
 	}
 }
 
-void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkLoadBufferElement& ChunkPosData)
+void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkFormCoords3D & Pos3D)
 {
-	if (!PlayerChunks.Contains(ChunkPosData.LocRelToCurrentChunk))
-		ChunkLoadingBuffer.Enqueue(ChunkPosData);
+	if (!PlayerChunks.Contains(Pos3D.To2D()))
+		ChunkLoadingBuffer.Enqueue(Pos3D);
 	else
 	{
-		LoadChunkCubes(ChunkPosData);
+		LoadChunkCubes(Pos3D);
 	}
 }
 
-void UWorldLoadingComponent::LoadChunk(ChunkLoadBufferElement Data)
+void UWorldLoadingComponent::LoadChunk(ChunkFormCoords3D Pos3D)
 {
 	//FVector ChunkCoords {  Data.x, Data.y };
-	if (Chunk* NewChunk = McFWorld->CreateChunk(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk))
+	if (Chunk* NewChunk = McFWorld->CreateChunk(Pos3D.To2D()))
 	{
-		PlayerChunks.Add(Data.LocRelToCurrentChunk);
+		PlayerChunks.Add(Pos3D.To2D());
 
-		LoadChunkCubes(Data);
+		LoadChunkCubes(Pos3D);
 	}
 
 }
 
-void UWorldLoadingComponent::LoadChunkCubes(ChunkLoadBufferElement Data)
+void UWorldLoadingComponent::LoadChunkCubes(ChunkFormCoords3D Pos3D)
 {
 	int8 RangeDown, RangeUp;
-	CalcCubeRangeFromDist(Data, RangeDown, RangeUp);
-	int8 Height = Data.CurrChunkPos.z;
-	McFWorld->GetChunkAt(Data.CurrChunkPos.To2D() + Data.LocRelToCurrentChunk)
+	CalcCubeRangeFromDist(Pos3D.To2D(), RangeDown, RangeUp);
+	int8 Height = Pos3D.z;
+	McFWorld->GetChunkAt(Pos3D.To2D())
 		->UpdateChunkCubesLoading(Height, RangeDown, RangeUp);
 }
 
-void UWorldLoadingComponent::CalcCubeRangeFromDist(const ChunkLoadBufferElement& ChunkPosData, int8& OutRangeDown, int8& OutRangeUp)
+void UWorldLoadingComponent::CalcCubeRangeFromDist(const ChunkFormCoords2D& Pos2D, int8& OutRangeDown, int8& OutRangeUp)
 {
 	//TODO scale with Loading Distance and environment (Cave, Hills, Structure, etc.)
-	float MaxDist = fmaxf(abs(ChunkPosData.LocRelToCurrentChunk.x), abs(ChunkPosData.LocRelToCurrentChunk.y));
+	ChunkFormCoords2D LocDiff = CurrentChunkCoordinates.To2D() - Pos2D;
+	float MaxDist = fmaxf(abs(LocDiff.x), abs(LocDiff.y));
 	if (MaxDist <= 5)
 	{
 		OutRangeDown = 2;
