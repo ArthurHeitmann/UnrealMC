@@ -46,7 +46,13 @@ ChunkFormCoords2D Chunk::GetPos()
 
 Chunk::~Chunk()
 {
+	while (bIsGenerating)
+		FPlatformProcess::Sleep(0.01);
+
 	McWorld->RemoveLoadedChunk(Pos);
+	McWorld->
+	if (!bHasFinishedGenerating)
+		McWorld->AddRemovedChunk(this);
 
 	TArray<USceneComponent*> comps;
 	Root->GetChildrenComponents(true, comps);
@@ -82,6 +88,11 @@ void Chunk::CreateChunkCube(int8 PosZ)
 	McWorld->AddLoadedChunkCube(NewCube, NewCube->GetPos());
 	McWorld->AddChunkGenTask(NewCube);
 	//NewCube->SetWorldLocation(GetActorLocation() + FVector{ Pos.x * 1600.f, Pos.y * 1600.f, PosZ * 1600.f });
+
+	if (Pos.x == 0 && Pos.y == 0 && PosZ == 3)
+	{
+
+	}
 }
 
 void Chunk::DequeueChunkCubes()
@@ -120,6 +131,16 @@ void Chunk::SetHasFinishedGenerating(bool state = true)
 bool Chunk::GetHasFinishedGenerating()
 {
 	return bHasFinishedGenerating;
+}
+
+bool Chunk::GetIsGenerating()
+{
+	return bIsGenerating;
+}
+
+void Chunk::SetIsGenerating(bool val)
+{
+	bIsGenerating = val;
 }
 
 //void Chunk::UpdateMesh()
@@ -260,9 +281,15 @@ void Chunk::SetMeshLifeStage(int Stage)
 	LifeStage = Stage;
 }
 
+ChunkCube* Chunk::GetChunkCube(int8 PosZ)
+{
+	ChunkCube** found = ChunkCubes.Find(PosZ);
+	return found ? *found : nullptr;
+}
+
 void Chunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp)
 {
-	for (int8 z = -RangeDown; z <= RangeUp; z++)
+	for (int8 z = -RangeDown; z <= RangeUp; ++z)
 	{
 		int8 PosZ = BaseHeight + z;
 		if (PosZ >= 0 && PosZ < 16 && !ChunkCubes.Contains(PosZ))

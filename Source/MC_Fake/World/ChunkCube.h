@@ -38,13 +38,14 @@ private:
 	TArray<TArray<TArray<class Block*>>> BlockData;
 	ChunkCubeGenData CubeData;
 	ChunkCubeNeighbours CubeNeighbours;
-	UBoxComponent* tmpBox;
+	class UBoxComponent* tmpBox;
 	UStaticMeshComponent* tmpStatMesh;
 	class URuntimeMeshComponent* ChunkMesh;
 	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
 	//int8 Height; TODO CR
 	bool bHasDataChanged = false;
+	bool bIsGenerating = false;
 	bool bHasFinishedGenerating = false;
 
 	void UpdateMesh();
@@ -64,7 +65,10 @@ public:
 	void SetParentChunk(class Chunk*);
 	//void SetHeight(int8 Height);
 	void SetHasDataChanged(bool val = true);
+	bool GetHasFinishedGenerating();
 	void SetHasFinishedGenerating(bool val = true);
+	bool GetIsGenerating();
+	void SetIsGenerating(bool val);
 	Block*& GetBlockAt(int x, int y, int z);
 	ChunkCubeGenData& GetChunkCubeGenData();
 	ChunkCubeNeighbours& GetChunkCubeNeighbours();

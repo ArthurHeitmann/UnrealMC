@@ -53,15 +53,15 @@ Item::PostUseTask I_BlockItem::OnItemUse(const FHitResult& HitPointData, AMcWorl
 	/*	if (HitPointData.ImpactNormal.Z > 0)
 			z++;
 		else*/ if (HitPointData.ImpactNormal.Z < 0)
-			z--;
+			--z;
 		/*else if (HitPointData.ImpactNormal.X > 0)
 			x++;*/
 		else if (HitPointData.ImpactNormal.X < 0/* && !NegXApplied*/)
-			x--;
+			--x;
 		/*else if (HitPointData.ImpactNormal.Y > 0)
 			y++;*/
 		else if (HitPointData.ImpactNormal.Y < 0/* && !NegYApplied*/)
-			y--;
+			--y;
 	World->AddBlockSetTask(x, y, z, BlockRef->Clone(), 255);
 
 	return { Decrement, 1 };

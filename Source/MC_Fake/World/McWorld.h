@@ -28,6 +28,7 @@ public:
 	void AddChunkGenTask(class ChunkCube* Cube);
 	void AddLoadedChunkCube(class ChunkCube*, ChunkFormCoords3D CurrChunkPos);
 	void RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos);
+	void AddRemovedChunk(class Chunk* chunk);
 	void RemoveLoadedChunk(ChunkFormCoords2D Pos);
 	void QuickSave();
 	void QuickLoad();
@@ -46,6 +47,7 @@ private:
 	TMap<ChunkFormCoords3D, class ChunkCube*> LoadedChunkCubes;
 	TArray<class ChunkGenerator*> GeneratorThreads;
 	TQueue<ChunkGenBufferElement> ChunkGenBuffer;
+	TArray<Chunk*> RemovedChunksInGenBuffer;
 	TMap<ChunkFormCoords2D, TArray<ChunkCubeGenBufferElement>> ChunkCubeGenTasks;
 	TQueue<TArray<ChunkCubeGenBufferElement>> ChunkCubeGenBuffer;
 	/* 
@@ -57,6 +59,7 @@ private:
 		
 	*/
 	TMap<class ChunkCube*, ChunkNeighbourUpdates> NeighbourUpdateTasks;
+	FCriticalSection NeighbourUpdatesMutex;
 
 	void DequeueChunkGenTasks();
 	void DequeueChunkCubeGenTasks();

@@ -21,7 +21,7 @@ void UWorldLoadingComponent::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TSubclassOf<AMcWorld>(AMcWorld::StaticClass()), AllWorlds);
 	if (AllWorlds.Num() > 1)
 	{
-		for (int i = 1; i < AllWorlds.Num(); i++)
+		for (int i = 1; i < AllWorlds.Num(); ++i)
 			AllWorlds[i]->Destroy();
 	}
 	else if (AllWorlds.Num() == 1)
@@ -45,13 +45,6 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	if (!bIsEnabled)
 		return;
 
-	if (!ChunkLoadingBuffer.IsEmpty())
-	{
-		ChunkFormCoords3D NewChunk;
-		ChunkLoadingBuffer.Dequeue(NewChunk);
-		LoadChunk(NewChunk);
-	}
-
 	FVector ChunkCoordinatesNew3D = GetComponentLocation();
 	ChunkFormCoords3D ChunkCoordinatesNew { floorf(ChunkCoordinatesNew3D.X / 1600), 
 		floorf(ChunkCoordinatesNew3D.Y / 1600),
@@ -59,26 +52,21 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (CurrentChunkCoordinates == ChunkCoordinatesNew)
 		return;
-
+	UE_LOG(LogTemp, Warning, TEXT("Position changed \n X: %d Y: %d Z: %d"), ChunkCoordinatesNew.x, ChunkCoordinatesNew.y, ChunkCoordinatesNew.z);
 	//ChunkFormCoords3D ChunkLocDifference = ChunkCoordinatesNew - CurrentChunkCoordinates;		TODO CR
 	CurrentChunkCoordinates = ChunkCoordinatesNew;
 	ChunkFormCoords2D ChunkCoords2D = CurrentChunkCoordinates.To2D();
 
 	//Update life stages
-	for (int i = 0; i < PlayerChunks.Num(); i++)
+	for (int i = 0; i < PlayerChunks.Num(); ++i)
 	{
 		ChunkFormCoords2D LocDiff = ChunkCoords2D - PlayerChunks[i];
 		//PlayerChunks[i] += LocDiff;		TODO CR
 		int MaxDistance = FMath::Max(abs(LocDiff.x), abs(LocDiff.y));
-		if (MaxDistance < ChunkLoadingDistance)
+		if (MaxDistance < ChunkLoadingDistance + 3)
 		{
 			if (Chunk* Chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 				Chunk->SetMeshLifeStage(0);
-		}
-		else if (MaxDistance < ChunkLoadingDistance + 3 && false)//		TODO CR
-		{
-			if (Chunk* Chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
-				Chunk->SetMeshLifeStage(1);
 		}
 		else
 		{
@@ -92,13 +80,13 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 
 	//Enqueue new chunks, that are now within the render distance/ChunkLoadingDistance   
-	for (int layer = 0; layer <= ChunkLoadingDistance - 1; layer++)
+	for (int layer = 0; layer <= ChunkLoadingDistance - 1; ++layer)
 	{
-		for (int x = -layer; x <= layer; x++)
+		for (int x = -layer; x <= layer; ++x)
 		{
 			if (abs(x) == layer)
 			{
-				for (int y = -layer; y <= layer; y++)
+				for (int y = -layer; y <= layer; ++y)
 					ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, y }, CurrentChunkCoordinates.z });
 			}
 			else
@@ -113,7 +101,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkFormCoords3D & Pos3D)
 {
 	if (!PlayerChunks.Contains(Pos3D.To2D()))
-		ChunkLoadingBuffer.Enqueue(Pos3D);
+		LoadChunk(Pos3D);
 	else
 	{
 		LoadChunkCubes(Pos3D);
@@ -149,7 +137,7 @@ void UWorldLoadingComponent::CalcCubeRangeFromDist(const ChunkFormCoords2D& Pos2
 	if (MaxDist <= 5)
 	{
 		OutRangeDown = 2;
-		OutRangeUp = 16;
+		OutRangeUp = 4;
 	}
 	else
 	{

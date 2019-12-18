@@ -474,7 +474,7 @@ TArray<int32> Block::GetAllTrainglesFrom(int32 Start)
 {
 	TArray<int32> Tris;
 	Tris.Reserve(36);
-	for (int face = 0; face < 6; face++)
+	for (int face = 0; face < 6; ++face)
 	{
 		int vl = face * 4 + Start;
 		Tris.Append({

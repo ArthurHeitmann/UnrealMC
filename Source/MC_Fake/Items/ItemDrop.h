@@ -23,7 +23,7 @@ protected:
 	UPROPERTY()
 	class UTimelineComponent* TLComp;
 	UPROPERTY()
-	UCurveFloat* FloatCurve;
+	class UCurveFloat* FloatCurve;
 	UFUNCTION()
 	void TimelineUpdate(float val);
 	UFUNCTION()

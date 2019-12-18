@@ -35,20 +35,23 @@ void ChunkCube::Tick(float Delta)
 {
 	//Super::TickComponent(Delta, Type, TickFunction); TODO RC
 
-	if (bHasDataChanged)
+	if (bHasDataChanged && bHasFinishedGenerating)
 		UpdateMesh();
 
 }
 
 ChunkCube::~ChunkCube()
 {
+	while (bIsGenerating)
+		FPlatformProcess::Sleep(0.01);
+
 	McWorld->RemoveLoadedChunkCube(Pos);
 
-	for (int x = 0; x < BlockData.Num(); x++)
+	for (int x = 0; x < BlockData.Num(); ++x)
 	{
-		for (int y = 0; y < BlockData[x].Num(); y++)
+		for (int y = 0; y < BlockData[x].Num(); ++y)
 		{
-			for (int z = 0; z < BlockData[x][y].Num(); z++)
+			for (int z = 0; z < BlockData[x][y].Num(); ++z)
 			{
 				if (BlockData[x][y][z] && BlockData[x][y][z]->GetBlockEnum() != BAir)
 					delete BlockData[x][y][z];
@@ -82,11 +85,11 @@ void ChunkCube::UpdateMesh()
 	TMap<EAllBlocks, Block*> Materials;
 	TMap<EAllBlocks, TArray<FVector>> VerteciesCustomCollision;
 	TMap<EAllBlocks, TArray<int32>> TrianglesCustomCollision;
-	for (int x = 0; x < 16; x++)
+	for (int x = 0; x < 16; ++x)
 	{
-		for (int y = 0; y < 16; y++)
+		for (int y = 0; y < 16; ++y)
 		{
-			for (int z = 0; z < 16; z++)
+			for (int z = 0; z < 16; ++z)
 			{
 				if (BlockData[x][y][z]->GetBlockModelType() != EBlockModelType::NONE)
 				{
@@ -220,13 +223,27 @@ void ChunkCube::SetParentChunk(Chunk* PChunk)
 
 void ChunkCube::SetHasDataChanged(bool val)
 {
-	if (bHasFinishedGenerating)
-		bHasDataChanged = val;
+	bHasDataChanged = val;
+}
+
+bool ChunkCube::GetHasFinishedGenerating()
+{
+	return bHasFinishedGenerating;
 }
 
 void ChunkCube::SetHasFinishedGenerating(bool val)
 {
 	bHasFinishedGenerating = val;
+}
+
+bool ChunkCube::GetIsGenerating()
+{
+	return bIsGenerating;
+}
+
+void ChunkCube::SetIsGenerating(bool val)
+{
+	bIsGenerating = val;
 }
 
 Block*& ChunkCube::GetBlockAt(int x, int y, int z)
@@ -268,6 +285,6 @@ void ChunkCube::UpdateCubeNeighbour(EDirection NeighbourSide, ChunkCube* NewNeig
 		break;
 	}
 	
-	if (bUpdateMesh)
+	if (bUpdateMesh && bHasFinishedGenerating)
 		bHasDataChanged = true;
 }

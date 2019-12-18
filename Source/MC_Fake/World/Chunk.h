@@ -35,6 +35,7 @@ private:
 	int LifeStage = 0;		//0: normal (visible), 1: Only shadows; no Mesh, 2: Hidden, 3: to be destroyed
 	//bool bHasDataChanged = false;
 	bool bHasFinishedGenerating = false;
+	bool bIsGenerating = false;
 	TQueue<int8> ChunkCubesCreatingBuffer;
 	//double LastTimeUpdated = 0;
 	/*Chunk* NorthChunk;
@@ -65,8 +66,11 @@ public:
 	//void SetHasDataChanged(bool state = true);
 	void SetHasFinishedGenerating(bool state);
 	bool GetHasFinishedGenerating();
+	bool GetIsGenerating();
+	void SetIsGenerating(bool val);
 	//void UpdateMesh();
 	void SetMeshLifeStage(int Stage);
+	class ChunkCube* GetChunkCube(int8 PosZ);
 	/* Loads new ChunkCubes if they now are in range */
 	void UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp);
 	Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);

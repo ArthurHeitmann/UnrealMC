@@ -33,10 +33,11 @@ AMcWorld::AMcWorld()
 void AMcWorld::BeginPlay()
 {
 	Super::BeginPlay();
-	GeneratorThreads.SetNum(4);
+	const int numOfThreads = 3;
+	GeneratorThreads.SetNum(numOfThreads);
 	//GeneratorThreads.SetNum(FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2);
 	//for (int i = 0; i < FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2; i++)
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < numOfThreads; ++i)
 	{
 		GeneratorThreads[i] = new ChunkGenerator;
 		GeneratorThreads[i]->SetWorld(this);
@@ -54,19 +55,19 @@ void AMcWorld::Tick(float DeltaTime)
 		chunk.Value->Tick(DeltaTime);
 	}
 
-	DequeueChunkGenTasks();
 	DequeueChunkCubeGenTasks();
+	DequeueChunkGenTasks();
 }
 
 void AMcWorld::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Destroying McWorld!"));
-	for (int i = 0; i < GeneratorThreads.Num(); i++)
+	for (int i = 0; i < GeneratorThreads.Num(); ++i)
 	{
 		GeneratorThreads[i]->bRun = false;
-		GeneratorThreads[i]->ThisThread->Suspend(true);
-		GeneratorThreads[i]->ThisThread->Kill(false);
+		//GeneratorThreads[i]->ThisThread->Suspend(true);
+		GeneratorThreads[i]->ThisThread->Kill(true);
 		delete GeneratorThreads[i];
 	}
 	GeneratorThreads.Empty();
@@ -82,6 +83,10 @@ void AMcWorld::DequeueChunkGenTasks()
 		{
 			ChunkGenBufferElement Element;
 			ChunkGenBuffer.Dequeue(Element);
+			while (RemovedChunksInGenBuffer.Contains(Element.Chunk)) {
+				RemovedChunksInGenBuffer.RemoveSwap(Element.Chunk);
+				ChunkGenBuffer.Dequeue(Element);
+			}
 			Thread->SetChunkData(Element.Chunk);
 			ChunkFormCoords2D key2D = { Element.x, Element.y };//TODO CR what is this
 		}
@@ -129,15 +134,21 @@ void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube, int32 ChunkX, int32 
 
 void AMcWorld::FinalizeChunkGen(Chunk* Chunk)
 {
+	ChunkFormCoords2D p = Chunk->GetPos();
+
 	Chunk->SetHasFinishedGenerating(true);
-	if (ChunkCubeGenTasks.Contains(Chunk->GetPos()))
-		ChunkCubeGenBuffer.Enqueue(ChunkCubeGenTasks[Chunk->GetPos()]);
+	if (ChunkCubeGenTasks.Contains(p))
+		ChunkCubeGenBuffer.Enqueue(ChunkCubeGenTasks.FindAndRemoveChecked(p));
 }
 
 void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos)
 {
-	FinishedChunkCube->SetHasFinishedGenerating();
+	NeighbourUpdatesMutex.Lock();
+
+	FinishedChunkCube->SetNextGenerationStage(255);
 	FinishedChunkCube->SetHasDataChanged();
+
+	//TODO CR Check if all Trues for bUpdateMesh are necessary
 
 	if (NeighbourUpdateTasks.Contains(FinishedChunkCube))
 	{
@@ -145,37 +156,37 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 		if (updates.NewNChunk)
 		{
 			FinishedChunkCube->UpdateCubeNeighbour(NORTH, updates.NewNChunk, false);
-			updates.NewNChunk->UpdateCubeNeighbour(SOUTH, FinishedChunkCube, false);
+			updates.NewNChunk->UpdateCubeNeighbour(SOUTH, FinishedChunkCube, true);
 			updates.NewNChunk = nullptr;
 		}
 		if (updates.NewEChunk)
 		{
 			FinishedChunkCube->UpdateCubeNeighbour(EAST, updates.NewEChunk, false);
-			updates.NewEChunk->UpdateCubeNeighbour(WEST, FinishedChunkCube, false);
+			updates.NewEChunk->UpdateCubeNeighbour(WEST, FinishedChunkCube, true);
 			updates.NewEChunk = nullptr;
 		}
 		if (updates.NewSChunk)
 		{
 			FinishedChunkCube->UpdateCubeNeighbour(SOUTH, updates.NewSChunk, false);
-			updates.NewSChunk->UpdateCubeNeighbour(NORTH, FinishedChunkCube, false);
+			updates.NewSChunk->UpdateCubeNeighbour(NORTH, FinishedChunkCube, true);
 			updates.NewSChunk = nullptr;
 		}
 		if (updates.NewWChunk)
 		{
 			FinishedChunkCube->UpdateCubeNeighbour(WEST, updates.NewWChunk, false);
-			updates.NewWChunk->UpdateCubeNeighbour(EAST, FinishedChunkCube, false);
+			updates.NewWChunk->UpdateCubeNeighbour(EAST, FinishedChunkCube, true);
 			updates.NewWChunk = nullptr;
 		}
 		if (updates.NewTChunk)
 		{
-			FinishedChunkCube->UpdateCubeNeighbour(TOP, updates.NewWChunk, false);
-			updates.NewTChunk->UpdateCubeNeighbour(BOTTOM, FinishedChunkCube, false);
+			FinishedChunkCube->UpdateCubeNeighbour(TOP, updates.NewTChunk, false);
+			updates.NewTChunk->UpdateCubeNeighbour(BOTTOM, FinishedChunkCube, true);
 			updates.NewTChunk = nullptr;
 		}
 		if (updates.NewBChunk)
 		{
-			FinishedChunkCube->UpdateCubeNeighbour(BOTTOM, updates.NewWChunk, false);
-			updates.NewBChunk->UpdateCubeNeighbour(TOP, FinishedChunkCube, false);
+			FinishedChunkCube->UpdateCubeNeighbour(BOTTOM, updates.NewBChunk, false);
+			updates.NewBChunk->UpdateCubeNeighbour(TOP, FinishedChunkCube, true);
 			updates.NewBChunk = nullptr;
 		}
 
@@ -185,10 +196,10 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	key.x--;
 	if (LoadedChunkCubes.Contains(key)) 
 	{
-		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetHasFinishedGenerating())
 		{
-			LoadedChunkCubes[key]->UpdateCubeNeighbour(NORTH, FinishedChunkCube, false);
-			FinishedChunkCube->UpdateCubeNeighbour(SOUTH, LoadedChunkCubes[key], false);
+			LoadedChunkCubes[key]->UpdateCubeNeighbour(NORTH, FinishedChunkCube, true);
+			FinishedChunkCube->UpdateCubeNeighbour(SOUTH, LoadedChunkCubes[key], true);
 		}
 		else
 			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ FinishedChunkCube, 0, 0, 0, 0, 0 });
@@ -196,10 +207,10 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	key.x += 2;
 	if (LoadedChunkCubes.Contains(key))
 	{
-		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetHasFinishedGenerating())
 		{
-			LoadedChunkCubes[key]->UpdateCubeNeighbour(SOUTH, FinishedChunkCube, false);
-			FinishedChunkCube->UpdateCubeNeighbour(NORTH, LoadedChunkCubes[key], false);
+			LoadedChunkCubes[key]->UpdateCubeNeighbour(SOUTH, FinishedChunkCube, true);
+			FinishedChunkCube->UpdateCubeNeighbour(NORTH, LoadedChunkCubes[key], true);
 		}
 		else
 			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, 0, FinishedChunkCube, 0, 0, 0 });
@@ -208,10 +219,10 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	key.y--;
 	if (LoadedChunkCubes.Contains(key))
 	{
-		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetHasFinishedGenerating())
 		{
-			LoadedChunkCubes[key]->UpdateCubeNeighbour(EAST, FinishedChunkCube, false);
-			FinishedChunkCube->UpdateCubeNeighbour(WEST, LoadedChunkCubes[key], false);
+			LoadedChunkCubes[key]->UpdateCubeNeighbour(EAST, FinishedChunkCube, true);
+			FinishedChunkCube->UpdateCubeNeighbour(WEST, LoadedChunkCubes[key], true);
 		}
 		else
 			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, FinishedChunkCube, 0, 0, 0, 0 });
@@ -219,10 +230,10 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	key.y += 2;
 	if (LoadedChunkCubes.Contains(key))
 	{
-		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetHasFinishedGenerating())
 		{
-			LoadedChunkCubes[key]->UpdateCubeNeighbour(WEST, FinishedChunkCube, false);
-			FinishedChunkCube->UpdateCubeNeighbour(EAST, LoadedChunkCubes[key], false);
+			LoadedChunkCubes[key]->UpdateCubeNeighbour(WEST, FinishedChunkCube, true);
+			FinishedChunkCube->UpdateCubeNeighbour(EAST, LoadedChunkCubes[key], true);
 		}
 		else
 			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, 0, 0, FinishedChunkCube, 0, 0 });
@@ -231,25 +242,30 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	key.z--;
 	if (LoadedChunkCubes.Contains(key))
 	{
-		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetHasFinishedGenerating())
 		{
-			LoadedChunkCubes[key]->UpdateCubeNeighbour(TOP, FinishedChunkCube, false);
-			FinishedChunkCube->UpdateCubeNeighbour(BOTTOM, LoadedChunkCubes[key], false);
+			LoadedChunkCubes[key]->UpdateCubeNeighbour(TOP, FinishedChunkCube, true);
+			FinishedChunkCube->UpdateCubeNeighbour(BOTTOM, LoadedChunkCubes[key], true);
 		}
 		else
-			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, 0, 0, FinishedChunkCube, 0, 0 });
+			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, 0, 0, 0, FinishedChunkCube, 0 });
 	}
 	key.z += 2;
 	if (LoadedChunkCubes.Contains(key))
 	{
-		if (LoadedChunkCubes[key]->GetNextGenerationStage() == 255)
+		if (LoadedChunkCubes[key]->GetHasFinishedGenerating())
 		{
-			LoadedChunkCubes[key]->UpdateCubeNeighbour(BOTTOM, FinishedChunkCube, false);
-			FinishedChunkCube->UpdateCubeNeighbour(TOP, LoadedChunkCubes[key], false);
+			LoadedChunkCubes[key]->UpdateCubeNeighbour(BOTTOM, FinishedChunkCube, true);
+			FinishedChunkCube->UpdateCubeNeighbour(TOP, LoadedChunkCubes[key], true);
 		}
 		else
-			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, 0, 0, FinishedChunkCube, 0, 0 });
+			NeighbourUpdateTasks.Add(LoadedChunkCubes[key], ChunkNeighbourUpdates{ 0, 0, 0, 0, FinishedChunkCube });
 	}
+
+
+	FinishedChunkCube->SetHasFinishedGenerating();
+
+	NeighbourUpdatesMutex.Unlock();
 }
 
 Block* AMcWorld::GetBlockFromEnum(EAllBlocks Block)
@@ -307,7 +323,7 @@ Chunk* AMcWorld::CreateChunk(ChunkFormCoords2D Location)
 	//{
 	NewChunk = new Chunk(Location, this);
 	//Chunk = GetWorld()->SpawnActor<Chunk>({Location.x * 1600.f, Location.y * 1600.f, 0.f}, FRotator::ZeroRotator);
-	ChunkGenBuffer.Enqueue({ Location.x, Location.y, NewChunk, 0 }); 
+	ChunkGenBuffer.Enqueue({ Location.x, Location.y, NewChunk }); 
 	//}
 	
 	LoadedChunks.Add(Location, NewChunk);
@@ -330,6 +346,12 @@ void AMcWorld::AddLoadedChunkCube(ChunkCube* Cube, ChunkFormCoords3D CurrChunkPo
 void AMcWorld::RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos)
 {
 	LoadedChunkCubes.FindAndRemoveChecked(CurrChunkPos);
+	ChunkCubeGenTasks.Remove(CurrChunkPos.To2D());
+}
+
+void AMcWorld::AddRemovedChunk(Chunk* chunk)
+{
+	RemovedChunksInGenBuffer.Add(chunk);
 }
 
 void AMcWorld::RemoveLoadedChunk(ChunkFormCoords2D Pos)

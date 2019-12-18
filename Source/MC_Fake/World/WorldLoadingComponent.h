@@ -27,7 +27,6 @@ private:
 	/* Absolute coordinates (in Chunk Form) where the player/component currently is */
 	ChunkFormCoords3D CurrentChunkCoordinates;
 	TArray<ChunkFormCoords2D> PlayerChunks;
-	TQueue<ChunkFormCoords3D> ChunkLoadingBuffer;
 	class AMcWorld* McFWorld;
 	UPROPERTY(EditAnywhere)
 	bool bIsEnabled;

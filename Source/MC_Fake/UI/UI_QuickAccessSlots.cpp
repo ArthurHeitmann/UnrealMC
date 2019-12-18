@@ -85,7 +85,7 @@ void UUI_QuickAccessSlots::SetInventorySlots(UItemSlots* NewInventorySlots, int3
 	Inventory = NewInventorySlots;
 	SlotsPerRow = pSlotsPerRow;
 	UIItemSlots.Reserve(pSlotsPerRow);
-	for (int i = 0; i < pSlotsPerRow && i < NewInventorySlots->GetNumSlots(); i++)
+	for (int i = 0; i < pSlotsPerRow && i < NewInventorySlots->GetNumSlots(); ++i)
 	{
 
 		ItemSlotCombo comb;

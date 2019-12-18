@@ -44,7 +44,7 @@ FItemStack UItemSlots::PickupItemStack(FItemStack Items)
 	TArray<FItemStack*> OrderedEmptySlots;
 	TArray<FItemStack*> OrderedSameTypeSlots;
 
-	for (int i = 0; i < Slots.Num() && Items.ItemCount > 0; i++)
+	for (int i = 0; i < Slots.Num() && Items.ItemCount > 0; ++i)
 	{
 		FItemStack* CurrentStack = Slots[i];
 

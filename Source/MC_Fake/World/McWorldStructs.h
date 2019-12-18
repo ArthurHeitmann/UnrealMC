@@ -8,14 +8,12 @@
 struct ChunkCubeGenBufferElement {
 	class ChunkCube* Cube;
 	int NextGenStage;
-	FRunnableThread* Thread = nullptr;
 };
 
 struct ChunkGenBufferElement {
 	int32 x;
 	int32 y;
 	class Chunk* Chunk;
-	FRunnableThread* Thread = nullptr;
 };
 
 struct BlockSetBufferElement {

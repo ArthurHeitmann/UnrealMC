@@ -29,6 +29,8 @@ private:
 	int NextGenerationStage;
 	int LastGenerationStage;
 
+	class Block* GetBlockAt(int32 x, int32 y, int32 z);
+	void SetBlockAt(int32 x, int32 y, int32 z, class Block* b);
 
 	void GenerateChunkData();
 	void GenerateChunkCubes();
