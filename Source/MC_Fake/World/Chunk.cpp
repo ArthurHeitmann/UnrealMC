@@ -50,7 +50,7 @@ Chunk::~Chunk()
 		FPlatformProcess::Sleep(0.01);
 
 	McWorld->RemoveLoadedChunk(Pos);
-	McWorld->
+	//McWorld-> TODO CR
 	if (!bHasFinishedGenerating)
 		McWorld->AddRemovedChunk(this);
 

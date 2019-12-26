@@ -3,7 +3,6 @@
 #include "Chunk.h"
 #include "ChunkCube.h"
 #include "Engine/Texture.h"
-#include "Enums.h"
 #include "FastNoise/FastNoise.h"
 #include "McWorld.h"
 
@@ -203,6 +202,8 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 			{
 				int RelX = x + TurbulenceNoise->GetNoise(x + Pos.x, z) * 13.f;
 				int RelY = y + TurbulenceNoise->GetNoise(y + Pos.y, z) * 13.f;
+				RelX = x;
+				RelY = y;
 				float HeightMapValue;
 				if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
 					HeightMapValue = Maps.HeightMap[RelX][RelY];
@@ -231,31 +232,38 @@ void ChunkGenerator::Stage_DirtGrass()
 	{
 		for (int y = 0; y < 16; ++y)
 		{
+			float slope = 40 * abs(Maps.HeightMap[x][y] - Maps.HeightMap[x < 15 ? x + 1 : 14][y < 15 ? y + 1 : 14]);
 			for (int z = 0; z < 16; ++z)
 			{
-				EAllBlocks b = BlockData[x][y][z]->GetBlockEnum();
-				EAllBlocks b1 = GetBlockAt(x, y, z + 1) ? GetBlockAt(x, y, z + 1)->GetBlockEnum() : BAir;
-				EAllBlocks b2 = GetBlockAt(x, y, z + 2) ? GetBlockAt(x, y, z + 2)->GetBlockEnum() : BAir;
-				EAllBlocks b3 = GetBlockAt(x, y, z + 3) ? GetBlockAt(x, y, z + 3)->GetBlockEnum() : BAir;
-				EAllBlocks b4 = GetBlockAt(x, y, z + 4) ? GetBlockAt(x, y, z + 4)->GetBlockEnum() : BAir;
-				EAllBlocks b5 = GetBlockAt(x, y, z + 5) ? GetBlockAt(x, y, z + 5)->GetBlockEnum() : BAir;
-				EAllBlocks b6 = GetBlockAt(x, y, z + 6) ? GetBlockAt(x, y, z + 6)->GetBlockEnum() : BAir;
-				
-				if (b == BStone && (b2 == BAir || b3 == BAir || b4 == BAir || b5 == BAir || b6 == BAir))
+				int blocksUp = fmin(5 / slope, 6);
+				EAllBlocks* nextBlocks = new EAllBlocks[blocksUp];
+				for (int zNext = 0; zNext < blocksUp; zNext++)
 				{
-					if (b1 != BAir)
-					{
-						if (b != BAir)
-							delete BlockData[x][y][z];
-						BlockData[x][y][z] = World->GetBlockFromEnum(BDirt);
-					}
+					if (Block* b = GetBlockAt(x, y, z + zNext + Pos.z))
+						nextBlocks[zNext] = b->GetBlockEnum();
 					else
+						nextBlocks[zNext] = BAir;
+				}
+				
+				if (nextBlocks[0] == BStone)
+				{
+					if (hasAirInRange(nextBlocks, 2, blocksUp))
 					{
-						if (b != BAir)
-							delete BlockData[x][y][z];
-						BlockData[x][y][z] = World->GetBlockFromEnum(BGrass);
+						if (nextBlocks[1] != BAir)
+						{
+							if (nextBlocks[0] != BAir)
+								delete BlockData[x][y][z];
+							BlockData[x][y][z] = World->GetBlockFromEnum(BDirt);
+						}
+						else
+						{
+							if (nextBlocks[0] != BAir)
+								delete BlockData[x][y][z];
+							BlockData[x][y][z] = World->GetBlockFromEnum(BGrass);
+						}
 					}
 				}
+				delete [] nextBlocks;
 			}
 		}
 	}
@@ -284,7 +292,7 @@ void ChunkGenerator::Stage_CaveCarving()
 					bottomFactor = expf(-z + 6.5f) + 1.f;
 				if (z > 50)
 					topFactor = expf(0.4f * z -23.1) + 1.f;
-				float CaveNoiseValue = abs(CaveNoise1->GetNoise(Pos.x + x, Pos.y + y, z)) * bottomFactor * topFactor;
+				float CaveNoiseValue = abs(CaveNoise1->GetNoise(Pos.x + x, Pos.y + y, z + Pos.z)) * bottomFactor * topFactor;
 
 				if (CaveNoiseValue < .035)
 				{
@@ -354,6 +362,17 @@ void ChunkGenerator::Stage_Trees()
 			}
 		}
 	}
+}
+
+bool ChunkGenerator::hasAirInRange(EAllBlocks* NextBlocks, int start, int end)
+{
+	for (int i = start; i < end; i++)
+	{
+		if (NextBlocks[i] == BAir)
+			return true;
+	}
+
+	return false;
 }
 
 void ChunkGenerator::wait()

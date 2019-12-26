@@ -8,6 +8,7 @@
 #include "McWorld.h"
 #include "McWorldStructs.h"
 #include "ChunkFormCoords.h"
+#include "Enums.h"
 
 /**
  * 
@@ -15,6 +16,9 @@
 class MC_FAKE_API ChunkGenerator : public FRunnable
 {
 private:
+	const float SLOPE_GRASS = 5;
+	const float SLOPE_DIRT = 7
+
 	//bool bIsDone = true;
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
@@ -41,6 +45,8 @@ private:
 	void Stage_DirtGrass();
 	void Stage_CaveCarving();
 	void Stage_Trees();
+
+	bool hasAirInRange(EAllBlocks* NextBlocks, int start, int end);
 
 	void wait();
 
