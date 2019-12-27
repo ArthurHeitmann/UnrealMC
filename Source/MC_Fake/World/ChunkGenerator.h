@@ -17,7 +17,7 @@ class MC_FAKE_API ChunkGenerator : public FRunnable
 {
 private:
 	const float SLOPE_GRASS = 5;
-	const float SLOPE_DIRT = 7
+	const float SLOPE_DIRT = 7;
 
 	//bool bIsDone = true;
 	bool bGenerateChunk = false;

@@ -74,6 +74,7 @@ void ChunkGenerator::GenerateChunkCubes()
 		for (auto& cube : CubeGenerationList)
 		{
 			CurrentCubeElement = cube;
+			CurrentCubeElement.Cube->SetNextGenerationStage(stage);
 			Pos = CurrentCubeElement.Cube->GetPos() * 16;
 			switch (stage)
 			{
@@ -88,7 +89,7 @@ void ChunkGenerator::GenerateChunkCubes()
 				Stage_CaveCarving();
 				break;
 			case 3:
-				//Stage_Trees();
+				Stage_Trees();
 				break;
 			case 255:
 				World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
@@ -235,7 +236,7 @@ void ChunkGenerator::Stage_DirtGrass()
 			float slope = 40 * abs(Maps.HeightMap[x][y] - Maps.HeightMap[x < 15 ? x + 1 : 14][y < 15 ? y + 1 : 14]);
 			for (int z = 0; z < 16; ++z)
 			{
-				int blocksUp = fmin(5 / slope, 6);
+				int blocksUp = fmax(1, fmin(5 / slope, 6));
 				EAllBlocks* nextBlocks = new EAllBlocks[blocksUp];
 				for (int zNext = 0; zNext < blocksUp; zNext++)
 				{

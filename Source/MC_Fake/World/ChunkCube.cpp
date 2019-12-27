@@ -29,6 +29,7 @@ ChunkCube::ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* Pare
 	tmpBox->RegisterComponent();
 	tmpBox->SetBoxExtent({ 800.f, 800.f, 800.f });
 	tmpBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
+	tmpBox->bHiddenInGame = false;
 }
 
 void ChunkCube::Tick(float Delta)

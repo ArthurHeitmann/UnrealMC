@@ -108,16 +108,15 @@ void AMcWorld::DequeueChunkCubeGenTasks()
 	}
 }
 
-void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube, int32 ChunkX, int32 ChunkY, int32 ChunkZ)
+void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube)
 {
-	ChunkFormCoords3D key = { ChunkX, ChunkY, ChunkZ };
-	if (!BlockSetTasks.Contains(key))
+	if (!BlockSetTasks.Contains(ChunkCube->GetPos()))
 		return;
 
 	auto& BlockData = ChunkCube->GetBlockData();
 	int ChunkNextGenStage = ChunkCube->GetNextGenerationStage();
 	bool bDataChanged = false;
-	auto& Tasks = BlockSetTasks[key];
+	auto& Tasks = BlockSetTasks[ChunkCube->GetPos()];
 	while (Tasks.Num())
 	{
 		if (Tasks[0].MinGenStage <= ChunkNextGenStage)
@@ -144,6 +143,8 @@ void AMcWorld::FinalizeChunkGen(Chunk* Chunk)
 void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos)
 {
 	NeighbourUpdatesMutex.Lock();
+
+	CompleteBlockSetTasks(FinishedChunkCube);
 
 	FinishedChunkCube->SetNextGenerationStage(255);
 	FinishedChunkCube->SetHasDataChanged();

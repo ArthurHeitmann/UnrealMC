@@ -17,6 +17,7 @@ class MC_FAKE_API AMcWorld : public AActor
 	GENERATED_BODY()
 
 public:	
+	UPROPERTY(EditAnywhere)
 	USceneComponent* ChunksRoot;
 
 	AMcWorld();
@@ -34,7 +35,7 @@ public:
 	void QuickLoad();
 	class Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded, int MinGenStage = 0, int maxGenStae = 255);
 	void AddBlockSetTask(int32 x, int32 y, int32 z, class Block* Block, uint8 MinGenStage);
-	void CompleteBlockSetTasks(class ChunkCube * ChunkCube, int32 ChunkX, int32 ChunkY, int32 ChunkZ);
+	void CompleteBlockSetTasks(class ChunkCube * ChunkCube);
 	void FinalizeChunkGen(class Chunk* Chunk);
 	void FinalizeCubeGen(class ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos);
 
