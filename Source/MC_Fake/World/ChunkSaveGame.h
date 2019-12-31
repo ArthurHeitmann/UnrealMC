@@ -17,9 +17,9 @@ class MC_FAKE_API UChunkSaveGame : public USaveGame
 	
 public:
 	int PosX, PosY;
-	TArray<TArray<TArray<Block>>> ChunkBlockData;
+	TArray<TArray<TArray<B_Block>>> ChunkBlockData;
 	int NextGenerationStage;
 
-	void ParseData(const TArray<TArray<TArray<Block*>>>& NewData);
-	TArray<TArray<TArray<Block*>>> GetData();
+	void ParseData(const TArray<TArray<TArray<B_Block*>>>& NewData);
+	TArray<TArray<TArray<B_Block*>>> GetData();
 };

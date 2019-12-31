@@ -298,7 +298,7 @@ void Chunk::UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeU
 	}
 }
 
-Block* Chunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
+B_Block* Chunk::RegisterHitAt(const FHitResult& HitResult, Item* Item)
 {
 	////what a mess
 	//Block* HitBlock;
@@ -418,7 +418,7 @@ bool Chunk::ContinueHit(ABlockBreaking* Block, class Item* Item)
 	return false;
 }
 
-void Chunk::CancelBreaking(Block* Block)
+void Chunk::CancelBreaking(B_Block* Block)
 {
 	/*for (int i = 0; i < BreakingBlocks.Num(); i++)
 	{
@@ -448,7 +448,7 @@ TMap<int8, class ChunkCube*>& Chunk::GetChunkCubes()
 	return ChunkCubes;
 }
 
-Block* Chunk::GetBlockAt(int x, int y, int z)
+B_Block* Chunk::GetBlockAt(int x, int y, int z)
 {
 	int8 Key = z / 16;
 	if (ChunkCubes.Contains(Key))
@@ -457,7 +457,7 @@ Block* Chunk::GetBlockAt(int x, int y, int z)
 		return nullptr;
 }
 
-Block*& Chunk::GetBlockAtAsRef(int x, int y, int z)
+B_Block*& Chunk::GetBlockAtAsRef(int x, int y, int z)
 {
 	int8 Key = z / 16;
 	return (*ChunkCubes.Find(Key))->GetBlockAt(x, y, Key);

@@ -24,7 +24,7 @@ B_Stone::B_Stone()
 	//TextureBMP = TextureBmpObj.Object;
 }
 
-Block* B_Stone::Clone()
+B_Block* B_Stone::Clone()
 {
 	return new B_Stone();
 }

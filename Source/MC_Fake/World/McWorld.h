@@ -23,9 +23,10 @@ public:
 	AMcWorld();
 	virtual void Tick(float DeltaTime) override;
 
-	class Block* GetBlockFromEnum(EAllBlocks Block);
+	class B_Block* GetBlockFromEnum(EAllBlocks Block);
 	class Chunk* GetChunkAt(ChunkFormCoords2D Location);
 	class Chunk* CreateChunk(ChunkFormCoords2D Location);
+	class ChunkCube* GetChunkCubeAt(const ChunkFormCoords3D& Location);
 	void AddChunkGenTask(class ChunkCube* Cube);
 	void AddLoadedChunkCube(class ChunkCube*, ChunkFormCoords3D CurrChunkPos);
 	void RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos);
@@ -33,8 +34,8 @@ public:
 	void RemoveLoadedChunk(ChunkFormCoords2D Pos);
 	void QuickSave();
 	void QuickLoad();
-	class Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded, int MinGenStage = 0, int maxGenStae = 255);
-	void AddBlockSetTask(int32 x, int32 y, int32 z, class Block* Block, uint8 MinGenStage);
+	class B_Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded, int MinGenStage = 0, int maxGenStae = 255);
+	void AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* Block, uint8 MinGenStage);
 	void CompleteBlockSetTasks(class ChunkCube * ChunkCube);
 	void FinalizeChunkGen(class Chunk* Chunk);
 	void FinalizeCubeGen(class ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos);

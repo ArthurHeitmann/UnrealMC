@@ -39,14 +39,16 @@ struct ChunkFormCoords3D {
 	ChunkFormCoords3D(float X, float Y, float Z) : x((int32) X), y((int32) Y), z((int32) Z) {}
 	ChunkFormCoords3D(const ChunkFormCoords2D& c, int32 Z) : x(c.x), y(c.y), z(Z) {}
 
-	ChunkFormCoords3D FromNormalCoords(int32 x, int32 y, int32 z) {
-		this->x = (int32) floorf(x / 16);
-		this->y = (int32) floorf(y / 16);
-		this->z = (int32) floorf(z / 16);
+	static ChunkFormCoords3D FromNormalCoords(float x, float y, float z) {
+		return { (int32) floorf(x / 16), (int32) floorf(y / 16), (int32) floorf(z / 16) };
 	}
 
 	ChunkFormCoords2D To2D() const {
 		return ChunkFormCoords2D{ x, y };
+	}
+
+	FVector ToWorldCoordinates() {
+		return {x * 1600.f, y * 1600.f, z * 1600.f};
 	}
 
 	bool operator==(const ChunkFormCoords3D& c) const {

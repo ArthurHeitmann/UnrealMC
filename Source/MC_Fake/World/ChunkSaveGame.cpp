@@ -3,7 +3,7 @@
 
 #include "ChunkSaveGame.h"
 
-void UChunkSaveGame::ParseData(const TArray<TArray<TArray<Block*>>>& NewData)
+void UChunkSaveGame::ParseData(const TArray<TArray<TArray<B_Block*>>>& NewData)
 {
 	ChunkBlockData.SetNum(16);
 	for (int x = 0; x < 16; x++)
@@ -21,9 +21,9 @@ void UChunkSaveGame::ParseData(const TArray<TArray<TArray<Block*>>>& NewData)
 
 }
 
-TArray<TArray<TArray<Block*>>> UChunkSaveGame::GetData()
+TArray<TArray<TArray<B_Block*>>> UChunkSaveGame::GetData()
 {
-	TArray<TArray<TArray<Block*>>> out;
+	TArray<TArray<TArray<B_Block*>>> out;
 
 	out.SetNum(16);
 	for (int x = 0; x < 16; x++)

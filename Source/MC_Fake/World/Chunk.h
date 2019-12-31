@@ -13,18 +13,6 @@ struct ChunkGenMaps {
 
 class MC_FAKE_API Chunk
 {
-	struct BlockBreakingData {
-		class ABlockBreaking* Block;
-		float HitTime;
-		class Item* ItemUsed;
-		int x; int y; int z;
-
-		bool operator==(BlockBreakingData b)
-		{
-			return Block == b.Block && x == b.x && y == b.y && z == b.z;
-		}
-	};
-
 private:
 	class AMcWorld* McWorld;
 	USceneComponent* CubesRoot;
@@ -44,7 +32,6 @@ private:
 	Chunk* WestChunk;*/
 
 
-	TArray<BlockBreakingData> BreakingBlocks;
 
 	void CreateChunkCube(int8 Pos);
 	void DequeueChunkCubes();
@@ -73,12 +60,12 @@ public:
 	class ChunkCube* GetChunkCube(int8 PosZ);
 	/* Loads new ChunkCubes if they now are in range */
 	void UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp);
-	Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);
+	B_Block* RegisterHitAt(const FHitResult& HitResult, class Item* Item);
 	bool ContinueHit(class ABlockBreaking* Block, class Item* Item);
-	void CancelBreaking(class Block* Block);
+	void CancelBreaking(class B_Block* Block);
 	TMap<int8, class ChunkCube*>& GetChunkCubes();
-	Block* GetBlockAt(int x, int y, int z);
-	Block*& GetBlockAtAsRef(int x, int y, int z);
+	B_Block* GetBlockAt(int x, int y, int z);
+	B_Block*& GetBlockAtAsRef(int x, int y, int z);
 	ChunkGenMaps& GetChunkGenMaps();
 	/*void SetNorthChunk(Chunk* c);
 	void SetEastChunk(Chunk* c);

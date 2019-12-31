@@ -25,7 +25,7 @@ TArray<uint8> B_Air::GetBinaryData()
 	return {0, 0};
 }
 
-Block* B_Air::Clone()
+B_Block* B_Air::Clone()
 {
 	return AirRef;
 }

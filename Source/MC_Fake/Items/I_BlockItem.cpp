@@ -3,7 +3,7 @@
 #include "Misc/McStaticFunctions.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
-I_BlockItem::I_BlockItem(class Block* Block)
+I_BlockItem::I_BlockItem(class B_Block* Block)
 {
 	this->BlockRef = Block;
 	Texture = Block->GetTexture();

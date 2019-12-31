@@ -83,7 +83,7 @@ void ChunkCube::UpdateMesh()
 	TMap<EAllBlocks, TArray<FVector2D>> UVs;
 	TMap<EAllBlocks, TArray<int32>> Triangles;
 	TMap<EAllBlocks, TArray<FVector>> Normals;
-	TMap<EAllBlocks, Block*> Materials;
+	TMap<EAllBlocks, B_Block*> Materials;
 	TMap<EAllBlocks, TArray<FVector>> VerteciesCustomCollision;
 	TMap<EAllBlocks, TArray<int32>> TrianglesCustomCollision;
 	for (int x = 0; x < 16; ++x)
@@ -180,7 +180,7 @@ void ChunkCube::UpdateMesh()
 	bHasDataChanged = false;
 }
 
-bool ChunkCube::ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side)
+bool ChunkCube::ShouldFaceBePlacedBetween(B_Block* b1, B_Block* b2, EDirection Side)
 {
 	return b2->IsSideOptimizable(Side)
 		&& b2->GetBlockModelType() != BLOCK
@@ -192,7 +192,7 @@ ChunkFormCoords3D ChunkCube::GetPos()
 	return Pos;
 }
 
-TArray<TArray<TArray<class Block*>>>& ChunkCube::GetBlockData()
+TArray<TArray<TArray<class B_Block*>>>& ChunkCube::GetBlockData()
 {
 	return BlockData;
 }
@@ -247,7 +247,7 @@ void ChunkCube::SetIsGenerating(bool val)
 	bIsGenerating = val;
 }
 
-Block*& ChunkCube::GetBlockAt(int x, int y, int z)
+B_Block*& ChunkCube::GetBlockAt(int x, int y, int z)
 {
 	return BlockData[x][y][z];
 }

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Block.h"
 
-class MC_FAKE_API B_Dirt : public Block
+class MC_FAKE_API B_Dirt : public B_Block
 {
 	
 //protected:
@@ -11,5 +11,5 @@ class MC_FAKE_API B_Dirt : public Block
 public:
 	B_Dirt();
 
-	virtual Block* Clone() override;
+	virtual B_Block* Clone() override;
 };

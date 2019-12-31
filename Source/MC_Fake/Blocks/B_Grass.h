@@ -6,7 +6,7 @@
 /**
  * 
  */
-class MC_FAKE_API B_Grass : public Block
+class MC_FAKE_API B_Grass : public B_Block
 {
 	
 //protected:
@@ -25,5 +25,5 @@ public:
 	TArray<FVector2D> GetAllUVs() override;
 
 
-	virtual Block* Clone() override;
+	virtual B_Block* Clone() override;
 };

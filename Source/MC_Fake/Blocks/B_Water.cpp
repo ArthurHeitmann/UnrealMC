@@ -15,7 +15,7 @@ B_Water::B_Water()
 
 UMaterialInstanceDynamic* B_Water::GetMaterial(UObject* UObj)
 {
-	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(Block::BlockMaterial, UObj);
+	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(B_Block::BlockMaterial, UObj);
 	OutMat->SetTextureParameterValue(TEXT("Block Texture"), Texture);
 	return OutMat;
 }
@@ -25,7 +25,7 @@ bool B_Water::IsBlockOpaque()
 	return false;
 }
 
-Block* B_Water::Clone()
+B_Block* B_Water::Clone()
 {
 	return new B_Water();
 }

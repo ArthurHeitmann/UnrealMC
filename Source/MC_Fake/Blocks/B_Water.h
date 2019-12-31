@@ -8,7 +8,7 @@
 /**
  * 
  */
-class MC_FAKE_API B_Water : public Block
+class MC_FAKE_API B_Water : public B_Block
 {
 	
 
@@ -18,5 +18,5 @@ public:
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;
 	bool IsBlockOpaque() override;
 
-	virtual Block* Clone() override;
+	virtual B_Block* Clone() override;
 };

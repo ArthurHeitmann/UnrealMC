@@ -7,7 +7,7 @@
 
 struct ChunkData {
 	uint8 GeneratorVersion;
-	TArray<TArray<TArray<class Block*>>> BlockData;
+	TArray<TArray<TArray<class B_Block*>>> BlockData;
 	uint64 LastTimeUpdated;
 	uint8 NextGenerationStage;
 

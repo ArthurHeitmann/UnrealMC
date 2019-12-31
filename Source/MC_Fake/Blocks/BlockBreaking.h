@@ -12,7 +12,7 @@ class MC_FAKE_API ABlockBreaking : public AActor
 	GENERATED_BODY()
 	
 private:
-	class Block* BlockData;
+	class B_Block* BlockData;
 	class URuntimeMeshComponent* Mesh;
 	class URuntimeMeshComponent* CollisionMesh;
 	UPROPERTY(EditAnywhere)
@@ -24,8 +24,8 @@ protected:
 public:	
 	ABlockBreaking();
 
-	void InitWithBlock(class Block* NewBlock);
-	void SetBreakingStage(float percentage);
+	void InitWithBlock(class B_Block* NewBlock);
+	void SetTimePassed(float seconds);
 
-	class Block* GetBlock();
+	class B_Block* GetBlock();
 };

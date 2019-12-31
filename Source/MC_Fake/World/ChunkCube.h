@@ -35,7 +35,7 @@ private:
 	class Chunk* ParentChunk;
 	USceneComponent* Root;
 
-	TArray<TArray<TArray<class Block*>>> BlockData;
+	TArray<TArray<TArray<class B_Block*>>> BlockData;
 	ChunkCubeGenData CubeData;
 	ChunkCubeNeighbours CubeNeighbours;
 	class UBoxComponent* tmpBox;
@@ -48,8 +48,7 @@ private:
 	bool bIsGenerating = false;
 	bool bHasFinishedGenerating = false;
 
-	void UpdateMesh();
-	bool ShouldFaceBePlacedBetween(Block* b1, Block* b2, EDirection Side);
+	bool ShouldFaceBePlacedBetween(B_Block* b1, B_Block* b2, EDirection Side);
 protected:
 
 public:
@@ -58,7 +57,7 @@ public:
 	void Tick(float Delta);
 
 	ChunkFormCoords3D GetPos();
-	TArray<TArray<TArray<class Block*>>>& GetBlockData();
+	TArray<TArray<TArray<class B_Block*>>>& GetBlockData();
 	void SetNextGenerationStage(int NewStage);
 	int GetNextGenerationStage();
 	class Chunk* GetParentChunk();
@@ -69,8 +68,9 @@ public:
 	void SetHasFinishedGenerating(bool val = true);
 	bool GetIsGenerating();
 	void SetIsGenerating(bool val);
-	Block*& GetBlockAt(int x, int y, int z);
+	B_Block*& GetBlockAt(int x, int y, int z);
 	ChunkCubeGenData& GetChunkCubeGenData();
 	ChunkCubeNeighbours& GetChunkCubeNeighbours();
 	void UpdateCubeNeighbour(EDirection NeighbourSide, ChunkCube* NewNeighbour, bool bUpdateMesh = false);
+	void UpdateMesh();
 };

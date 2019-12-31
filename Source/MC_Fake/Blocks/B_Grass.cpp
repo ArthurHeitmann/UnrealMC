@@ -115,7 +115,7 @@ TArray<FVector2D> B_Grass::GetAllUVs()
 }
 
 
-Block* B_Grass::Clone()
+B_Block* B_Grass::Clone()
 {
 	return new B_Grass();
 }

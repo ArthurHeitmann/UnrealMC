@@ -26,7 +26,7 @@ void ABlockBreaking::BeginPlay()
 	
 }
 
-void ABlockBreaking::InitWithBlock(Block* NewBlock)
+void ABlockBreaking::InitWithBlock(B_Block* NewBlock)
 {
 	BlockData = NewBlock;
 	if (Mesh->GetNumSections())
@@ -42,12 +42,13 @@ void ABlockBreaking::InitWithBlock(Block* NewBlock)
 	CollisionMesh->CreateMeshSection(0, Vertecies, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
 }
 
-void ABlockBreaking::SetBreakingStage(float percentage)
+void ABlockBreaking::SetTimePassed(float seconds)
 {
+	float percentage = fmax(0.f, fmin(1.f, seconds / BlockData->GetBreakTime()));
 	Mesh->SetWorldScale3D(FVector(1, 1, 1) * (1.f - percentage * 0.05));
 }
 
-Block* ABlockBreaking::GetBlock()
+B_Block* ABlockBreaking::GetBlock()
 {
 	return BlockData;
 }

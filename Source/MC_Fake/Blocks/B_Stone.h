@@ -8,7 +8,7 @@
 /**
  * 
  */
-class MC_FAKE_API B_Stone : public Block
+class MC_FAKE_API B_Stone : public B_Block
 {
 	
 protected:
@@ -17,5 +17,5 @@ protected:
 public:
 	B_Stone();
 
-	virtual Block* Clone() override;
+	virtual B_Block* Clone() override;
 };

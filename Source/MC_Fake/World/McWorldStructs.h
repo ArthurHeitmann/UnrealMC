@@ -19,11 +19,11 @@ struct ChunkGenBufferElement {
 struct BlockSetBufferElement {
 	ChunkFormCoords3D CurrChunkPos;
 	uint16 RelX, RelY, RelZ;
-	class Block* BlockS;
+	class B_Block* BlockS;
 	uint8 MinGenStage;
 
 	BlockSetBufferElement() {}
-	BlockSetBufferElement(int32 x, int32 y, int32 z, Block* b, uint8 MinGenerationStage)
+	BlockSetBufferElement(int32 x, int32 y, int32 z, B_Block* b, uint8 MinGenerationStage)
 	{
 		int16 tmpRelX = x % 16;
 		int16 tmpRelY = y % 16;

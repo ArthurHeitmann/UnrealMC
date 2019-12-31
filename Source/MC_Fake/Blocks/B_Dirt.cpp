@@ -18,7 +18,7 @@ B_Dirt::B_Dirt()
 	Texture = TextureObj.Object;
 }
 
-Block* B_Dirt::Clone()
+B_Block* B_Dirt::Clone()
 {
 	return new B_Dirt();
 }

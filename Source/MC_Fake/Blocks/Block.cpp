@@ -14,9 +14,9 @@
 #include "B_Grass.h"
 #include "B_Water.h"
 
-UMaterial* Block::BlockMaterial;
+UMaterial* B_Block::BlockMaterial;
 
-Block::Block()
+B_Block::B_Block()
 {
 	BlockID = -1;
 	SubID = 0;
@@ -24,21 +24,22 @@ Block::Block()
 	BlockModelType = BLOCK;
 	BreakingAction = ANoAction;
 	BreakTime = 0.75f;	
-	if (!Block::BlockMaterial)
+	if (!B_Block::BlockMaterial)
 	{
 		static ConstructorHelpers::FObjectFinder<UMaterial> MaterialInstanceObj(TEXT("Material'/Game/Materials/Blocks/M_BlockDefault.M_BlockDefault'"));
-		Block::BlockMaterial = MaterialInstanceObj.Object;
+		B_Block::BlockMaterial = MaterialInstanceObj.Object;
 	}
 	bCustomCollisionMesh = false;
+
 	Texture = nullptr;
 	TextureBMP = nullptr;
 }
 
-Block::~Block()
+B_Block::~B_Block()
 {
 }
 
-Block* Block::GetBlockFromBytes(uint8* Bytes)
+B_Block* B_Block::GetBlockFromBytes(uint8* Bytes)
 {
 	uint16* id = reinterpret_cast<uint16*>(Bytes);
 	switch (*id)
@@ -58,7 +59,7 @@ Block* Block::GetBlockFromBytes(uint8* Bytes)
 	}
 }
 
-void Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
+void B_Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
 {
 	AItemDrop* Drop = World->SpawnActor<AItemDrop>(Location + FVector(50, 50, 50), FRotator::ZeroRotator);
 	if (!Drop)
@@ -67,43 +68,43 @@ void Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
 	Drop->SetMesh(GetAllVertecies(-50, -50, -50), GetAllTrainglesFrom(0), GetAllUVs(), GetAllNormals(), GetMaterial(Drop));
 }
 
-bool Block::IsSideOptimizable(EDirection Direction)
+bool B_Block::IsSideOptimizable(EDirection Direction)
 {
 	return true;
 }
 
-bool Block::IsBlockOpaque()
+bool B_Block::IsBlockOpaque()
 {
 	return true;
 }
 
-bool Block::UsesCustomModel()
+bool B_Block::UsesCustomModel()
 {
 	return false;
 }
 
-bool Block::HasConstantMaterial()
+bool B_Block::HasConstantMaterial()
 {
 	return true;
 }
 
-FName Block::GetName()
+FName B_Block::GetName()
 {
 	return BlockName;
 }
 
-float Block::GetBreakTime()
+float B_Block::GetBreakTime()
 {
 	return BreakTime;
 }
 
-Block* Block::Clone()
+B_Block* B_Block::Clone()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Cloning default Block"));
-	return new Block(*this);
+	return new B_Block(*this);
 }
 
-TArray<uint8> Block::GetBinaryData()
+TArray<uint8> B_Block::GetBinaryData()
 {
 	uint8* Bytes = reinterpret_cast<uint8*>(FMemory::Malloc(sizeof(uint8) * 3));
 	Bytes[0] = BlockID & 255;
@@ -116,53 +117,53 @@ TArray<uint8> Block::GetBinaryData()
 	return out;
 }
 
-bool Block::operator==(const Block& B)
+bool B_Block::operator==(const B_Block& B)
 {
 	return BlockName == B.BlockName && BlockEnum == B.BlockEnum;
 }
 
-bool Block::operator!=(const Block& B)
+bool B_Block::operator!=(const B_Block& B)
 {
 	return !(*this == B);
 }
 
-void Block::OnPlace(class UWorld* World, FVector Location)
+void B_Block::OnPlace(class UWorld* World, FVector Location)
 {
 }
 
-void Block::OnLeftclick(class UWorld* World, FVector Location)
+void B_Block::OnLeftclick(class UWorld* World, FVector Location)
 {
 }
 
-void Block::OnBeginBreak(class UWorld* World, FVector Location)
+void B_Block::OnBeginBreak(class UWorld* World, FVector Location)
 {
 }
 
-void Block::Updatebreak(float Millis)
+void B_Block::Updatebreak(float Millis)
 {
 }
 
-void Block::OnBreak(class UWorld* World, FVector Location)
+void B_Block::OnBreak(class UWorld* World, FVector Location)
 {
 	DropItem(World, Location, new I_BlockItem(this));
 }
 
-EBlockModelType Block::GetBlockModelType()
+EBlockModelType B_Block::GetBlockModelType()
 {
 	return BlockModelType;
 }
 
-EAllBlocks Block::GetBlockEnum()
+EAllBlocks B_Block::GetBlockEnum()
 {
 	return BlockEnum;
 }
 
-EItemActions Block::GetBreakingAction()
+EItemActions B_Block::GetBreakingAction()
 {
 	return BreakingAction;
 }
 
-UMaterialInstanceDynamic* Block::GetMaterial(UObject* UObj)
+UMaterialInstanceDynamic* B_Block::GetMaterial(UObject* UObj)
 {
 	UMaterialInstanceDynamic* OutMat = UMaterialInstanceDynamic::Create(BlockMaterial, UObj);
 	if (Texture)
@@ -172,17 +173,17 @@ UMaterialInstanceDynamic* Block::GetMaterial(UObject* UObj)
 	return OutMat;
 }
 
-UTexture* Block::GetTexture()
+UTexture* B_Block::GetTexture()
 {
 	return Texture;
 }
 
-UTexture* Block::GetTextureBMP()
+UTexture* B_Block::GetTextureBMP()
 {
 	return TextureBMP;
 }
 
-TArray<FVector> Block::GetTopVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetTopVertecies(float x, float y, float z)
 {
 	return {
 		{x, y, z + 100},
@@ -192,7 +193,7 @@ TArray<FVector> Block::GetTopVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> Block::GetRightVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetRightVertecies(float x, float y, float z)
 {
 	return {
 		{x, y + 100, z},
@@ -202,7 +203,7 @@ TArray<FVector> Block::GetRightVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> Block::GetBottomVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetBottomVertecies(float x, float y, float z)
 {
 	return {
 		{x, y, z},
@@ -212,7 +213,7 @@ TArray<FVector> Block::GetBottomVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> Block::GetLeftVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetLeftVertecies(float x, float y, float z)
 {
 	return {
 		{x, y, z},
@@ -222,7 +223,7 @@ TArray<FVector> Block::GetLeftVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> Block::GetFrontVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetFrontVertecies(float x, float y, float z)
 {
 	return {
 		{x, y, z},
@@ -232,7 +233,7 @@ TArray<FVector> Block::GetFrontVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> Block::GetBackVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetBackVertecies(float x, float y, float z)
 {
 	return {
 		{x + 100, y + 100, z},
@@ -242,7 +243,7 @@ TArray<FVector> Block::GetBackVertecies(float x, float y, float z)
 	};
 }
 
-TArray<int32> Block::GetTopTrianglesFrom(int32 Start)
+TArray<int32> B_Block::GetTopTrianglesFrom(int32 Start)
 {
 	return {
 		Start, Start + 1 , Start + 2,
@@ -251,7 +252,7 @@ TArray<int32> Block::GetTopTrianglesFrom(int32 Start)
 }
 
 
-TArray<int32> Block::GetRightTrianglesFrom(int32 Start)
+TArray<int32> B_Block::GetRightTrianglesFrom(int32 Start)
 {
 	return {
 		Start, Start + 1 , Start + 2,
@@ -259,7 +260,7 @@ TArray<int32> Block::GetRightTrianglesFrom(int32 Start)
 	};
 }
 
-TArray<int32> Block::GetBottomTrianglesFrom(int32 Start)
+TArray<int32> B_Block::GetBottomTrianglesFrom(int32 Start)
 {
 	return {
 		Start, Start + 1 , Start + 2,
@@ -267,7 +268,7 @@ TArray<int32> Block::GetBottomTrianglesFrom(int32 Start)
 	};
 }
 
-TArray<int32> Block::GetLeftTrianglesFrom(int32 Start)
+TArray<int32> B_Block::GetLeftTrianglesFrom(int32 Start)
 {
 	return {
 		Start, Start + 1 , Start + 2,
@@ -275,7 +276,7 @@ TArray<int32> Block::GetLeftTrianglesFrom(int32 Start)
 	};
 }
 
-TArray<int32> Block::GetFrontTrianglesFrom(int32 Start)
+TArray<int32> B_Block::GetFrontTrianglesFrom(int32 Start)
 {
 	return {
 		Start, Start + 1 , Start + 2,
@@ -283,7 +284,7 @@ TArray<int32> Block::GetFrontTrianglesFrom(int32 Start)
 	};
 }
 
-TArray<int32> Block::GetBackTrianglesFrom(int32 Start)
+TArray<int32> B_Block::GetBackTrianglesFrom(int32 Start)
 {
 	return {
 		Start, Start + 1 , Start + 2,
@@ -291,7 +292,7 @@ TArray<int32> Block::GetBackTrianglesFrom(int32 Start)
 	};
 }
 
-TArray<FVector2D> Block::GetTopUVs()
+TArray<FVector2D> B_Block::GetTopUVs()
 {
 	return {
 		{0, 0},
@@ -301,7 +302,7 @@ TArray<FVector2D> Block::GetTopUVs()
 	};
 }
 
-TArray<FVector2D> Block::GetRightUVs()
+TArray<FVector2D> B_Block::GetRightUVs()
 {
 	return {
 		{0, 0},
@@ -311,7 +312,7 @@ TArray<FVector2D> Block::GetRightUVs()
 	};
 }
 
-TArray<FVector2D> Block::GetBottomUVs()
+TArray<FVector2D> B_Block::GetBottomUVs()
 {
 	return {
 		{0, 1},
@@ -321,7 +322,7 @@ TArray<FVector2D> Block::GetBottomUVs()
 	};
 }
 
-TArray<FVector2D> Block::GetLeftUVs()
+TArray<FVector2D> B_Block::GetLeftUVs()
 {
 	return {
 		{1, 0},
@@ -331,7 +332,7 @@ TArray<FVector2D> Block::GetLeftUVs()
 	};
 }
 
-TArray<FVector2D> Block::GetFrontUVs()
+TArray<FVector2D> B_Block::GetFrontUVs()
 {
 	return {
 		{0, 0},
@@ -341,7 +342,7 @@ TArray<FVector2D> Block::GetFrontUVs()
 	};
 }
 
-TArray<FVector2D> Block::GetBackUVs()
+TArray<FVector2D> B_Block::GetBackUVs()
 {
 	return {
 		{0, 0},
@@ -351,49 +352,49 @@ TArray<FVector2D> Block::GetBackUVs()
 	};
 }
 
-TArray<FVector> Block::GetTopNormals()
+TArray<FVector> B_Block::GetTopNormals()
 {
 	return {
 		{0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}
 	};
 }
 
-TArray<FVector> Block::GetRightNormals()
+TArray<FVector> B_Block::GetRightNormals()
 {
 	return {
 		{0, 1, 0}, {0, 1, 0}, {0, 1, 0}, {0, 1, 0}
 	};
 }
 
-TArray<FVector> Block::GetBottomNormals()
+TArray<FVector> B_Block::GetBottomNormals()
 {
 	return {
 		{0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}
 	};
 }
 
-TArray<FVector> Block::GetLeftNormals()
+TArray<FVector> B_Block::GetLeftNormals()
 {
 	return {
 		{0, -1, 0}, {0, -1, 0}, {0, -1, 0}, {0, -1, 0}
 	};
 }
 
-TArray<FVector> Block::GetFrontNormals()
+TArray<FVector> B_Block::GetFrontNormals()
 {
 	return {
 		{-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0}
 	};
 }
 
-TArray<FVector> Block::GetBackNormals()
+TArray<FVector> B_Block::GetBackNormals()
 {
 	return {
 		{1, 0, 0}, {1, 0, 0}, {1, 0, 0}, {1, 0, 0}
 	};
 }
 
-TArray<FVector> Block::GetAllVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetAllVertecies(float x, float y, float z)
 {
 	return {
 		{x, y, z + 100},
@@ -423,7 +424,7 @@ TArray<FVector> Block::GetAllVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector2D> Block::GetAllUVs()
+TArray<FVector2D> B_Block::GetAllUVs()
 {
 	return {
 		{0, 0},
@@ -458,7 +459,7 @@ TArray<FVector2D> Block::GetAllUVs()
 	};
 }
 
-TArray<FVector> Block::GetAllNormals()
+TArray<FVector> B_Block::GetAllNormals()
 {
 	return {
 		{0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1},
@@ -470,7 +471,7 @@ TArray<FVector> Block::GetAllNormals()
 	};
 }
 
-TArray<int32> Block::GetAllTrainglesFrom(int32 Start)
+TArray<int32> B_Block::GetAllTrainglesFrom(int32 Start)
 {
 	TArray<int32> Tris;
 	Tris.Reserve(36);

@@ -35,7 +35,7 @@ uint32 ChunkGenerator::Run()
 	return 0;
 }
 
-Block* ChunkGenerator::GetBlockAt(int32 x, int32 y, int32 z)
+B_Block* ChunkGenerator::GetBlockAt(int32 x, int32 y, int32 z)
 {
 	int8 PosZ = (int8) floorf(z / 16);
 
@@ -45,7 +45,7 @@ Block* ChunkGenerator::GetBlockAt(int32 x, int32 y, int32 z)
 	return nullptr;
 }
 
-void ChunkGenerator::SetBlockAt(int32 x, int32 y, int32 z, Block* b)
+void ChunkGenerator::SetBlockAt(int32 x, int32 y, int32 z, B_Block* b)
 {
 	int8 PosZ = (int8) floorf(z / 16);
 
@@ -89,7 +89,7 @@ void ChunkGenerator::GenerateChunkCubes()
 				Stage_CaveCarving();
 				break;
 			case 3:
-				Stage_Trees();
+				//Stage_Trees();
 				break;
 			case 255:
 				World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
@@ -240,7 +240,7 @@ void ChunkGenerator::Stage_DirtGrass()
 				EAllBlocks* nextBlocks = new EAllBlocks[blocksUp];
 				for (int zNext = 0; zNext < blocksUp; zNext++)
 				{
-					if (Block* b = GetBlockAt(x, y, z + zNext + Pos.z))
+					if (B_Block* b = GetBlockAt(x, y, z + zNext + Pos.z))
 						nextBlocks[zNext] = b->GetBlockEnum();
 					else
 						nextBlocks[zNext] = BAir;

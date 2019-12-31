@@ -18,7 +18,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UWorldLoadingComponent* WorldLoader;
 	UPROPERTY(EditAnywhere)
-	class ULineTraceingInteractions* LineTracer;
+	class ULineTracingInteractions* LineTracing;
 	UPROPERTY(EditAnywhere)
 	class UItemSystemComponent* ItemSystem;
 	

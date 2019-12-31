@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "../World/McWorld.h"
 #include "Enums.h"
+#include "../World/CollisionType.h"
 
-class MC_FAKE_API Block
+class MC_FAKE_API B_Block
 {
-	
-
 	struct ItemDrops { float Chance; class Item* Item; };
 
 protected:
@@ -29,10 +28,10 @@ protected:
 	void DropItem(class UWorld* World, FVector Location, class Item* DropItem);
 
 public:
-	Block();
-	virtual ~Block();
+	B_Block();
+	virtual ~B_Block();
 
-	static Block* GetBlockFromBytes(uint8* Bytes);
+	static B_Block* GetBlockFromBytes(uint8* Bytes);
 
 	virtual bool IsSideOptimizable(EDirection Direction);
 	virtual bool IsBlockOpaque();
@@ -47,10 +46,10 @@ public:
 	virtual UTexture* GetTextureBMP();
 	//virtual class UTexture* GetTexture();
 	float GetBreakTime();
-	virtual Block* Clone();
+	virtual B_Block* Clone();
 	virtual TArray<uint8> GetBinaryData();
-	virtual bool operator==(const Block& B);
-	virtual bool operator!=(const Block& B);
+	virtual bool operator==(const B_Block& B);
+	virtual bool operator!=(const B_Block& B);
 
 	virtual void OnPlace(class UWorld* World, FVector Location);
 	virtual void OnLeftclick(class UWorld* World, FVector Location);

@@ -8,7 +8,7 @@
 /**
  * 
  */
-class MC_FAKE_API B_Leaves : public Block
+class MC_FAKE_API B_Leaves : public B_Block
 {
 	
 public:
@@ -17,5 +17,5 @@ public:
 	bool IsBlockOpaque() override;
 	virtual void OnBreak(class UWorld* World, FVector Location) override;
 
-	virtual Block* Clone() override;
+	virtual B_Block* Clone() override;
 };

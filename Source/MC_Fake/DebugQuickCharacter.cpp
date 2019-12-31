@@ -4,7 +4,7 @@
 #include "World/WorldLoadingComponent.h"
 #include "Engine/World.h"
 #include "Blocks/BlockBreaking.h"
-#include "LineTraceingInteractions.h"
+#include "LineTracingInteractions.h"
 #include "World/McWorld.h"
 #include "Kismet/GameplayStatics.h"
 #include "Items/I_Pickaxe_Stone.h"
@@ -29,8 +29,8 @@ ADebugQuickCharacter::ADebugQuickCharacter()
 	Camera->bUsePawnControlRotation = true;
 	WorldLoader = CreateDefaultSubobject<UWorldLoadingComponent>(TEXT("World Loader"));
 	WorldLoader->SetupAttachment(GetRootComponent());
-	LineTracer = CreateDefaultSubobject<ULineTraceingInteractions>(TEXT("Line Tracing Component"));
-	LineTracer->SetCamera(Camera);
+	LineTracing = CreateDefaultSubobject<ULineTracingInteractions>(TEXT("Line Tracing Component"));
+	LineTracing->SetCamera(Camera);
 
 	ItemSystem = CreateDefaultSubobject<UItemSystemComponent>(TEXT("Item System"));
 	ItemSystem->SetupAttachment(GetRootComponent());
@@ -58,17 +58,17 @@ void ADebugQuickCharacter::Turn(float v)
 
 void ADebugQuickCharacter::LeftClick()
 {
-	LineTracer->LeftClickStart();
+	LineTracing->LeftClickStart();
 }
 
 void ADebugQuickCharacter::LeftClickEnd()
 {
-	LineTracer->LeftClickEnd();
+	LineTracing->LeftClickEnd();
 }
 
 void ADebugQuickCharacter::RightClick()
 {
-	LineTracer->RightClickStart();
+	LineTracing->RightClickStart();
 }
 
 void ADebugQuickCharacter::ToggleItemWheel()
@@ -153,7 +153,7 @@ void ADebugQuickCharacter::BeginPlay()
 	FVector ScaleTr2(0.25, 0.25, 0.25);
 	//ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset1, TransOffset1, ScaleTr1), FTransform(RotOffset2, TransOffset2, ScaleTr2));
 	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
-	LineTracer->SetSelectedItemPointer(SelectedItemPointer);
+	LineTracing->SetSelectedItemPointer(SelectedItemPointer);
 }
 
 // Called every frame

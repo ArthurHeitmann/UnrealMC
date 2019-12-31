@@ -50,6 +50,19 @@ void AMcWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	bool b = false;
+	if (b)
+	{
+		auto a1 = ChunkCubeGenTasks.GetAllocatedSize();
+		TArray<ChunkFormCoords2D> ar1;
+		ChunkCubeGenTasks.GenerateKeyArray(ar1);
+		TArray<ChunkFormCoords2D> ar2;
+		ChunkCubeGenTasks.GetKeys(ar2);
+		ChunkCubeGenTasks.Compact();
+		ChunkCubeGenTasks.Shrink();
+	}
+
 	for (auto& chunk : LoadedChunks)
 	{
 		chunk.Value->Tick(DeltaTime);
@@ -269,7 +282,7 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	NeighbourUpdatesMutex.Unlock();
 }
 
-Block* AMcWorld::GetBlockFromEnum(EAllBlocks Block)
+B_Block* AMcWorld::GetBlockFromEnum(EAllBlocks Block)
 {
 	switch (Block)
 	{
@@ -331,12 +344,25 @@ Chunk* AMcWorld::CreateChunk(ChunkFormCoords2D Location)
 	return NewChunk;
 }
 
+ChunkCube* AMcWorld::GetChunkCubeAt(const ChunkFormCoords3D& Location)
+{
+	ChunkCube** FoundChunkC = LoadedChunkCubes.Find(Location);
+	return FoundChunkC ? *FoundChunkC : nullptr;
+}
+
 void AMcWorld::AddChunkGenTask(ChunkCube* Cube)
 {
-	ChunkFormCoords2D key2D = Cube->GetPos().To2D();
-	if (!ChunkCubeGenTasks.Contains(key2D))
-		ChunkCubeGenTasks.Add(key2D, TArray<ChunkCubeGenBufferElement>());
-	ChunkCubeGenTasks[key2D].Add({ Cube, 0 });
+	Chunk** c = LoadedChunks.Find(Cube->GetPos().To2D());
+	if (c && (*c)->GetHasFinishedGenerating())
+		ChunkCubeGenBuffer.Enqueue({ { Cube, 0 } });
+	else
+	{
+		ChunkFormCoords2D key2D = Cube->GetPos().To2D();
+		if (!ChunkCubeGenTasks.Contains(key2D))
+			ChunkCubeGenTasks.Add(key2D, TArray<ChunkCubeGenBufferElement>());
+
+		ChunkCubeGenTasks[key2D].Add({ Cube, 0 });
+	}
 }
 
 void AMcWorld::AddLoadedChunkCube(ChunkCube* Cube, ChunkFormCoords3D CurrChunkPos)
@@ -443,7 +469,7 @@ void AMcWorld::QuickLoad()
 //	return false;
 //}
 
-Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded = false, int MinGenStage, int maxGenStage)
+B_Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded = false, int MinGenStage, int maxGenStage)
 {
 	int32 ChunkX = x / 16;
 	int32 ChunkY = y / 16;
@@ -480,7 +506,7 @@ Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded = 
 	return nullptr;
 }
 
-void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class Block* NewBlock, uint8 MinGenStage)
+void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* NewBlock, uint8 MinGenStage)
 {
 	BlockSetBufferElement e(x, y, z, NewBlock, MinGenStage);
 	if (LoadedChunkCubes.Contains(e.CurrChunkPos) && LoadedChunkCubes[e.CurrChunkPos]->GetNextGenerationStage() >= MinGenStage)

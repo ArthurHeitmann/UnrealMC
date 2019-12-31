@@ -8,7 +8,7 @@
 /**
  * 
  */
-class MC_FAKE_API B_LogOak : public Block
+class MC_FAKE_API B_LogOak : public B_Block
 {
 	
 public:
@@ -23,5 +23,5 @@ public:
 
 	TArray<FVector2D> GetAllUVs() override;
 
-	virtual Block* Clone() override;
+	virtual B_Block* Clone() override;
 };
