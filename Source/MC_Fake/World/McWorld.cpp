@@ -33,6 +33,7 @@ AMcWorld::AMcWorld()
 void AMcWorld::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	const int numOfThreads = 3;
 	GeneratorThreads.SetNum(numOfThreads);
 	//GeneratorThreads.SetNum(FPlatformMisc::NumberOfCoresIncludingHyperthreads() / 2);
@@ -150,7 +151,11 @@ void AMcWorld::FinalizeChunkGen(Chunk* Chunk)
 
 	Chunk->SetHasFinishedGenerating(true);
 	if (ChunkCubeGenTasks.Contains(p))
+	{
+		ChunkCubesGenQueueMutex.Lock();
 		ChunkCubeGenBuffer.Enqueue(ChunkCubeGenTasks.FindAndRemoveChecked(p));
+		ChunkCubesGenQueueMutex.Unlock();
+	}
 }
 
 void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos)
@@ -341,6 +346,8 @@ Chunk* AMcWorld::CreateChunk(ChunkFormCoords2D Location)
 	//}
 	
 	LoadedChunks.Add(Location, NewChunk);
+
+	
 	return NewChunk;
 }
 
@@ -352,12 +359,14 @@ ChunkCube* AMcWorld::GetChunkCubeAt(const ChunkFormCoords3D& Location)
 
 void AMcWorld::AddChunkGenTask(ChunkCube* Cube)
 {
+
 	Chunk** c = LoadedChunks.Find(Cube->GetPos().To2D());
 	if (c && (*c)->GetHasFinishedGenerating())
 		ChunkCubeGenBuffer.Enqueue({ { Cube, 0 } });
 	else
 	{
 		ChunkFormCoords2D key2D = Cube->GetPos().To2D();
+
 		if (!ChunkCubeGenTasks.Contains(key2D))
 			ChunkCubeGenTasks.Add(key2D, TArray<ChunkCubeGenBufferElement>());
 

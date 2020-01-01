@@ -86,7 +86,7 @@ void ChunkGenerator::GenerateChunkCubes()
 				Stage_DirtGrass();
 				break;
 			case 2:
-				Stage_CaveCarving();
+				//Stage_CaveCarving();
 				break;
 			case 3:
 				//Stage_Trees();
@@ -211,7 +211,7 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 				else //TODO increase height map seize?
 					HeightMapValue = HeightNoise->GetNoise(Pos.x + RelX, Pos.y + RelY);
 
-				HeightMapValue = HeightMapValue * 40.f + 50;
+				HeightMapValue = HeightMapValue * 5.f + 56;
 				
 				if (Pos.z + z <= HeightMapValue)
 					BlockData[x][y][z] = World->GetBlockFromEnum(BStone);

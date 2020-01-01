@@ -15,6 +15,7 @@
 #include "../Misc/FileIO.h"
 #include "GameFramework/Character.h"
 #include "ChunkCube.h"
+#include "Engine/World.h"
 #include "ChunkFormCoords.h"
 
 Chunk::Chunk(ChunkFormCoords2D Pos, class AMcWorld* McWorld)
@@ -89,10 +90,6 @@ void Chunk::CreateChunkCube(int8 PosZ)
 	McWorld->AddChunkGenTask(NewCube);
 	//NewCube->SetWorldLocation(GetActorLocation() + FVector{ Pos.x * 1600.f, Pos.y * 1600.f, PosZ * 1600.f });
 
-	if (Pos.x == 0 && Pos.y == 0 && PosZ == 3)
-	{
-
-	}
 }
 
 void Chunk::DequeueChunkCubes()

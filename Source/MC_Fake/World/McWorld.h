@@ -62,6 +62,7 @@ private:
 	*/
 	TMap<class ChunkCube*, ChunkNeighbourUpdates> NeighbourUpdateTasks;
 	FCriticalSection NeighbourUpdatesMutex;
+	FCriticalSection ChunkCubesGenQueueMutex;
 
 	void DequeueChunkGenTasks();
 	void DequeueChunkCubeGenTasks();
