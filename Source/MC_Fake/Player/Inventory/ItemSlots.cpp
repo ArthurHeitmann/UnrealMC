@@ -9,7 +9,6 @@
 
 UItemSlots::UItemSlots()
 {
-	//SetNumSlots(1);
 }
 
 FItemStack* UItemSlots::GetStackAt(int x)

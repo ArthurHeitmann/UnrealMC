@@ -5,8 +5,6 @@
 #include "../World/McWorld.h"
 #include "Enums.h"
 
-//UMaterialInstanceDynamic* B_Dirt::DirtMaterial;
-
 B_Dirt::B_Dirt()
 {
 	BlockID = 2;

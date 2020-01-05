@@ -8,14 +8,6 @@
 #include "ItemSlots.generated.h"
 
 
-//USTRUCT()
-//struct FItemStack {
-//	GENERATED_BODY()
-//
-//	int32 Number;
-//	Item* Item;
-//};
-
 /**
  * 
  */
@@ -25,8 +17,7 @@ class MC_FAKE_API UItemSlots : public UObject
 	GENERATED_BODY()
 	
 protected:
-	//UPROPERTY(EditAnywhere)
-	TArray<FItemStack*> Slots;    //TODO Check whether undeleted pointers can occur
+	TArray<FItemStack*> Slots;
 
 public:
 	UItemSlots();

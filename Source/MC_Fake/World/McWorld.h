@@ -8,7 +8,6 @@
 #include "McWorldStructs.h"
 #include "ChunkFormCoords.h"
 #include "Chunk.h"
-//#include "Blocks/Block.h"
 #include "McWorld.generated.h"
 
 UCLASS()
@@ -34,7 +33,7 @@ public:
 	void RemoveLoadedChunk(ChunkFormCoords2D Pos);
 	void QuickSave();
 	void QuickLoad();
-	class B_Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeded, int MinGenStage = 0, int maxGenStae = 255);
+	class B_Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeeded, int MinGenStage = 0, int MaxGenState = 255);
 	void AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* Block, uint8 MinGenStage);
 	void CompleteBlockSetTasks(class ChunkCube * ChunkCube);
 	void FinalizeChunkGen(class Chunk* Chunk);
@@ -60,8 +59,8 @@ private:
 	/*
 		
 	*/
-	TMap<class ChunkCube*, ChunkNeighbourUpdates> NeighbourUpdateTasks;
-	FCriticalSection NeighbourUpdatesMutex;
+	TMap<class ChunkCube*, ChunkNeighborUpdates> NeighborUpdateTasks;
+	FCriticalSection NeighborUpdatesMutex;
 	FCriticalSection ChunkCubesGenQueueMutex;
 
 	void DequeueChunkGenTasks();

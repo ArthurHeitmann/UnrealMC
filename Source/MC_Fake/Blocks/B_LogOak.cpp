@@ -1,6 +1,3 @@
-
-
-
 #include "B_LogOak.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
@@ -15,9 +12,7 @@ B_LogOak::B_LogOak()
 	BlockEnum = BLog_Oak;
 	BreakTime = 3;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/log_oak.log_oak'"));
-	//static ConstructorHelpers::FObjectFinder<UTexture> TextureBmpObj(TEXT("Texture2D'/Game/Materials/Textures/log_oak_BMP.log_oak_BMP'"));
 	Texture = TextureObj.Object;
-	//TextureBMP = TextureBmpObj.Object;
 }
 
 TArray<FVector2D> B_LogOak::GetTopUVs()

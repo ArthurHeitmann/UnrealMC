@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "WorldLoadingComponent.h"
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
@@ -28,14 +25,6 @@ void UWorldLoadingComponent::BeginPlay()
 		McFWorld = Cast<AMcWorld>(AllWorlds[0]);
 	else
 		McFWorld = GetWorld()->SpawnActor<AMcWorld>();
-
-	/*FVector ChunkCoordinatesNew3D = GetComponentLocation();
-	CurrentChunkCoordinates = { 
-		floorf(ChunkCoordinatesNew3D.X / 1600),
-		floorf(ChunkCoordinatesNew3D.Y / 1600),
-		floorf(ChunkCoordinatesNew3D.Z / 1600) 
-	};			TODO CR  */
-
 }
 
 void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -52,8 +41,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (CurrentChunkCoordinates == ChunkCoordinatesNew)
 		return;
-	UE_LOG(LogTemp, Warning, TEXT("Position changed \n X: %d Y: %d Z: %d"), ChunkCoordinatesNew.x, ChunkCoordinatesNew.y, ChunkCoordinatesNew.z);
-	//ChunkFormCoords3D ChunkLocDifference = ChunkCoordinatesNew - CurrentChunkCoordinates;		TODO CR
+
 	CurrentChunkCoordinates = ChunkCoordinatesNew;
 	ChunkFormCoords2D ChunkCoords2D = CurrentChunkCoordinates.To2D();
 
@@ -61,19 +49,11 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	for (int i = 0; i < PlayerChunks.Num(); ++i)
 	{
 		ChunkFormCoords2D LocDiff = ChunkCoords2D - PlayerChunks[i];
-		//PlayerChunks[i] += LocDiff;		TODO CR
-		int MaxDistance = FMath::Max(abs(LocDiff.x), abs(LocDiff.y));
-		if (MaxDistance < ChunkLoadingDistance + 3)
-		{
-			if (Chunk* Chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
-				Chunk->SetMeshLifeStage(0);
-		}
-		else
+		if (FMath::Max(abs(LocDiff.X), abs(LocDiff.Y)) > ChunkLoadingDistance + 3)
 		{
 			if (Chunk* chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 			{
-				ChunkFormCoords2D tmpCoords = PlayerChunks[i];
-				PlayerChunks.Remove(tmpCoords);
+				PlayerChunks.Remove(PlayerChunks[i]);
 				delete chunk;
 			}
 		}
@@ -87,12 +67,12 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			if (abs(x) == layer)
 			{
 				for (int y = -layer; y <= layer; ++y)
-					ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, y }, CurrentChunkCoordinates.z });
+					ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, y }, CurrentChunkCoordinates.Z });
 			}
 			else
 			{
-				ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, layer }, CurrentChunkCoordinates.z });
-				ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, -layer }, CurrentChunkCoordinates.z });
+				ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, layer }, CurrentChunkCoordinates.Z });
+				ProcessChunkDistanceUpdate({ ChunkCoords2D + ChunkFormCoords2D{ x, -layer }, CurrentChunkCoordinates.Z });
 			}
 		}
 	}
@@ -103,18 +83,14 @@ void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkFormCoords3D 
 	if (!PlayerChunks.Contains(Pos3D.To2D()))
 		LoadChunk(Pos3D);
 	else
-	{
 		LoadChunkCubes(Pos3D);
-	}
 }
 
 void UWorldLoadingComponent::LoadChunk(ChunkFormCoords3D Pos3D)
 {
-	//FVector ChunkCoords {  Data.x, Data.y };
-	if (Chunk* NewChunk = McFWorld->CreateChunk(Pos3D.To2D()))
+	if (McFWorld->CreateChunk(Pos3D.To2D()))
 	{
 		PlayerChunks.Add(Pos3D.To2D());
-
 		LoadChunkCubes(Pos3D);
 	}
 
@@ -124,7 +100,7 @@ void UWorldLoadingComponent::LoadChunkCubes(ChunkFormCoords3D Pos3D)
 {
 	int8 RangeDown, RangeUp;
 	CalcCubeRangeFromDist(Pos3D.To2D(), RangeDown, RangeUp);
-	int8 Height = Pos3D.z;
+	int8 Height = Pos3D.Z;
 	McFWorld->GetChunkAt(Pos3D.To2D())
 		->UpdateChunkCubesLoading(Height, RangeDown, RangeUp);
 }
@@ -133,7 +109,7 @@ void UWorldLoadingComponent::CalcCubeRangeFromDist(const ChunkFormCoords2D& Pos2
 {
 	//TODO scale with Loading Distance and environment (Cave, Hills, Structure, etc.)
 	ChunkFormCoords2D LocDiff = CurrentChunkCoordinates.To2D() - Pos2D;
-	float MaxDist = fmaxf(abs(LocDiff.x), abs(LocDiff.y));
+	float MaxDist = fmaxf(abs(LocDiff.X), abs(LocDiff.Y));
 	if (MaxDist <= 5)
 	{
 		OutRangeDown = 2;

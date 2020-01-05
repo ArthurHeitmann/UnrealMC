@@ -11,7 +11,7 @@ void UItemMeshComponent::OnItemChange()
 {
 	if ((*ItemPointer)->ItemCount > 0)
 	{
-		bool bCustomMesh = (*ItemPointer)->ItemS->HasCutomDisplayMesh();
+		bool bCustomMesh = (*ItemPointer)->ItemS->HasCustomDisplayMesh();
 		if (bWasPreviouseItemEmpty)
 		{
 			if (bCustomMesh)
@@ -60,9 +60,6 @@ void UItemMeshComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false);
-	//CustomMesh->AttachToComponent(this, Rules);
-	//ItemMesh->AttachToComponent(this, Rules);
 	ItemMesh = NewObject<UStaticMeshComponent>(this, TEXT("Item Mesh"));
 	CustomMesh = NewObject<URuntimeMeshComponent>(this, TEXT("Custom Mesh"));
 	ItemMesh->SetupAttachment(this);

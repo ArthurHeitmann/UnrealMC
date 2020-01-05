@@ -1,10 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/PrimitiveComponent.h"
 #include "Enums.h"
 #include "McWorld.h"
-//#include "McWorldStructs.h"
 #include "ChunkFormCoords.h"
 
 struct ChunkCubeGenData {
@@ -12,9 +10,7 @@ struct ChunkCubeGenData {
 	bool bHasGrass;
 };
 
-
-
-struct ChunkCubeNeighbours {
+struct ChunkCubeNeighbors {
 	ChunkCube* North = nullptr;
 	ChunkCube* East = nullptr;
 	ChunkCube* South = nullptr;
@@ -37,13 +33,11 @@ private:
 
 	TArray<TArray<TArray<class B_Block*>>> BlockData;
 	ChunkCubeGenData CubeData;
-	ChunkCubeNeighbours CubeNeighbours;
-	class UBoxComponent* tmpBox;
-	UStaticMeshComponent* tmpStatMesh;
+	ChunkCubeNeighbors CubeNeighbors;
+	class UBoxComponent* BoundingBox;
 	class URuntimeMeshComponent* ChunkMesh;
 	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
-	//int8 Height; TODO CR
 	bool bHasDataChanged = false;
 	bool bIsGenerating = false;
 	bool bHasFinishedGenerating = false;
@@ -62,15 +56,14 @@ public:
 	int GetNextGenerationStage();
 	class Chunk* GetParentChunk();
 	void SetParentChunk(class Chunk*);
-	//void SetHeight(int8 Height);
-	void SetHasDataChanged(bool val = true);
+	void SetHasDataChanged(bool bState = true);
 	bool GetHasFinishedGenerating();
-	void SetHasFinishedGenerating(bool val = true);
+	void SetHasFinishedGenerating(bool BState = true);
 	bool GetIsGenerating();
-	void SetIsGenerating(bool val);
+	void SetIsGenerating(bool bState);
 	B_Block*& GetBlockAt(int x, int y, int z);
 	ChunkCubeGenData& GetChunkCubeGenData();
-	ChunkCubeNeighbours& GetChunkCubeNeighbours();
-	void UpdateCubeNeighbour(EDirection NeighbourSide, ChunkCube* NewNeighbour, bool bUpdateMesh = false);
+	ChunkCubeNeighbors& GetChunkCubeNeighbors();
+	void UpdateCubeNeighbor(EDirection NeighborSide, ChunkCube* NewNeighbor, bool bUpdateMesh = false);
 	void UpdateMesh();
 };

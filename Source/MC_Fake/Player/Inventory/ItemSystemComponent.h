@@ -1,5 +1,3 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -20,9 +18,9 @@ public:
 	void InitPickUpBox(const FVector& BoxExtent);
 	void InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform & Offset1 = FTransform(), const FTransform & Offset2 = FTransform());
 	void InitItemSlots(int32 Num);
-	void InitUI(AGameModeBase* Gamemode);
+	void InitUI(class AGameModeBase* Gamemode);
 
-	void SelectItemSlot(int32 num);
+	void SelectItemSlot(int32 Num);
 	void SelectNextItem();
 	void SelectPreviousItem();
 
@@ -34,8 +32,6 @@ protected:
 	class UItemSlots* Slot_BasicInventory;
 	UPROPERTY(EditAnywhere)
 	class UUI_QuickAccessSlots* QuickAccessSlots;
-	//UPROPERTY(EditAnywhere)
-	//class UItemSlotsHUD* ItemSlotsHUD;
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* ItemPickupBox;
 	UPROPERTY(EditAnywhere)

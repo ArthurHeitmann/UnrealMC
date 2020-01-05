@@ -8,7 +8,7 @@
 #include "World/McWorld.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/McStaticFunctions.h"
-#include "Blocks/Block.h"
+#include "Blocks/B_Block.h"
 
 ULineTracingInteractions::ULineTracingInteractions()
 {
@@ -51,7 +51,6 @@ void ULineTracingInteractions::LeftClickStart()
 		if (Cast<URuntimeMeshComponent>(Result.Component))
 		{
 
-			//UE_LOG(LogTemp, Error, TEXT("Feature currently unsupported"));
 			if (ABlockBreaking* BreakingBlock = Cast<ABlockBreaking>(Result.Actor))
 			{
 				if (BreakingBlock != BreakingIndicator)
@@ -60,14 +59,7 @@ void ULineTracingInteractions::LeftClickStart()
 					RegisterNewHitAt(Result);
 				}
 				else
-				{
 					ContinueBreaking();
-				}
-				/*if (HittingChunk->ContinueHit(Block, (*CurrentItem)->ItemS))
-				{
-					HittingBlock = nullptr;
-					HittingChunk = nullptr;
-				}*/
 			}
 			else if (AMcWorld* Block = Cast<AMcWorld>(Result.Actor))
 			{
@@ -75,10 +67,6 @@ void ULineTracingInteractions::LeftClickStart()
 					CancelBreaking();
 
 				RegisterNewHitAt(Result);
-				/*if (HittingBlock && NewHittingBlock != HittingBlock)
-					HittingChunk->CancelBreaking(HittingBlock);
-				HittingChunk = Chunk;
-				HittingBlock = NewHittingBlock;*/
 			}
 		}
 	}
@@ -94,9 +82,6 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 	HitLoc.X = HitHelper(hit.Normal.X, HitLoc.X);
 	HitLoc.Y = HitHelper(hit.Normal.Y, HitLoc.Y);
 	HitLoc.Z = HitHelper(hit.Normal.Z, HitLoc.Z);
-	/*HitLoc.X = hit.ImpactNormal.X != 0 ? roundf(HitLoc.X) : floorf(HitLoc.X);
-	HitLoc.Y = hit.ImpactNormal.Y != 0 ? roundf(HitLoc.Y) : floorf(HitLoc.Y);
-	HitLoc.Z = hit.ImpactNormal.Z != 0 ? roundf(HitLoc.Z) : floorf(HitLoc.Z);*/
 	ChunkFormCoords3D chunkPos = ChunkFormCoords3D::FromNormalCoords(HitLoc.X, HitLoc.Y, HitLoc.Z);
 	int32 RelX = McStaticFunctions::SmartMod(HitLoc.X, 16);
 	int32 RelY = McStaticFunctions::SmartMod(HitLoc.Y, 16);
@@ -123,7 +108,7 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 
 	LastUsedItem = (*CurrentItem)->ItemS;
 
-	auto NeighborCCubes = HittingCCube->GetChunkCubeNeighbours();
+	auto NeighborCCubes = HittingCCube->GetChunkCubeNeighbors();
 	if (RelX == 0 && NeighborCCubes.South)
 		NeighborCCubes.South->SetHasDataChanged();
 	if (RelX == 15 && NeighborCCubes.North)

@@ -14,7 +14,6 @@ USTRUCT(BlueprintType)
 struct FItemStack {
 	GENERATED_BODY()
 
-	//UPROPERTY()
 	UPROPERTY(BlueprintReadOnly)
 	int32 ItemCount;
 	Item* ItemS;

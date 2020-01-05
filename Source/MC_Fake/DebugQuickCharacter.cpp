@@ -8,14 +8,9 @@
 #include "World/McWorld.h"
 #include "Kismet/GameplayStatics.h"
 #include "Items/I_Pickaxe_Stone.h"
-#include "Items/I_BlockItem.h"
-#include "Blocks/B_Stone.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Components/BoxComponent.h"
 #include "Player/Inventory/ItemSystemComponent.h"
-#include "Kismet/GameplayStatics.h"
 
-// Sets default values
 ADebugQuickCharacter::ADebugQuickCharacter()
 {
 	I_Pickaxe_Stone();
@@ -123,15 +118,6 @@ void ADebugQuickCharacter::EndCrouch()
 void ADebugQuickCharacter::ToggleChunkBoarders()
 {
 	UE_LOG(LogTemp, Error, TEXT("Feature currently unsupported"));
-	/*UWorld* W = GetWorld();
-	if (!W)
-		return;
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(W, Chunk::StaticClass(), FoundActors);
-	for (AActor* Chunk : FoundActors)
-	{
-		Cast<Chunk>(Chunk)->ToggleChunkBorders();
-	}*/
 }
 
 void ADebugQuickCharacter::BeginPlay()
@@ -144,26 +130,16 @@ void ADebugQuickCharacter::BeginPlay()
 	ItemSystem->InitUI(GetWorld()->GetAuthGameMode());
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
 
-	FVector TransOffset1(38, 45, -45);
-	FRotator RotOffset1(0, 90, 0);
-	FVector ScaleTr1(0.9, 0.9, 0.9);
-
-	FVector TransOffset2(27, 28, -34);
-	FRotator RotOffset2(0, 315, 0);
-	FVector ScaleTr2(0.25, 0.25, 0.25);
-	//ItemSystem->InitSelectedItemMesh(Camera, FTransform(RotOffset1, TransOffset1, ScaleTr1), FTransform(RotOffset2, TransOffset2, ScaleTr2));
 	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
 	LineTracing->SetSelectedItemPointer(SelectedItemPointer);
 }
 
-// Called every frame
 void ADebugQuickCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

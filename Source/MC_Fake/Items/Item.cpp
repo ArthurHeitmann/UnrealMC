@@ -1,6 +1,3 @@
-
-
-
 #include "Item.h"
 
 Item::Item()
@@ -20,7 +17,7 @@ FName Item::GetName()
 	return ItemName;
 }
 
-int32 Item::GetId()
+uint16 Item::GetId()
 {
 	return Id;
 }
@@ -65,12 +62,12 @@ bool Item::IsStackableWith(Item* OtherItem)
 	return ItemEnum == OtherItem->GetItemEnum();
 }
 
-bool Item::HasCutomDisplayMesh()
+bool Item::HasCustomDisplayMesh()
 {
 	return bCustomDisplayMesh;
 }
 
-void Item::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TArray<FVector2D>& UVs, TArray<int32>& Tris, TArray<FVector>& Normals, UMaterial *& Mat)
+void Item::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& VerticesOut, TArray<FVector2D>& UVsOut, TArray<int32>& TrianglesOut, TArray<FVector>& NormalsOut, UMaterial *& MatOut)
 {
 }
 

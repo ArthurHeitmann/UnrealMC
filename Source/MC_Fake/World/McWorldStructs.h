@@ -2,8 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "ChunkFormCoords.h"
-//#include "Blocks/Block.h"
-//#include "ChunkCube.h"
 
 struct ChunkCubeGenBufferElement {
 	class ChunkCube* Cube;
@@ -11,8 +9,8 @@ struct ChunkCubeGenBufferElement {
 };
 
 struct ChunkGenBufferElement {
-	int32 x;
-	int32 y;
+	int32 X;
+	int32 Y;
 	class Chunk* Chunk;
 };
 
@@ -22,7 +20,8 @@ struct BlockSetBufferElement {
 	class B_Block* BlockS;
 	uint8 MinGenStage;
 
-	BlockSetBufferElement() {}
+	BlockSetBufferElement(): RelX(0), RelY(0), RelZ(0), BlockS(nullptr), MinGenStage(0) {}
+
 	BlockSetBufferElement(int32 x, int32 y, int32 z, B_Block* b, uint8 MinGenerationStage)
 	{
 		int16 tmpRelX = x % 16;
@@ -34,16 +33,16 @@ struct BlockSetBufferElement {
 			tmpRelY += 16;
 		RelX = tmpRelX;
 		RelY = tmpRelY;
-		CurrChunkPos.x = (int32) floorf(x / 16.f);
-		CurrChunkPos.y = (int32) floorf(y / 16.f);
-		CurrChunkPos.z = (int32) floorf(z / 16.f);
+		CurrChunkPos.X = static_cast<int32>(floorf(x / 16.f));
+		CurrChunkPos.Y = static_cast<int32>(floorf(y / 16.f));
+		CurrChunkPos.Z = static_cast<int32>(floorf(z / 16.f));
 
 		BlockS = b;
 		MinGenStage = MinGenerationStage;
 	}
 };
 
-struct ChunkNeighbourUpdates {
+struct ChunkNeighborUpdates {
 	//North, East, South, West, Top, Bottom
 	class ChunkCube* NewNChunk;
 	class ChunkCube* NewEChunk;

@@ -50,6 +50,5 @@ private:
 	float Interp2Values(float v1, float v2, float alpha);
 	float Interp4Values(const TArray<float>& Values, NoiseVector InterpPoint, int GridSize);
 	float Smooth(float v);
-	//TArray<int> RandomNumbers;
 
 };

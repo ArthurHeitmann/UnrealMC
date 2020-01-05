@@ -19,22 +19,19 @@ private:
 	const float SLOPE_GRASS = 5;
 	const float SLOPE_DIRT = 7;
 
-	//bool bIsDone = true;
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
-	//int PosX, PosY;		TODO CR
 	ChunkFormCoords3D Pos;
 	ChunkFormCoords2D Pos2D;
 	TArray<ChunkCubeGenBufferElement> CubeGenerationList;
 	ChunkCubeGenBufferElement CurrentCubeElement;
-	//TArray<TArray<TArray<class Block*>>>* ChunkBlockData;
 	class Chunk* CurrentChunk;
 	class AMcWorld* World;
 	int NextGenerationStage;
 	int LastGenerationStage;
 
-	class B_Block* GetBlockAt(int32 x, int32 y, int32 z);
-	void SetBlockAt(int32 x, int32 y, int32 z, class B_Block* b);
+	class B_Block* GetBlockAt(int32 X, int32 Y, int32 Z);
+	void SetBlockAt(int32 X, int32 Y, int32 Z, class B_Block* Block);
 
 	void GenerateChunkData();
 	void GenerateChunkCubes();
@@ -46,9 +43,9 @@ private:
 	void Stage_CaveCarving();
 	void Stage_Trees();
 
-	bool hasAirInRange(EAllBlocks* NextBlocks, int start, int end);
+	bool HasAirInRange(EAllBlocks* NextBlocks, int Start, int End);
 
-	void wait();
+	void Wait();
 
 public:
 	bool bRun = true;
@@ -56,12 +53,9 @@ public:
 	FRunnableThread* ThisThread;
 
 	~ChunkGenerator();
-	virtual uint32 Run();
-	//void Reset(int x, int y, class Chunk* WorkingChunk, int NewGenerationStage, int MaxGenStage = 255, bool bUseThread = true);
+	virtual uint32 Run() override;
 	void SetChunkData(class Chunk* WorkingChunk);
 	void SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes);
 	void SetWorld(class AMcWorld* NewWorld);
-	//void Generate();
 
-	void GenerateChunkCube();
 };

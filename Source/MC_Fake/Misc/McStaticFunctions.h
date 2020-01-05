@@ -11,9 +11,9 @@ class MC_FAKE_API McStaticFunctions
 {
 public:
 
-    static FORCEINLINE int32 SmartMod(int32 num, int32 div)
+    static FORCEINLINE int32 SmartMod(int32 Num, int32 Div)
     {
-        int32 mod = num % div;
-        return mod >= 0 ? mod : mod + div;
+        int32 Mod = Num % Div;
+        return Mod >= 0 ? Mod : Mod + Div;
     }
 };

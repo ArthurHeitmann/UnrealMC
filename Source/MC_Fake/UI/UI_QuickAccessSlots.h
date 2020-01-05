@@ -32,31 +32,13 @@ private:
 	static const float DEG_TO_RAD;
 	float DistFromCenter;
 
-	//Toggle Vis Timeline
 	bool bIsVisible;
-	/*UPROPERTY()
-	class UTimelineComponent* TLComp;
-	UPROPERTY()
-	UCurveFloat* TimeCurve;
-	UFUNCTION()
-	void TLUpdate(float val);
-	UFUNCTION()
-	void TLFinished();*/
-	//UFUNCTION()
-	//FOnTimelineFloat InterpFunction{};
-	
-	//end Timeline
-
 
 protected:
 
 public:
 	UUI_QuickAccessSlots(const FObjectInitializer& FOs);
-	bool Initialize();
-
-	/*FItemStack& SetSelecteddItemSlotById(int32 id);
-	FItemStack& NextSelectedItem();
-	FItemStack& PreviousSelectedItem();*/
+	bool Initialize() override;
 
 	void SetInventorySlots(class UItemSlots* NewInventorySlots, int32 pSlotsPerRow = 10);
 	void SetSelectedItemPointer(FItemStack const** ISP);

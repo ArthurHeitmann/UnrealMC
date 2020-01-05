@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "B_Air.h"
 #include "../World/McWorld.h"
 #include "Enums.h"

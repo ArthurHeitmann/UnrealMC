@@ -27,9 +27,6 @@ void UItemSystemComponent::BeginPlay()
 void UItemSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-
-	//QuickAccessSlots->UpdateSlotsUI(GetWorld());
 }
 
 FItemStack UItemSystemComponent::AddItemStackToInventory(FItemStack Items)

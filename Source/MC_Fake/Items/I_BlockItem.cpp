@@ -1,5 +1,5 @@
 #include "I_BlockItem.h"
-#include "../Blocks/Block.h"
+#include "../Blocks/B_Block.h"
 #include "Misc/McStaticFunctions.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
@@ -69,9 +69,9 @@ Item::PostUseTask I_BlockItem::OnItemUse(const FHitResult& HitPointData, AMcWorl
 
 void I_BlockItem::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TArray<FVector2D>& UVs, TArray<int32>& Tris, TArray<FVector>& Normals, UMaterial*& Mat)
 {
-	Verts = BlockRef->GetAllVertecies(0, 0, 0);
+	Verts = BlockRef->GetAllVertices(0, 0, 0);
 	UVs = BlockRef->GetAllUVs();
-	Tris = BlockRef->GetAllTrainglesFrom();
+	Tris = BlockRef->GetAllTrianglesFrom();
 	Normals = BlockRef->GetAllNormals();
 	Mat = (UMaterial*) BlockRef->GetMaterial(Base);
 }

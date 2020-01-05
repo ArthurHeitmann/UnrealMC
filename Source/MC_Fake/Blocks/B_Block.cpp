@@ -1,7 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Block.h"
+#include "B_Block.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 #include "../Items/Item.h"
@@ -29,6 +26,7 @@ B_Block::B_Block()
 		static ConstructorHelpers::FObjectFinder<UMaterial> MaterialInstanceObj(TEXT("Material'/Game/Materials/Blocks/M_BlockDefault.M_BlockDefault'"));
 		B_Block::BlockMaterial = MaterialInstanceObj.Object;
 	}
+	bCustomItemDrops = false;
 	bCustomCollisionMesh = false;
 
 	Texture = nullptr;
@@ -65,7 +63,7 @@ void B_Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
 	if (!Drop)
 		return;
 	Drop->SetItemStack({ DropItem, 1 });
-	Drop->SetMesh(GetAllVertecies(-50, -50, -50), GetAllTrainglesFrom(0), GetAllUVs(), GetAllNormals(), GetMaterial(Drop));
+	Drop->SetMesh(GetAllVertices(-50, -50, -50), GetAllTrianglesFrom(0), GetAllUVs(), GetAllNormals(), GetMaterial(Drop));
 }
 
 bool B_Block::IsSideOptimizable(EDirection Direction)
@@ -81,11 +79,6 @@ bool B_Block::IsBlockOpaque()
 bool B_Block::UsesCustomModel()
 {
 	return false;
-}
-
-bool B_Block::HasConstantMaterial()
-{
-	return true;
 }
 
 FName B_Block::GetName()
@@ -131,7 +124,7 @@ void B_Block::OnPlace(class UWorld* World, FVector Location)
 {
 }
 
-void B_Block::OnLeftclick(class UWorld* World, FVector Location)
+void B_Block::OnInteract(class UWorld* World, FVector Location)
 {
 }
 
@@ -139,13 +132,22 @@ void B_Block::OnBeginBreak(class UWorld* World, FVector Location)
 {
 }
 
-void B_Block::Updatebreak(float Millis)
+void B_Block::UpdateBreak(class UWorld* World, FVector Location, float Seconds)
 {
 }
 
 void B_Block::OnBreak(class UWorld* World, FVector Location)
 {
-	DropItem(World, Location, new I_BlockItem(this));
+	if (bCustomItemDrops)
+	{
+		for (const auto& DropProb : PossibleItemDrops)
+		{
+			if (FMath::FRandRange(0.f, 1.f) >= DropProb.Chance)
+				DropItem(World, Location, DropProb.Item);
+		}
+	}
+	else
+		DropItem(World, Location, new I_BlockItem(this));
 }
 
 EBlockModelType B_Block::GetBlockModelType()
@@ -183,7 +185,7 @@ UTexture* B_Block::GetTextureBMP()
 	return TextureBMP;
 }
 
-TArray<FVector> B_Block::GetTopVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetTopVertices(float x, float y, float z)
 {
 	return {
 		{x, y, z + 100},
@@ -193,7 +195,7 @@ TArray<FVector> B_Block::GetTopVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> B_Block::GetRightVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetRightVertices(float x, float y, float z)
 {
 	return {
 		{x, y + 100, z},
@@ -203,7 +205,7 @@ TArray<FVector> B_Block::GetRightVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> B_Block::GetBottomVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetBottomVertices(float x, float y, float z)
 {
 	return {
 		{x, y, z},
@@ -213,7 +215,7 @@ TArray<FVector> B_Block::GetBottomVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> B_Block::GetLeftVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetLeftVertices(float x, float y, float z)
 {
 	return {
 		{x, y, z},
@@ -223,7 +225,7 @@ TArray<FVector> B_Block::GetLeftVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> B_Block::GetFrontVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetFrontVertices(float x, float y, float z)
 {
 	return {
 		{x, y, z},
@@ -233,7 +235,7 @@ TArray<FVector> B_Block::GetFrontVertecies(float x, float y, float z)
 	};
 }
 
-TArray<FVector> B_Block::GetBackVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetBackVertices(float x, float y, float z)
 {
 	return {
 		{x + 100, y + 100, z},
@@ -394,7 +396,7 @@ TArray<FVector> B_Block::GetBackNormals()
 	};
 }
 
-TArray<FVector> B_Block::GetAllVertecies(float x, float y, float z)
+TArray<FVector> B_Block::GetAllVertices(float x, float y, float z)
 {
 	return {
 		{x, y, z + 100},
@@ -471,17 +473,17 @@ TArray<FVector> B_Block::GetAllNormals()
 	};
 }
 
-TArray<int32> B_Block::GetAllTrainglesFrom(int32 Start)
+TArray<int32> B_Block::GetAllTrianglesFrom(int32 Start)
 {
-	TArray<int32> Tris;
-	Tris.Reserve(36);
+	TArray<int32> Triangles;
+	Triangles.Reserve(36);
 	for (int face = 0; face < 6; ++face)
 	{
 		int vl = face * 4 + Start;
-		Tris.Append({
+		Triangles.Append({
 			vl, vl + 1 , vl + 2,
 			vl, vl + 2, vl + 3
 			});
 	};
-	return Tris;
+	return Triangles;
 }

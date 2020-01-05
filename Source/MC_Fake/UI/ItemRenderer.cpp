@@ -1,20 +1,15 @@
-
-
-
 #include "ItemRenderer.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "../Items/ItemMeshComponent.h"
 #include "../Items/ItemStack.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ConstructorHelpers.h"
-#include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/KismetRenderingLibrary.h"
 
-// Sets default values
 AItemRenderer::AItemRenderer()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
 	USceneComponent* Root = CreateDefaultSubobject<USceneCaptureComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Scene Capture"));
@@ -58,12 +53,11 @@ UMaterialInstanceDynamic* AItemRenderer::GetUIMaterial(UObject* MatOwner)
 	return UIMaterial;
 }
 
-// Called when the game starts or when spawned
 void AItemRenderer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector TotalOffset(0, 0, -1000);    //TODO Increase Value
+	FVector TotalOffset(0, 0, -1000);
 
 	FTransform Offset(FVector(80.f, -35.f, -50.f));
 	Offset.SetScale3D({ 0.5, 0.5, 0.5 });
@@ -79,7 +73,6 @@ void AItemRenderer::EndPlay(EEndPlayReason::Type Reason)
 		delete PPIS;
 }
 
-// Called every frame
 void AItemRenderer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

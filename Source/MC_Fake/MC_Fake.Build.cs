@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 using UnrealBuildTool;
 
 public class MC_Fake : ModuleRules
@@ -7,12 +5,10 @@ public class MC_Fake : ModuleRules
 	public MC_Fake(ReadOnlyTargetRules Target) : base(Target)
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        //bUseRTTI = true;    //TODo remove
         PublicDependencyModuleNames.AddRange(new string[] { "Core",
             "CoreUObject",
             "Engine",
             "InputCore",
-            //"ProceduralMeshComponent",
             "EngineSettings",
             "UnrealFastNoisePlugin",
             "UMG"

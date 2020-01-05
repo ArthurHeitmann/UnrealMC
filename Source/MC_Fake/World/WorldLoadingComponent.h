@@ -1,25 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "Chunk.h"
 #include "Containers/Queue.h"
 #include "McWorld.h"
 #include "ChunkFormCoords.h"
-//#include "McWorldStructs.h"
 #include "WorldLoadingComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MC_FAKE_API UWorldLoadingComponent : public USceneComponent
 {
-	//struct ChunkPair { FVector2D Loc; Chunk* chunk; };
-
 	GENERATED_BODY()
-
-	//struct ChunkLoadBufferElement { ChunkFormCoords3D CurrChunkPos ; ChunkFormCoords2D LocRelToCurrentChunk; };
 
 private:
 	UPROPERTY(EditAnywhere)

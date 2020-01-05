@@ -13,18 +13,7 @@ const float UUI_QuickAccessSlots::DEG_TO_RAD = 0.0174532925199;
 
 UUI_QuickAccessSlots::UUI_QuickAccessSlots(const FObjectInitializer& FOs) : Super(FOs)
 {
-	//Super::NativeConstruct();
-
-	//static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(TEXT("CurveFloat'/Game/Animation/Curves/C_ItemWheelToggle.C_ItemWheelToggle'"));
-	//TimeCurve = CurveFinder.Object;
-
-	//InterpFunction.BindUFunction(this, TEXT("TLUpdate"));
 }
-
-/*void UUI_QuickAccessSlots::SetSelecteddItemPointer(Item** NewItemPointer)
-{
-	SelectedItem = NewItemPointer;
-}*/
 
 bool UUI_QuickAccessSlots::Initialize()
 {
@@ -40,11 +29,6 @@ bool UUI_QuickAccessSlots::Initialize()
 	
 	bIsVisible = false;
 	SetVisibility(ESlateVisibility::Hidden);
-	//SetRenderOpacity(0);
-
-	//TLComp = NewObject<UTimelineComponent>(this, TEXT());
-	//TLComp->CreationMethod = EComponentCreationMethod::UserConstructionScript;   //TODO Try removing this
-	//TLComp->AddInterpFloat(TimeCurve, InterpFunction, TEXT("TL Float"));
 
 	return true;
 }
@@ -79,8 +63,6 @@ bool UUI_QuickAccessSlots::Initialize()
 
 void UUI_QuickAccessSlots::SetInventorySlots(UItemSlots* NewInventorySlots, int32 pSlotsPerRow)
 {
-	//if (!TLComp->IsRegistered())
-		//TLComp->RegisterComponent();
 
 	Inventory = NewInventorySlots;
 	SlotsPerRow = pSlotsPerRow;
@@ -132,41 +114,10 @@ void UUI_QuickAccessSlots::SelectPreviousItem()
 
 void UUI_QuickAccessSlots::ToggleVisibility()
 {
-	/*if (!TLComp)
-	{
-		TLComp = NewObject<UTimelineComponent>(GetWorld(), TEXT("Item Wheel Toggle Timeline"));
-		TLComp->RegisterComponent();
-		TLComp->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-		TLComp->SetLooping(false);
-		FOnTimelineFloat onTimelineCallback;
-		FOnTimelineEventStatic FinishedCallback;
-		onTimelineCallback.BindUFunction(this, TEXT("TLUpdate"));
-		FinishedCallback.BindUFunction(this, TEXT("TLFinished"));
-		TLComp->AddInterpFloat(TimeCurve, onTimelineCallback);
-		TLComp->SetTimelineFinishedFunc(FinishedCallback);
-	}
-
-	if (TLComp->IsPlaying())
-		TLComp->Stop();*/
-
 	if (bIsVisible)
 		SetVisibility(ESlateVisibility::Hidden);
 	else
 		SetVisibility(ESlateVisibility::Visible);
 	bIsVisible = !bIsVisible;
 		
-	//TLComp->PlayFromStart();
 }
-
-//
-//void UUI_QuickAccessSlots::TLUpdate(float val)
-//{
-//	SetRenderOpacity(bIsVisible ? 1 - val : val);
-//}
-//
-//void UUI_QuickAccessSlots::TLFinished()
-//{
-//	if (bIsVisible)
-//		SetVisibility(ESlateVisibility::Hidden);
-//	bIsVisible = !bIsVisible;
-//}

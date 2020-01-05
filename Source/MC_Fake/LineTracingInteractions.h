@@ -16,8 +16,6 @@ class MC_FAKE_API ULineTracingInteractions : public UActorComponent
 private:	
 	UPROPERTY(EditAnywhere)
 	float HandReachDistance;
-	//FHitResult LeftClickResult;
-	//FHitResult RightClickResult;
 	class B_Block* HittingBlock;
 	class B_Block** InitialBlock;
 	class ABlockBreaking* BreakingIndicator;

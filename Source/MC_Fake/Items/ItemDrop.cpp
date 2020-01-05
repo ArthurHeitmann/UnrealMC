@@ -9,11 +9,10 @@
 #include "Components/SphereComponent.h"
 #include "Components/TimelineComponent.h"
 
-// Sets default values
 AItemDrop::AItemDrop()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 	InteractionZone = CreateDefaultSubobject<USphereComponent>(TEXT("ItemDrop Interaction Zone"));
 	InteractionZone->SetSphereRadius(0);
 	Mesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Item Drop Mesh"));
@@ -25,12 +24,6 @@ AItemDrop::AItemDrop()
 	Mesh->AddLocalOffset({0, 0, 15});
 	InteractionZone->SetCollisionProfileName(TEXT("NoCollision"));
 	SM->SetCollisionProfileName(TEXT("NoCollision"));
-	//SM->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
-	/*SM->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	SM->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
-	SM->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);*/
-
-	//Mesh->SetWorldScale3D({.25, .25, .25});
 	SM->SetWorldScale3D({.25, .25, .25});
 	SM->SetVisibility(false);
 	InteractionZone->SetupAttachment(SM);
@@ -71,7 +64,6 @@ void AItemDrop::ItemOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	}
 }
 
-// Called when the game starts or when spawned
 void AItemDrop::BeginPlay()
 {
 	Super::BeginPlay();
@@ -117,13 +109,6 @@ void AItemDrop::Tick(float DeltaTime)
 		SM->WakeAllRigidBodies();
 		InitComplete = true;
 	}
-
-	/*FRotator currRot = Mesh->GetComponentRotation();
-	currRot.Pitch = 0;
-	currRot.Roll = 0;
-	currRot.Yaw += FMath::Fmod(45.f * DeltaTime, 360);
-	Mesh->SetWorldRotation(currRot);
-	Mesh->AddLocalOffset({0, 0, sinf(TimeElapsed)});*/
 
 	if (TLComp)
 		TLComp->TickComponent(DeltaTime, LEVELTICK_TimeOnly, nullptr);

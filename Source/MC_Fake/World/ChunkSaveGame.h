@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "../Blocks/Block.h"
+#include "../Blocks/B_Block.h"
 #include "ChunkSaveGame.generated.h"
 
 /**

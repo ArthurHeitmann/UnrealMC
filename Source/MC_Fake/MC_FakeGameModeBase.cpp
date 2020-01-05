@@ -1,8 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "MC_FakeGameModeBase.h"
-#include "UI/ItemSlotsHUD.h"
+#include "DebugQuickCharacter.h"
 
 void AMC_FakeGameModeBase::BeginPlay()
 {

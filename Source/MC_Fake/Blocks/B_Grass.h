@@ -1,17 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Block.h"
+#include "B_Block.h"
 
 /**
  * 
  */
 class MC_FAKE_API B_Grass : public B_Block
 {
-	
-//protected:
-	//static UMaterialInstanceDynamic* GrassBlockMaterial;
-
 public:
 	B_Grass();
 

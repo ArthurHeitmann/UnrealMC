@@ -20,13 +20,12 @@ bool UUI_ItemSlot::Initialize()
 	UCanvasPanel* Root = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), FName("Root"));
 	WidgetTree->RootWidget = Root;
 	UOverlay* Root2 = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass(), FName("Second Root"));
-	//
+	
 	Root1_2 = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
 	MarkUnselected();
 	UCanvasPanelSlot* CanvasSlot = Root->AddChildToCanvas(Root1_2);
 	Root1_2->AddChild(Root2);
-	//
-	//UCanvasPanelSlot* CanvasSlot = Root->AddChildToCanvas(Root2);
+
 	CanvasSlot->SetSize({ 150, 150 });
 	Root2->SetClipping(EWidgetClipping::ClipToBounds);
 	NameText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Item Name Text"));
@@ -55,12 +54,6 @@ void UUI_ItemSlot::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 		NameText->SetText(FText::FromString(""));
 	NumberText->SetText(FText::AsNumber(ItemStackC->ItemCount));
 }
-
-//
-//void UUI_ItemSlot::NativeConstruct()
-//{
-//	Super::NativeConstruct();
-//}
 
 void UUI_ItemSlot::SetItemStack(FItemStack* NewItemStack)
 {

@@ -6,7 +6,7 @@
 #include "HAL/PlatformFilemanager.h"
 #include "GenericPlatform/GenericPlatformFile.h"
 #include "Misc/Paths.h"
-#include "../Blocks/Block.h"
+#include "../Blocks/B_Block.h"
 #include "../World/Chunk.h"
 #include "Enums.h"
 #include "Serialization/Archive.h"
@@ -42,8 +42,8 @@ ChunkData FileIO::LoadChunk(const FString& WorldName, int PosX, int PosY)
 	int x = 0, y = 0, z = 0;
 	while (Bytes[currentByte] != 255)
 	{
-		OutData.BlockData[x][y][z] = Block::GetBlockFromBytes(Bytes + currentByte);
-		if (OutData.BlockData[x][y][z] != B_Air::AirRef)
+		OutData.BlockReference[x][y][z] = Block::GetBlockFromBytes(Bytes + currentByte);
+		if (OutData.BlockReference[x][y][z] != B_Air::AirRef)
 		{
 			if ((Bytes[currentByte + 2] & 128) == 0)
 				currentByte += 3;
