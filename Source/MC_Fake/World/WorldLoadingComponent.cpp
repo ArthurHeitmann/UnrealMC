@@ -53,7 +53,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			if (Chunk* chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 			{
-				PlayerChunks.Remove(PlayerChunks[i]);
+				PlayerChunks.RemoveAt(i--);               //i-- so that the index doesn't change on the next loop iteration
 				delete chunk;
 			}
 		}
