@@ -7,6 +7,7 @@ ABlockSpaceChecker::ABlockSpaceChecker()
 	PrimaryActorTick.bCanEverTick = false;
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>("Collision Box");
+	SetRootComponent(CollisionBox);
 	CollisionBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 	CollisionBox->SetBoxExtent({ 30.f, 30.f, 30.f });
 	CollisionBox->bHiddenInGame = false;

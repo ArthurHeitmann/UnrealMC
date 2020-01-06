@@ -39,8 +39,9 @@ uint32 ChunkGenerator::Run()
 B_Block* ChunkGenerator::GetBlockAt(int32 X, int32 Y, int32 Z)
 {
 	int8 PosZ = static_cast<int8>(floorf(Z / 16));
-
-	if (ChunkCube* c = CurrentChunk->GetChunkCube(PosZ))
+	
+	ChunkCube* c = CurrentChunk->GetChunkCube(PosZ);
+	if (c && c->GetBlockData().Num() == 16)
 		return c->GetBlockAt(X, Y, Z % 16);
 
 	return nullptr;
