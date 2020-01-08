@@ -129,6 +129,7 @@ void ADebugQuickCharacter::BeginPlay()
 	ItemSystem->InitItemSlots(10);
 	ItemSystem->InitUI(GetWorld()->GetAuthGameMode());
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
+	ItemSystem->InitSelectedItemMesh(Camera);
 
 	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
 	LineTracing->SetSelectedItemPointer(SelectedItemPointer);

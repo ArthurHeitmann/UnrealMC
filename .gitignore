@@ -90,3 +90,4 @@ DerivedDataCache/*
 
 #custom
 enc_temp_folder/*
+AssetRegistryCache/*

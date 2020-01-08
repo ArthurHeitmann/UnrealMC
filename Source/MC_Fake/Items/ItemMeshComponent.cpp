@@ -66,8 +66,6 @@ void UItemMeshComponent::BeginPlay()
 	CustomMesh->SetupAttachment(this);
 	ItemMesh->RegisterComponent();
 	CustomMesh->RegisterComponent();
-	ItemMesh->SetRelativeTransform(GetComponentTransform());
-	CustomMesh->SetRelativeTransform(GetComponentTransform());
 	ItemMesh->SetStaticMesh(TmpItemMesh);
 	ItemMaterial = UMaterialInstanceDynamic::Create(TmpItemMaterial, this);
 	ItemMesh->SetCollisionProfileName(TEXT("NoCollision"));
@@ -95,7 +93,6 @@ void UItemMeshComponent::SetItem(FItemStack const ** NewItemStackPointer)
 void UItemMeshComponent::SetItemMeshOffset(const FTransform & Offset)
 {
 	ItemMesh->AddLocalTransform(Offset);
-	CustomMesh->AddLocalTransform(Offset);
 }
 
 void UItemMeshComponent::SetCustomMeshOffset(const FTransform & Offset)

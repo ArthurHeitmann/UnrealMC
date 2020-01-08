@@ -50,8 +50,25 @@ void UItemSystemComponent::InitPickUpBox(const FVector& BoxExtent)
 	ItemPickupBox->OnComponentBeginOverlap.AddDynamic(this, &UItemSystemComponent::ItemPickBoxTrigger);
 }
 
+void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo)
+{
+	FTransform ItemMeshTrans;
+	FTransform BlockMeshTrans;
+
+	ItemMeshTrans.SetLocation(FVector{ 38, 45, -45 });
+	ItemMeshTrans.SetRotation(FRotator(0, 90, 0).Quaternion());
+	ItemMeshTrans.SetScale3D(FVector{ 0.9, 0.9, 0.9 });
+	BlockMeshTrans.SetLocation(FVector{ 27, 28, -34 });
+	BlockMeshTrans.SetRotation(FRotator(0, 315, 0).Quaternion());
+	BlockMeshTrans.SetScale3D(FVector{ 0.25, 0.25, 0.25 });
+
+	InitSelectedItemMesh(AttachTo, ItemMeshTrans, BlockMeshTrans);
+}
+
 void UItemSystemComponent::InitSelectedItemMesh(USceneComponent* AttachTo, const FTransform & Offset1, const FTransform & Offset2)
 {
+	auto a = Offset2.GetLocation();
+	
 	SelectedItemMesh = NewObject<UItemMeshComponent>(this, TEXT("Selected Item Mesh Component"));
 	SelectedItemMesh->SetupAttachment(AttachTo);
 	SelectedItemMesh->RegisterComponent();
@@ -82,8 +99,7 @@ void UItemSystemComponent::InitUI(AGameModeBase * Gamemode)
 
 void UItemSystemComponent::SelectItemSlot(int32 num)
 {
-	/*FItemStack& ItemS = QuickAccessSlots->SetSelecteddItemSlotById(num);
-	*SelectedItemRef = &ItemS;*/
+	QuickAccessSlots->SelectItemStack(num);
 }
 
 void UItemSystemComponent::SelectNextItem()

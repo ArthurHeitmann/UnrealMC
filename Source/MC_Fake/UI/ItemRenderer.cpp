@@ -63,6 +63,7 @@ void AItemRenderer::BeginPlay()
 	Offset.SetScale3D({ 0.5, 0.5, 0.5 });
 	Offset.SetRotation(FQuat(FRotator(0.f, 45.f, 0.f)));
 	ItemMesh->SetItemMeshOffset(Offset);
+	ItemMesh->SetCustomMeshOffset(Offset);
 
 	AddActorWorldOffset(TotalOffset); 
 }
