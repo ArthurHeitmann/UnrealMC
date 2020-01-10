@@ -96,6 +96,7 @@ void UUI_QuickAccessSlots::SetSelectedItemPointer(FItemStack const** ISP)
 void UUI_QuickAccessSlots::SelectItemStack(int32 id)
 {
 	*SelectedItem = Inventory->GetStackAt(SlotsPerRow * SelectedRowID + id);
+	SelectedItemId = id;
 }
 
 void UUI_QuickAccessSlots::SelectNextItem()
@@ -112,12 +113,13 @@ void UUI_QuickAccessSlots::SelectPreviousItem()
 	SelectItemStack(SelectedItemId);
 }
 
-void UUI_QuickAccessSlots::ToggleVisibility()
+void UUI_QuickAccessSlots::SetWheelVisibility(bool State)
 {
-	if (bIsVisible)
-		SetVisibility(ESlateVisibility::Hidden);
-	else
-		SetVisibility(ESlateVisibility::Visible);
-	bIsVisible = !bIsVisible;
+	SetVisibility(State ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	bIsVisible = State;
 		
+}
+
+void UUI_QuickAccessSlots::UpdateSelectedSlot()
+{
 }

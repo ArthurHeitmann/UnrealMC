@@ -26,7 +26,7 @@ public:
 	void SelectPreviousItem();
 
 	void SetSelectedItemPointer(FItemStack const ** NewISPointer);
-	void ToggleItemWheel();
+	void SetItemWheelVisibility(bool State);
 
 protected:
 	UPROPERTY(EditAnywhere)

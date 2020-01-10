@@ -11,7 +11,7 @@ class MC_FAKE_API UUI_QuickAccessSlots : public UUserWidget
 {
 	GENERATED_BODY()
 
-private:
+protected:
 	struct ItemSlotCombo {
 		UUI_ItemSlot* InvSlot;
 		class UCanvasPanelSlot* UISlot;
@@ -34,7 +34,7 @@ private:
 
 	bool bIsVisible;
 
-protected:
+	void UpdateSelectedSlot();
 
 public:
 	UUI_QuickAccessSlots(const FObjectInitializer& FOs);
@@ -42,7 +42,8 @@ public:
 
 	void SetInventorySlots(class UItemSlots* NewInventorySlots, int32 pSlotsPerRow = 10);
 	void SetSelectedItemPointer(FItemStack const** ISP);
-	void ToggleVisibility();
+	void SetWheelVisibility(bool State);
+
 
 	void SelectItemStack(int32 id);
 	void SelectNextItem();
