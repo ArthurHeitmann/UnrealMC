@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "B_Block.h"
+#include "B_Fluid.h"
+#include "BlockManager.h"
 
 /**
  * 
  */
-class MC_FAKE_API B_Water : public B_Block
+class MC_FAKE_API B_Water : public B_Fluid
 {
 	
 
@@ -20,3 +21,5 @@ public:
 
 	virtual B_Block* Clone() override;
 };
+
+BlockRegistryImplementation(B_Water)

@@ -1,21 +1,21 @@
-
-
-
 #include "B_Leaves.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
 
+UMaterial* B_Leaves::WavyMaterialBase;
+
 B_Leaves::B_Leaves()
 {
 	BlockID = 18;
-	SubID = 0;
-	BlockName = TEXT("Leaves Oak");
 	BlockModelType = BLOCK;
-	BlockEnum = BLeaves_Oak;
 	BreakingAction = ABreakPlant;
 	BreakTime = 0.35;
-	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/leaves_oak.leaves_oak'"));
-	Texture = TextureObj.Object;
+
+	if (!WavyMaterialBase)
+	{
+		static ConstructorHelpers::FObjectFinder<UMaterial> WavyMatFinder(TEXT("Material'/Game/Materials/Blocks/M_WavyBlock.M_WavyBlock'"));
+		WavyMaterialBase = WavyMatFinder.Object;
+	}
 }
 
 bool B_Leaves::IsBlockOpaque()
@@ -25,6 +25,13 @@ bool B_Leaves::IsBlockOpaque()
 
 void B_Leaves::OnBreak(UWorld* World, FVector Location)
 {
+}
+
+UMaterialInstanceDynamic* B_Leaves::GetMaterial(UObject* UObj)
+{
+	auto outMat = UMaterialInstanceDynamic::Create(WavyMaterialBase, UObj);
+	outMat->SetTextureParameterValue("Block Texture", Texture);
+	return outMat;
 }
 
 B_Block* B_Leaves::Clone()

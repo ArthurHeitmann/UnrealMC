@@ -32,7 +32,8 @@ private:
 	void LeftClickEnd();
 	void RightClick();
 	void RightClickEnd();
-	void ToggleItemWheel();
+	void ToggleItemWheel(bool State);
+	DECLARE_DELEGATE_OneParam(FToggleItemWheel, bool);
 	void ScrollUp();
 	void ScrollDown();
 	void Save();

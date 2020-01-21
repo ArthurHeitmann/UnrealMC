@@ -34,7 +34,7 @@ protected:
 	/** If an Item has this Action property it can break the block faster. */
 	EItemActions BreakingAction;
 	/**
-	 * Each bloch as it's own enum.
+	 * Each block as it's own enum.
 	 * This should be replaced in the future with the BlockName, since this makes it more complicated to add new classes
 	 */
 	EAllBlocks BlockEnum;

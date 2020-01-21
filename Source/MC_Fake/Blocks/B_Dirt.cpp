@@ -1,9 +1,9 @@
 #include "B_Dirt.h"
-#include "Materials/MaterialInstanceDynamic.h"
+//#include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Engine/Texture2D.h"
-#include "../World/McWorld.h"
-#include "Enums.h"
+//#include "Engine/Texture2D.h"
+//#include "../World/McWorld.h"
+//#include "Enums.h"
 
 B_Dirt::B_Dirt()
 {

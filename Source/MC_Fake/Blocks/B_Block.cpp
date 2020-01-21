@@ -5,11 +5,7 @@
 #include "../Items/ItemDrop.h"
 #include "../Items/I_BlockItem.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "B_Air.h"
-#include "B_Stone.h"
-#include "B_Dirt.h"
-#include "B_Grass.h"
-#include "B_Water.h"
+
 
 UMaterial* B_Block::BlockMaterial;
 
@@ -39,7 +35,7 @@ B_Block::~B_Block()
 
 B_Block* B_Block::GetBlockFromBytes(uint8* Bytes)
 {
-	uint16* id = reinterpret_cast<uint16*>(Bytes);
+	/*uint16* id = reinterpret_cast<uint16*>(Bytes);
 	switch (*id)
 	{
 	case 0:
@@ -54,7 +50,8 @@ B_Block* B_Block::GetBlockFromBytes(uint8* Bytes)
 		return new B_Water();
 	default:
 		return nullptr;
-	}
+	}*/
+	return nullptr;
 }
 
 void B_Block::DropItem(UWorld* World, FVector Location, Item* DropItem)

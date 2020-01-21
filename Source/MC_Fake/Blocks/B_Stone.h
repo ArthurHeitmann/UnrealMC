@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "B_Block.h"
+#include "BlockManager.h"
 
 /**
  * 
@@ -13,3 +14,5 @@ public:
 
 	virtual B_Block* Clone() override;
 };
+
+BlockRegistryImplementation(B_Stone)

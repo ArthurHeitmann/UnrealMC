@@ -66,12 +66,12 @@ void ADebugQuickCharacter::RightClick()
 	LineTracing->RightClickStart();
 }
 
-void ADebugQuickCharacter::ToggleItemWheel()
+void ADebugQuickCharacter::ToggleItemWheel(bool State)
 {
 	if (UGameplayStatics::IsGamePaused(GetWorld()) || !ItemSystem)
 		return;
 
-	ItemSystem->ToggleItemWheel();
+	ItemSystem->SetItemWheelVisibility(State);
 }
 
 void ADebugQuickCharacter::ScrollUp()
@@ -167,8 +167,8 @@ void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("ShowChunkBoarders"), IE_Pressed, this, &ADebugQuickCharacter::ToggleChunkBoarders);
 	PlayerInputComponent->BindAction(TEXT("ScrollUp"), IE_Pressed, this, &ADebugQuickCharacter::ScrollUp);
 	PlayerInputComponent->BindAction(TEXT("ScrollDown"), IE_Pressed, this, &ADebugQuickCharacter::ScrollDown);
-	PlayerInputComponent->BindAction(TEXT("ToggleItemWheel"), IE_Pressed, this, &ADebugQuickCharacter::ToggleItemWheel);
-	PlayerInputComponent->BindAction(TEXT("ToggleItemWheel"), IE_Released, this, &ADebugQuickCharacter::ToggleItemWheel);
+	PlayerInputComponent->BindAction<FToggleItemWheel>(TEXT("ToggleItemWheel"), IE_Pressed, this, &ADebugQuickCharacter::ToggleItemWheel, true);
+	PlayerInputComponent->BindAction<FToggleItemWheel>(TEXT("ToggleItemWheel"), IE_Released, this, &ADebugQuickCharacter::ToggleItemWheel, false);
 
 	PlayerInputComponent->BindAxis(TEXT("Move Forward"), this, &ADebugQuickCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("Move Right"), this, &ADebugQuickCharacter::MoveRight);
