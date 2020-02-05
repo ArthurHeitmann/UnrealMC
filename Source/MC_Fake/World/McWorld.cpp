@@ -5,7 +5,7 @@
 #include "../Blocks/B_Grass.h"
 #include "../Blocks/B_Water.h"
 #include "../Blocks/B_LogOak.h"
-#include "../Blocks/B_Leaves.h"
+#include "../Blocks/B_LeavesOak.h"
 #include "Engine/World.h"
 #include "Chunk.h"
 #include "ChunkCube.h"
@@ -13,19 +13,28 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Misc/FileIO.h"
 
+
+
 AMcWorld::AMcWorld()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	ChunksRoot = CreateDefaultSubobject <USceneComponent>(TEXT("Chunks Root"));
 
+	static bool bHaveClonablesBeenInitialized = false;
+	if (!bHaveClonablesBeenInitialized)
+	{
+		BlockManager::InitializeAll();
+		bHaveClonablesBeenInitialized = true;
+	}
+	
 	if (!B_Air::AirRef)
 		B_Air::AirRef = (new B_Air());
 	B_Stone();
 	B_Dirt();
 	B_Grass();
 	B_Water();
-	B_Leaves();
+	B_LeavesOak();
 	B_LogOak();
 }
 
@@ -282,7 +291,7 @@ B_Block* AMcWorld::GetBlockFromEnum(EAllBlocks Block)
 	case BWater:
 		return new B_Water();
 	case BLeaves_Oak:
-		return new B_Leaves();
+		return new B_LeavesOak();
 	case BLog_Oak:
 		return new B_LogOak();
 	}

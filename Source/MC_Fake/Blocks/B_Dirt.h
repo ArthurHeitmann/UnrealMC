@@ -12,5 +12,3 @@ public:
 
 	virtual B_Block* Clone() override;
 };
-
-//BlockRegistryImplementation(B_Dirt)

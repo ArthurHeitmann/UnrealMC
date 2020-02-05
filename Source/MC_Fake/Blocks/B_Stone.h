@@ -15,4 +15,4 @@ public:
 	virtual B_Block* Clone() override;
 };
 
-BlockRegistryImplementation(B_Stone)
+BlockRegistryDefinition(B_Stone)

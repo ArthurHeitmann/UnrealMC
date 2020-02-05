@@ -29,3 +29,5 @@ B_Block* B_Water::Clone()
 {
 	return new B_Water();
 }
+
+BlockRegistryDefinition(B_Water)

@@ -2,15 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "B_Block.h"
+#pragma message("McClonable .h")
+#include "McClonable.h"
 
 class BlockManager
 {
 private:
-	static TMap<FName, B_Block * (*)()> BlockMakerMap;
-	static TMap<FName, B_Block*> StaticBlocksMap;
+	static TMap<FName, McCloneable * (*)()> BlockMakerMap;
+	static TMap<FName, McCloneable*> StaticBlocksMap;
 
 	template<class T>
-	static B_Block* MakeBlockInternal()
+	static McCloneable* MakeBlockInternal()
 	{
 		return new T;
 	}
@@ -22,39 +24,50 @@ public:
 		BlockMakerMap.Add(BlockName, &MakeBlockInternal<T>);
 	}
 
-	static void RegisterStaticBlock(FName BlockName, B_Block* B)
+	static void RegisterStaticBlock(FName BlockName, McCloneable* B)
 	{
 		StaticBlocksMap.Add(BlockName, B);
 	}
 
 	static inline B_Block* GetBlock(FName BlockName)
 	{
-		return BlockMakerMap[BlockName]();
+		return dynamic_cast<B_Block*>(BlockMakerMap[BlockName]());
 	}
 
 	static inline B_Block* GetStaticBlock(FName BlockName)
 	{
-		return StaticBlocksMap[BlockName];
+		return dynamic_cast<B_Block*>(StaticBlocksMap[BlockName]);
 	}
 
+	static void InitializeAll()
+	{
+		for (auto funcPair : BlockMakerMap)
+		{
+			//create an instance and delete it right away
+			//Basically just calling the constructor with extra steps
+			delete funcPair.Value();
+		}
+	}
 };
 
 
-#define BlockRegistryImplementation(className) class className##Helper \
+#define BlockRegistryDefinition(className) class className##Helper \
 {\
-	className Initializer; \
+	static className##Helper className##Initializer;\
 public:\
 	className##Helper() \
 	{\
 		BlockManager::RegisterBlock<className>(FName(#className));\
 	}\
-}; \
-\
-className##Helper className##Init;
+};
+
+
+#define BlockRegistryImplementation(className) className##Helper className##Helper::className##Initializer = className##Helper();
+
 
 #define BlockStaticRegistryImplementation(className, BlockVal) class className##Helper \
 {\
-	className Initializer; \
+	static className##Helper className##Initializer;\
 public:\
 	className##Helper() \
 	{\

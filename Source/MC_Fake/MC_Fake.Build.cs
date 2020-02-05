@@ -4,6 +4,7 @@ public class MC_Fake : ModuleRules
 {
 	public MC_Fake(ReadOnlyTargetRules Target) : base(Target)
 	{
+        bUseRTTI = true;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new string[] { "Core",
             "CoreUObject",

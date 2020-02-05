@@ -21,3 +21,6 @@ B_Block* B_Stone::Clone()
 {
 	return new B_Stone();
 }
+
+
+//BlockRegistryImplementation(B_Stone)

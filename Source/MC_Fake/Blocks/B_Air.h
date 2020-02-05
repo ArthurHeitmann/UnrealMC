@@ -20,14 +20,5 @@ public:
 	virtual B_Block* Clone() override;
 };
 
-BlockStaticRegistryImplementation(B_Air, new B_Air())
 
-//class B_AirHelper
-//{
-//	B_Air Initializer;
-//public: B_AirHelper()
-//{
-//	BlockManager::RegisterStaticBlock(FName("B_Air"), new B_Air());
-//}
-//};
-//B_AirHelper B_AirInit;
+//BlockStaticRegistryImplementation(B_Air, new B_Air())

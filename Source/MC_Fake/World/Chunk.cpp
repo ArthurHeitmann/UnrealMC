@@ -1,6 +1,5 @@
 #include "Chunk.h"
 #include "Components/BoxComponent.h"
-#include "Blocks/B_Stone.h"
 #include "McWorld.h"
 #include "GameFramework/Character.h"
 #include "ChunkCube.h"

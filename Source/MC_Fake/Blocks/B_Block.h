@@ -1,16 +1,19 @@
 #pragma once
-
 #include "CoreMinimal.h"
 #include "../World/McWorld.h"
 #include "Enums.h"
+#pragma message("B_Block.h 1")
+#include "McClonable.h"
+#pragma message("B_Block.h 2")
 
 
+class McCloneable;
 /**
  * This class holds all data of a Block/Voxel.
  *
  * Since there will be millions of blocks in the world, the size should be kept small (fewer attributes or make them static)
  */
-class MC_FAKE_API B_Block
+class MC_FAKE_API B_Block : public McCloneable
 {
 	/**
 	 * A helper struct ofr storing possible item drops

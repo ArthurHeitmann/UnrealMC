@@ -20,3 +20,5 @@ B_Block* B_Dirt::Clone()
 {
 	return new B_Dirt();
 }
+
+BlockRegistryDefinition(B_Dirt)

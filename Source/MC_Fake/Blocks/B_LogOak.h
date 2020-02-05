@@ -26,4 +26,4 @@ public:
 	virtual B_Block* Clone() override;
 };
 
-//BlockRegistryImplementation(B_LogOak)
+//BlockRegistryDefinition(B_LogOak)

@@ -15,4 +15,5 @@ public:
 	B_LeavesOak();
 };
 
-BlockRegistryImplementation(B_LeavesOak)
+//BlockRegistryDefinition(B_LeavesOak)
+//BlockRegistryImplementation(B_LeavesOak)
