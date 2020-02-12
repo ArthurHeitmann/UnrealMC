@@ -2,17 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "B_Block.h"
-#pragma message("McClonable .h")
-#include "McClonable.h"
 
 class BlockManager
 {
 private:
-	static TMap<FName, McCloneable * (*)()> BlockMakerMap;
-	static TMap<FName, McCloneable*> StaticBlocksMap;
+	static TMap<FName, B_Block * (*)()> BlockMakerMap;
+	static TMap<FName, B_Block*> StaticBlocksMap;
 
 	template<class T>
-	static McCloneable* MakeBlockInternal()
+	static B_Block* MakeBlockInternal()
 	{
 		return new T;
 	}
@@ -24,7 +22,7 @@ public:
 		BlockMakerMap.Add(BlockName, &MakeBlockInternal<T>);
 	}
 
-	static void RegisterStaticBlock(FName BlockName, McCloneable* B)
+	static void RegisterStaticBlock(FName BlockName, B_Block* B)
 	{
 		StaticBlocksMap.Add(BlockName, B);
 	}
@@ -39,15 +37,7 @@ public:
 		return dynamic_cast<B_Block*>(StaticBlocksMap[BlockName]);
 	}
 
-	static void InitializeAll()
-	{
-		for (auto funcPair : BlockMakerMap)
-		{
-			//create an instance and delete it right away
-			//Basically just calling the constructor with extra steps
-			delete funcPair.Value();
-		}
-	}
+	static void InitializeAll();
 };
 
 

@@ -6,6 +6,7 @@
 #include "FastNoise/FastNoise.h"
 #include "McWorld.h"
 #include "RunnableThread.h"
+#include "Blocks/BlockManager.h"
 
 
 uint32 ChunkGenerator::Run()
@@ -199,9 +200,9 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 					HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * 30.f + 50;
 
 				if (Pos.Z + z <= HeightMapValue)
-					BlockData[x][y][z] = World->GetBlockFromEnum(BStone);
+					BlockData[x][y][z] = BlockManager::GetBlock("Stone");
 				else
-					BlockData[x][y][z] = World->GetBlockFromEnum(BAir);
+					BlockData[x][y][z] = BlockManager::GetStaticBlock("Air");
 			}
 		}
 	}
@@ -220,30 +221,30 @@ void ChunkGenerator::Stage_DirtGrass()
 			for (int z = 0; z < 16; ++z)
 			{
 				int blocksUp = fmax(1, fmin(5 / slope, 6));
-				EAllBlocks* nextBlocks = new EAllBlocks[blocksUp];
+				FName* nextBlocks = new FName[blocksUp];
 				for (int zNext = 0; zNext < blocksUp; zNext++)
 				{
 					if (B_Block* b = GetBlockAt(x, y, z + zNext + Pos.Z))
-						nextBlocks[zNext] = b->GetBlockEnum();
+						nextBlocks[zNext] = b->GetName();
 					else
-						nextBlocks[zNext] = BAir;
+						nextBlocks[zNext] = "Air";
 				}
 				
-				if (nextBlocks[0] == BStone)
+				if (nextBlocks[0] == "Stone")
 				{
 					if (HasAirInRange(nextBlocks, 2, blocksUp))
 					{
-						if (nextBlocks[1] != BAir)
+						if (nextBlocks[1] != "Air")
 						{
-							if (nextBlocks[0] != BAir)
+							if (nextBlocks[0] != "Air")
 								delete BlockData[x][y][z];
-							BlockData[x][y][z] = World->GetBlockFromEnum(BDirt);
+							BlockData[x][y][z] = BlockManager::GetBlock("Dirt");
 						}
 						else
 						{
-							if (nextBlocks[0] != BAir)
+							if (nextBlocks[0] != "Air")
 								delete BlockData[x][y][z];
-							BlockData[x][y][z] = World->GetBlockFromEnum(BGrass);
+							BlockData[x][y][z] = BlockManager::GetBlock("Grass");
 						}
 					}
 				}
@@ -280,9 +281,9 @@ void ChunkGenerator::Stage_CaveCarving()
 
 				if (CaveNoiseValue < .035)
 				{
-					if (BlockData[x][y][z]->GetBlockEnum() != BAir)
+					if (BlockData[x][y][z]->GetName() != "Air")
 						delete BlockData[x][y][z];
-					BlockData[x][y][z] = World->GetBlockFromEnum(BAir);
+					BlockData[x][y][z] = BlockManager::GetStaticBlock("Air");
 				}
 			}
 		}
@@ -306,12 +307,12 @@ void ChunkGenerator::Stage_Trees()
 			{
 				for (int z = 15; z >= 0; z--)
 				{
-					if (BlockData[x][y][z]->GetBlockEnum() == BGrass)
+					if (BlockData[x][y][z]->GetName() == "Grass")
 					{
 						int TreeHeight = Rand.RandRange(6, 10);
 						for (int zT = z + 1; zT <= z + TreeHeight; ++zT)
 						{
-							SetBlockAt(x, y, zT + Pos.Z, World->GetBlockFromEnum(BLog_Oak));
+							SetBlockAt(x, y, zT + Pos.Z, BlockManager::GetBlock("LogOak"));
 						}
 
 						for (int zt = z + TreeHeight - 3; zt <= z + TreeHeight; ++zt)
@@ -328,16 +329,16 @@ void ChunkGenerator::Stage_Trees()
 									if (xt >= 0 && xt < 16 && yt >= 0 && yt < 16)		//Within chunkBoundaries
 									{
 										if (zt < 16)
-											BlockData[xt][yt][zt] = World->GetBlockFromEnum(BLeaves_Oak);
+											BlockData[xt][yt][zt] = BlockManager::GetBlock("LeavesOak");
 										else
-											SetBlockAt(xt, yt, zt + Pos.Z, World->GetBlockFromEnum(BLeaves_Oak));
+											SetBlockAt(xt, yt, zt + Pos.Z, BlockManager::GetBlock("LeavesOak"));
 									}
 									else
-										World->AddBlockSetTask(Pos.X + xt, Pos.Y + yt, Pos.Z + zt, World->GetBlockFromEnum(BLeaves_Oak), 1);
+										World->AddBlockSetTask(Pos.X + xt, Pos.Y + yt, Pos.Z + zt, BlockManager::GetBlock("LeavesOak"), 1);
 								}
 							}
 						}
-						SetBlockAt(x, y, z + TreeHeight + 1 + Pos.Z, World->GetBlockFromEnum(BLeaves_Oak));
+						SetBlockAt(x, y, z + TreeHeight + 1 + Pos.Z, BlockManager::GetBlock("LeavesOak"));
 						
 						break;
 					}
@@ -347,11 +348,11 @@ void ChunkGenerator::Stage_Trees()
 	}
 }
 
-bool ChunkGenerator::HasAirInRange(EAllBlocks* NextBlocks, int Start, int End)
+bool ChunkGenerator::HasAirInRange(FName* NextBlocks, int Start, int End)
 {
 	for (int i = Start; i < End; i++)
 	{
-		if (NextBlocks[i] == BAir)
+		if (NextBlocks[i] == "Air")
 			return true;
 	}
 

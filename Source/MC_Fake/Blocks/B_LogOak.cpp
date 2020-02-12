@@ -6,8 +6,7 @@ B_LogOak::B_LogOak()
 {
 	SubID = 0;
 	BlockName = TEXT("Log Oak");
-	BlockEnum = BLog_Oak;
-	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/log_oak.log_oak'"));
+	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/Log_Oak.Log_Oak'"));
 	Texture = TextureObj.Object;
 }
 

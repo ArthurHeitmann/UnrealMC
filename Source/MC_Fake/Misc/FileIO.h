@@ -6,7 +6,7 @@
 #include "Blocks/B_Air.h"
 
 struct ChunkData {
-	uint8 GeneratorVersion;
+	/*uint8 GeneratorVersion;
 	TArray<TArray<TArray<class B_Block*>>> BlockData;
 	uint64 LastTimeUpdated;
 	uint8 NextGenerationStage;
@@ -21,7 +21,7 @@ struct ChunkData {
 				BlockData[x][y].Init(B_Air::AirRef, 256);
 			}
 		}
-	}
+	}*/
 };
 
 /**

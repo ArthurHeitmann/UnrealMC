@@ -33,37 +33,8 @@ bool UUI_QuickAccessSlots::Initialize()
 	return true;
 }
 
-//FItemStack& UUI_QuickAccessSlots::SetSelecteddItemSlotById(int32 id)
-//{
-//	if (id < Slots.Num() && id >= 0)
-//		SelectedItemId = id;
-//	else if (id >= 0)
-//		SelectedItemId = id % Slots.Num();
-//	else
-//		SelectedItemId = -id % Slots.Num();
-//
-//	//*SelectedItem = Slots[SelectedItemId].ItemS;
-//	return Slots[SelectedItemId];
-//}
-//
-//FItemStack& UUI_QuickAccessSlots::NextSelectedItem()
-//{
-//	SelectedItemId = ++SelectedItemId % Slots.Num();
-//	//*SelectedItem = Slots[SelectedItemId].ItemS;
-//	return Slots[SelectedItemId];
-//}
-//
-//FItemStack& UUI_QuickAccessSlots::PreviousSelectedItem()
-//{
-//	SelectedItemId = --SelectedItemId % Slots.Num();
-//	//*SelectedItem = Slots[SelectedItemId].ItemS;
-//
-//	return Slots[SelectedItemId];
-//}
-
 void UUI_QuickAccessSlots::SetInventorySlots(UItemSlots* NewInventorySlots, int32 pSlotsPerRow)
 {
-
 	Inventory = NewInventorySlots;
 	SlotsPerRow = pSlotsPerRow;
 	UIItemSlots.Reserve(pSlotsPerRow);

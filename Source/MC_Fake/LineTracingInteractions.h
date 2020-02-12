@@ -22,7 +22,7 @@ private:
 	class ChunkCube* HittingCCube;
 	FVector HittingBlockCoordinates;
 	FIntVector HittingCoordinates;
-	class Item* LastUsedItem;
+	class I_Item* LastUsedItem;
 	float TimeSpentHitting;
 
 	class UCameraComponent* RayShootingCamera;

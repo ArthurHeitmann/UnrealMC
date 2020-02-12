@@ -10,7 +10,6 @@ B_Stone::B_Stone()
 	BlockID = 1;
 	BlockName = TEXT("Stone");
 	BlockModelType = EBlockModelType::BLOCK;
-	BlockEnum = BStone;
 	BreakingAction = APickaxe;
 	BreakTime = 7.5f;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/stone.stone'"));
@@ -22,5 +21,3 @@ B_Block* B_Stone::Clone()
 	return new B_Stone();
 }
 
-
-//BlockRegistryImplementation(B_Stone)

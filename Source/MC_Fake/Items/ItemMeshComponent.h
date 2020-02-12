@@ -23,7 +23,7 @@ protected:
 	UMaterialInstanceDynamic* ItemMaterial;
 	UStaticMesh* TmpItemMesh;
 	UMaterial* TmpItemMaterial;
-	Item PreviousItem;
+	I_Item PreviousItem;
 	bool bWasPreviouseItemEmpty = true;
 	FItemStack const ** ItemPointer;
 

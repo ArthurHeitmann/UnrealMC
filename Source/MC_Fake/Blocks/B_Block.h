@@ -2,23 +2,19 @@
 #include "CoreMinimal.h"
 #include "../World/McWorld.h"
 #include "Enums.h"
-#pragma message("B_Block.h 1")
-#include "McClonable.h"
-#pragma message("B_Block.h 2")
 
 
-class McCloneable;
 /**
  * This class holds all data of a Block/Voxel.
  *
  * Since there will be millions of blocks in the world, the size should be kept small (fewer attributes or make them static)
  */
-class MC_FAKE_API B_Block : public McCloneable
+class MC_FAKE_API B_Block
 {
 	/**
 	 * A helper struct ofr storing possible item drops
 	 */
-	struct ItemDrops { float Chance; class Item* Item; };
+	struct ItemDrops { float Chance; class I_Item* Item; };
 
 protected:
 	/**
@@ -36,11 +32,6 @@ protected:
 	EBlockModelType BlockModelType;
 	/** If an Item has this Action property it can break the block faster. */
 	EItemActions BreakingAction;
-	/**
-	 * Each block as it's own enum.
-	 * This should be replaced in the future with the BlockName, since this makes it more complicated to add new classes
-	 */
-	EAllBlocks BlockEnum;
 	/** This texture get's applied to the generic Block material*/
 	class UTexture* Texture;
 	/** This bump map texture get's applied to the generic Block material*/
@@ -65,7 +56,7 @@ protected:
 	 * @param Location The Location in World Space to drop the Item (usually the Blocks position)
 	 * @param DropItem
 	 */
-	void DropItem(class UWorld* World, FVector Location, class Item* DropItem);
+	void DropItem(class UWorld* World, FVector Location, class I_Item* DropItem);
 
 public:
 	/** Initialized the Block with some default values */
@@ -86,8 +77,8 @@ public:
 	/** If True no Block sides will be optimized. All Vertices, Triangles, etc. will be retrieved in one call. */
 	virtual bool UsesCustomModel();
 	virtual FName GetName();
+	virtual uint16 GetBlockID();
 	virtual EBlockModelType GetBlockModelType();
-	virtual EAllBlocks GetBlockEnum();
 	virtual EItemActions GetBreakingAction();
 	/** Creates a Material Instance from the default Material and applies the block specific textures to it. */
 	virtual class UMaterialInstanceDynamic* GetMaterial(UObject* UObj);

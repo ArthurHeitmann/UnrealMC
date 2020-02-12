@@ -15,7 +15,7 @@ class MC_FAKE_API UItemUEWrapper : public UObject
 	GENERATED_BODY()
 	
 private:
-	class Item* ItemRef;
+	class I_Item* ItemRef;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -23,6 +23,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetItemId();
 
-	void SetItem(class Item* NewItem);
+	void SetItem(class I_Item* NewItem);
 
 };

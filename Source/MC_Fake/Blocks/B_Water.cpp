@@ -7,7 +7,6 @@ B_Water::B_Water()
 	BlockID = 9;
 	BlockName = TEXT("Normal Water");
 	BlockModelType = WATER;
-	BlockEnum = BWater;
 	BreakTime = 999999999;
 	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/water_still.water_still'"));
 	Texture = TextureObj.Object;

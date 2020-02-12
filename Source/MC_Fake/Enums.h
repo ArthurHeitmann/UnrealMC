@@ -1,13 +1,5 @@
 #pragma once
 
-enum EAllBlocks {
-	BAir, BStone, BDirt, BGrass, BWater, BLog_Oak, BLeaves_Oak
-};
-
-enum EAllItems {
-	INoItem, IStone, IDirt, IGrass, ILog_Oak, ILeaves_Oak, IPickaxe_Stone
-};
-
 enum EDirection {
 	TOP, EAST, BOTTOM, WEST, SOUTH, NORTH
 };

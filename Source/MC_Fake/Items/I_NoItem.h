@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item.h"
+#include "I_Item.h"
 
 /**
  * 
  */
-class MC_FAKE_API I_NoItem : public Item
+class MC_FAKE_API I_NoItem : public I_Item
 {
 public:
 	I_NoItem();
 
-	virtual bool IsStackableWith(Item* OtherItem) override;
+	virtual bool IsStackableWith(I_Item* OtherItem) override;
 };

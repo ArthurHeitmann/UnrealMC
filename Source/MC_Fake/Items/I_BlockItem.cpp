@@ -9,32 +9,12 @@ I_BlockItem::I_BlockItem(class B_Block* Block)
 {
 	this->BlockRef = Block;
 	Texture = Block->GetTexture();
-	Id = Block->GetBlockEnum();
+	Id = Block->GetBlockID();
 	ItemName = Block->GetName();
 	bCustomDisplayMesh = true;
-
-	switch (Block->GetBlockEnum())
-	{
-	case BStone:
-		ItemEnum = IStone;
-		break;
-	case BDirt:
-		ItemEnum = IDirt;
-		break;
-	case BGrass:
-		ItemEnum = IGrass;
-		break;
-	case BLog_Oak:
-		ItemEnum = ILog_Oak;
-		break;
-
-	default:
-		ItemEnum = INoItem;
-	}
-
 }
 
-Item::PostUseTask I_BlockItem::OnItemUse(const FHitResult& HitPointData, AMcWorld* World)
+I_Item::PostUseTask I_BlockItem::OnItemUse(const FHitResult& HitPointData, AMcWorld* World)
 {
 	int32 x = floorf(HitPointData.Location.X / 100.f);
 	int32 y = floorf(HitPointData.Location.Y / 100.f);
@@ -73,6 +53,6 @@ void I_BlockItem::GetCustomDisplayMesh(UObject* Base, TArray<FVector>& Verts, TA
 
 I_BlockItem::~I_BlockItem()
 {
-	if (BlockRef->GetBlockEnum() != BAir)
+	if (BlockRef->GetName() != "Air")
 		delete BlockRef;
 }

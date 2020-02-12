@@ -19,7 +19,7 @@ int32 I_Tool::GetCharges()
 	return Charges;
 }
 
-bool I_Tool::IsStackableWith(Item* Item)
+bool I_Tool::IsStackableWith(I_Item* Item)
 {
 	return false;
 }

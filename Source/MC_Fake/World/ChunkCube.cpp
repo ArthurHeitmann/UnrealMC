@@ -50,7 +50,7 @@ ChunkCube::~ChunkCube()
 		{
 			for (int z = 0; z < BlockData[x][y].Num(); ++z)
 			{
-				if (BlockData[x][y][z] && BlockData[x][y][z]->GetBlockEnum() != BAir)
+				if (BlockData[x][y][z] && BlockData[x][y][z]->GetName() != "Air")
 					delete BlockData[x][y][z];
 			}
 		}
@@ -75,13 +75,13 @@ void ChunkCube::UpdateMesh()
 	if (!bHasFinishedGenerating || !BlockData.Num())
 		return;
 
-	TMap<EAllBlocks, TArray<FVector>> Vertices;
-	TMap<EAllBlocks, TArray<FVector2D>> UVs;
-	TMap<EAllBlocks, TArray<int32>> Triangles;
-	TMap<EAllBlocks, TArray<FVector>> Normals;
-	TMap<EAllBlocks, B_Block*> Materials;
-	TMap<EAllBlocks, TArray<FVector>> VerticesCustomCollision;
-	TMap<EAllBlocks, TArray<int32>> TrianglesCustomCollision;
+	TMap<uint16, TArray<FVector>> Vertices;
+	TMap<uint16, TArray<FVector2D>> UVs;
+	TMap<uint16, TArray<int32>> Triangles;
+	TMap<uint16, TArray<FVector>> Normals;
+	TMap<uint16, B_Block*> Materials;
+	TMap<uint16, TArray<FVector>> VerticesCustomCollision;
+	TMap<uint16, TArray<int32>> TrianglesCustomCollision;
 	for (int x = 0; x < 16; ++x)
 	{
 		for (int y = 0; y < 16; ++y)
@@ -90,7 +90,7 @@ void ChunkCube::UpdateMesh()
 			{
 				if (BlockData[x][y][z]->GetBlockModelType() != EBlockModelType::NONE)
 				{
-					EAllBlocks cbe = BlockData[x][y][z]->GetBlockEnum(); //current block enum (of this iteration)
+					uint16 cbe = BlockData[x][y][z]->GetBlockID(); //current block enum (of this iteration)
 					//If necessary create keys for new block type in all maps
 					if (!Materials.Contains(cbe))
 					{
@@ -175,7 +175,7 @@ void ChunkCube::UpdateMesh()
 	
 	for (auto i = Vertices.CreateConstIterator(); i; ++i)
 	{
-		EAllBlocks key = i.Key();
+		uint16 key = i.Key();
 		ChunkMesh->CreateMeshSection(key, i.Value(), Triangles[key], Normals[key], UVs[key], TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
 		ChunkMesh->SetMaterial(key, Materials[key]->GetMaterial(ChunkMesh));
 	}
@@ -220,11 +220,6 @@ void ChunkCube::SetParentChunk(Chunk* PChunk)
 {
 	ParentChunk = PChunk;
 }
-
-//void ChunkCube::SetHeight(int8 Height)
-//{
-//	this->Height = Height;
-//}
 
 void ChunkCube::SetHasDataChanged(bool val)
 {

@@ -15,4 +15,3 @@ public:
 	virtual B_Block* Clone() override;
 };
 
-BlockRegistryDefinition(B_Stone)

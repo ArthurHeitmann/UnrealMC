@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item.h"
+#include "I_Item.h"
 
 /**
  * 
  */
-class MC_FAKE_API I_Tool : public Item
+class MC_FAKE_API I_Tool : public I_Item
 {
 public:
 	I_Tool();
@@ -16,7 +16,7 @@ public:
 	int32 GetDurability();
 	int32 GetCharges();
 
-	virtual bool IsStackableWith(Item* Item) override;
+	virtual bool IsStackableWith(I_Item* Item) override;
 
 protected:
 	int32 Durability;

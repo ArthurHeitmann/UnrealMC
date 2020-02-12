@@ -2,7 +2,7 @@
 
 
 #include "ItemUEWrapper.h"
-#include "Item.h"
+#include "I_Item.h"
 
 FName UItemUEWrapper::GetItemName()
 {
@@ -18,7 +18,7 @@ int32 UItemUEWrapper::GetItemId()
 	return ItemRef->GetId();
 }
 
-void UItemUEWrapper::SetItem(Item* NewItem)
+void UItemUEWrapper::SetItem(I_Item* NewItem)
 {
 	ItemRef = NewItem;
 }

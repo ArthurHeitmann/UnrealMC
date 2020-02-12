@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Item.h"
+#include "I_Item.h"
 #include "ItemUEWrapper.h"
 #include "I_NoItem.h"
 #include "ItemStack.generated.h"
@@ -16,10 +16,10 @@ struct FItemStack {
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ItemCount;
-	Item* ItemS;
+	I_Item* ItemS;
 
 	FItemStack() : ItemCount(0), ItemS(nullptr) {}
-	FItemStack(Item* I, int32 Num) : ItemCount(Num), ItemS(I) {}
+	FItemStack(I_Item* I, int32 Num) : ItemCount(Num), ItemS(I) {}
 	~FItemStack() {
 		UE_LOG(LogTemp, Warning, TEXT(""));
 	}

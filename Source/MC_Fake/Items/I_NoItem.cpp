@@ -6,12 +6,11 @@
 
 I_NoItem::I_NoItem()
 {
-	ItemName = TEXT("");
-	ItemEnum = INoItem;
+	ItemName = TEXT("No Item");
 	Id = 0;
 }
 
-bool I_NoItem::IsStackableWith(Item* OtherItem)
+bool I_NoItem::IsStackableWith(I_Item* OtherItem)
 {
 	return false;
 }

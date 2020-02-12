@@ -2,14 +2,12 @@
 #include "../World/McWorld.h"
 #include "Enums.h"
 
-B_Air* B_Air::AirRef;
 
 B_Air::B_Air()
 {
 	BlockID = 0;
 	BlockName = TEXT("Air");
 	BlockModelType = NONE;
-	BlockEnum = BAir;
 }
 
 UMaterialInstanceDynamic* B_Air::GetMaterial(UObject* UO)
@@ -24,5 +22,5 @@ TArray<uint8> B_Air::GetBinaryData()
 
 B_Block* B_Air::Clone()
 {
-	return AirRef;
+	return this;          //BIG BIG BAD | NO GOOD
 }

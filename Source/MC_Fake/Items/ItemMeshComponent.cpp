@@ -5,7 +5,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Components/StaticMeshComponent.h"
-#include "Item.h"
+#include "I_Item.h"
 
 void UItemMeshComponent::OnItemChange()
 {

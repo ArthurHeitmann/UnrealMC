@@ -1,7 +1,7 @@
 #include "B_Block.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
-#include "../Items/Item.h"
+#include "../Items/I_Item.h"
 #include "../Items/ItemDrop.h"
 #include "../Items/I_BlockItem.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -54,7 +54,7 @@ B_Block* B_Block::GetBlockFromBytes(uint8* Bytes)
 	return nullptr;
 }
 
-void B_Block::DropItem(UWorld* World, FVector Location, Item* DropItem)
+void B_Block::DropItem(UWorld* World, FVector Location, I_Item* DropItem)
 {
 	AItemDrop* Drop = World->SpawnActor<AItemDrop>(Location + FVector(50, 50, 50), FRotator::ZeroRotator);
 	if (!Drop)
@@ -83,6 +83,11 @@ FName B_Block::GetName()
 	return BlockName;
 }
 
+uint16 B_Block::GetBlockID()
+{
+	return BlockID;
+}
+
 float B_Block::GetBreakTime()
 {
 	return BreakTime;
@@ -109,7 +114,7 @@ TArray<uint8> B_Block::GetBinaryData()
 
 bool B_Block::operator==(const B_Block& B)
 {
-	return BlockName == B.BlockName && BlockEnum == B.BlockEnum;
+	return BlockName == B.BlockName;
 }
 
 bool B_Block::operator!=(const B_Block& B)
@@ -150,11 +155,6 @@ void B_Block::OnBreak(class UWorld* World, FVector Location)
 EBlockModelType B_Block::GetBlockModelType()
 {
 	return BlockModelType;
-}
-
-EAllBlocks B_Block::GetBlockEnum()
-{
-	return BlockEnum;
 }
 
 EItemActions B_Block::GetBreakingAction()

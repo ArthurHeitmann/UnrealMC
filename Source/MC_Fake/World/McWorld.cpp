@@ -12,6 +12,7 @@
 #include "Core/Public/HAL/RunnableThread.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Misc/FileIO.h"
+#include "Blocks/BlockManager.h"
 
 
 
@@ -27,15 +28,7 @@ AMcWorld::AMcWorld()
 		BlockManager::InitializeAll();
 		bHaveClonablesBeenInitialized = true;
 	}
-	
-	if (!B_Air::AirRef)
-		B_Air::AirRef = (new B_Air());
-	B_Stone();
-	B_Dirt();
-	B_Grass();
-	B_Water();
-	B_LeavesOak();
-	B_LogOak();
+
 }
 
 void AMcWorld::BeginPlay()
@@ -156,50 +149,7 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	FinishedChunkCube->SetNextGenerationStage(255);
 	FinishedChunkCube->SetHasDataChanged();
 
-	//TODO CR Check if all Trues for bUpdateMesh are necessary
-	/*
-	if (NeighborUpdateTasks.Contains(FinishedChunkCube))
-	{
-		ChunkNeighborUpdates& updates = NeighborUpdateTasks[FinishedChunkCube];
-		if (updates.NewNChunk)
-		{
-			FinishedChunkCube->UpdateCubeNeighbor(NORTH, updates.NewNChunk, false);
-			updates.NewNChunk->UpdateCubeNeighbor(SOUTH, FinishedChunkCube, true);
-			updates.NewNChunk = nullptr;
-		}
-		if (updates.NewEChunk)
-		{
-			FinishedChunkCube->UpdateCubeNeighbor(EAST, updates.NewEChunk, false);
-			updates.NewEChunk->UpdateCubeNeighbor(WEST, FinishedChunkCube, true);
-			updates.NewEChunk = nullptr;
-		}
-		if (updates.NewSChunk)
-		{
-			FinishedChunkCube->UpdateCubeNeighbor(SOUTH, updates.NewSChunk, false);
-			updates.NewSChunk->UpdateCubeNeighbor(NORTH, FinishedChunkCube, true);
-			updates.NewSChunk = nullptr;
-		}
-		if (updates.NewWChunk)
-		{
-			FinishedChunkCube->UpdateCubeNeighbor(WEST, updates.NewWChunk, false);
-			updates.NewWChunk->UpdateCubeNeighbor(EAST, FinishedChunkCube, true);
-			updates.NewWChunk = nullptr;
-		}
-		if (updates.NewTChunk)
-		{
-			FinishedChunkCube->UpdateCubeNeighbor(TOP, updates.NewTChunk, false);
-			updates.NewTChunk->UpdateCubeNeighbor(BOTTOM, FinishedChunkCube, true);
-			updates.NewTChunk = nullptr;
-		}
-		if (updates.NewBChunk)
-		{
-			FinishedChunkCube->UpdateCubeNeighbor(BOTTOM, updates.NewBChunk, false);
-			updates.NewBChunk->UpdateCubeNeighbor(TOP, FinishedChunkCube, true);
-			updates.NewBChunk = nullptr;
-		}
-
-		NeighborUpdateTasks.Remove(FinishedChunkCube);
-	}*/
+	
 	ChunkFormCoords3D key = CurrChunkPos;
 	key.X--;
 	if (LoadedChunkCubes.Contains(key)) 
@@ -274,29 +224,6 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	FinishedChunkCube->SetHasFinishedGenerating();
 
 	NeighborUpdatesMutex.Unlock();
-}
-
-B_Block* AMcWorld::GetBlockFromEnum(EAllBlocks Block)
-{
-	switch (Block)
-	{
-	case BAir:
-		return B_Air::AirRef;
-	case BStone:
-		return new B_Stone();
-	case BDirt:
-		return new B_Dirt();
-	case BGrass:
-		return new B_Grass();
-	case BWater:
-		return new B_Water();
-	case BLeaves_Oak:
-		return new B_LeavesOak();
-	case BLog_Oak:
-		return new B_LogOak();
-	}
-
-	return B_Air::AirRef;
 }
 
 Chunk* AMcWorld::GetChunkAt(ChunkFormCoords2D Location)

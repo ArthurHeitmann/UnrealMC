@@ -2,7 +2,7 @@
 
 
 #include "ItemSlots.h"
-#include "../../Items/Item.h"
+#include "../../Items/I_Item.h"
 #include "../../MC_FakeGameModeBase.h"
 #include "Engine/World.h"
 #include "../../UI/ItemSlotsHUD.h"
@@ -47,33 +47,13 @@ FItemStack UItemSlots::PickupItemStack(FItemStack Items)
 	{
 		FItemStack* CurrentStack = Slots[i];
 
-		if (CurrentStack->ItemS->GetItemEnum() == INoItem)
+		if (CurrentStack->ItemS->GetName() == "No Item")
 			OrderedEmptySlots.Add(CurrentStack);
 		else if (CurrentStack->ItemS->IsItemStackable() &&
 			CurrentStack->ItemCount < CurrentStack->ItemS->GetMaxStackCount() &&
 			CurrentStack->ItemS->IsStackableWith(Items.ItemS))
 			OrderedSameTypeSlots.Add(CurrentStack);
 
-		/*if (CurrentStack->ItemS->GetItemEnum() == INoItem ||
-			()
-		{
-			if (CurrentStack->ItemS->GetItemEnum() == INoItem)
-			{
-				delete CurrentStack->ItemS;
-				CurrentStack->ItemS = Items.ItemS;
-			}
-			if (CurrentStack->ItemCount + Items.ItemCount > CurrentStack->ItemS->GetMaxStackCount())
-			{
-				int32 overflow = CurrentStack->ItemS->GetMaxStackCount() - CurrentStack->ItemCount;
-				CurrentStack->ItemCount = CurrentStack->ItemS->GetMaxStackCount();
-				Items.ItemCount -= overflow;
-			}
-			else
-			{
-				CurrentStack->ItemCount += Items.ItemCount;
-				Items.ItemCount = 0;
-			}
-		}*/
 	}
 
 	for (FItemStack*& SameSlot : OrderedSameTypeSlots)

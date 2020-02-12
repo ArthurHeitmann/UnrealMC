@@ -22,7 +22,6 @@ public:
 	AMcWorld();
 	virtual void Tick(float DeltaTime) override;
 
-	class B_Block* GetBlockFromEnum(EAllBlocks Block);
 	class Chunk* GetChunkAt(ChunkFormCoords2D Location);
 	class Chunk* CreateChunk(ChunkFormCoords2D Location);
 	class ChunkCube* GetChunkCubeAt(const ChunkFormCoords3D& Location);

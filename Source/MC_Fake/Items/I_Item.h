@@ -9,7 +9,7 @@
 /**
  * Holds all Data of an Item.
  */
-class MC_FAKE_API Item
+class MC_FAKE_API I_Item
 {
 
 public:
@@ -24,8 +24,6 @@ protected:
 	FName ItemName;
 	/** Unique ID for this Item type */
 	uint16 Id;
-	/** Unique Enum for this Item type */
-	EAllItems ItemEnum;
 	/** Set of things this Item can be used for (attacking, mining, eating, etc.) */
 	TSet<EItemActions> ItemActions;
 	/** The Damage this Item deals when hitting an Entity */
@@ -48,29 +46,28 @@ protected:
 
 public:
 	/** Initializes this Item with default properties */
-	Item();
+	I_Item();
 
 	FName GetName();
 	uint16 GetId();
 	TSet<EItemActions> GetItemActions();
-	EAllItems GetItemEnum();
 	float GetAttackDamage();
 	float GetBreakingSpeed();
 	int GetStrength();
 	bool IsItemStackable();
 	int32 GetMaxStackCount();
-	virtual bool IsStackableWith(Item* OtherItem);
+	virtual bool IsStackableWith(I_Item* OtherItem);
 	bool HasCustomDisplayMesh();
 	virtual void GetCustomDisplayMesh(UObject* Base, TArray<FVector>& VerticesOut, TArray<FVector2D>& UVsOut, 
 		TArray<int32>& TrianglesOut, TArray<FVector>& NormalsOut, class UMaterial*& MatOut);
 
-	virtual bool operator==(const Item& I);
-	virtual bool operator!=(const Item& I);
+	virtual bool operator==(const I_Item& I);
+	virtual bool operator!=(const I_Item& I);
 
 	/** This function gets called whenever the user interacts with this Item */
 	virtual PostUseTask OnItemUse(const FHitResult& HitPointData, class AMcWorld* World);
 
 	class UTexture* GetTexture();
 
-	virtual ~Item();
+	virtual ~I_Item();
 };

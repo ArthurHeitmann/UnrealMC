@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Misc/McStaticFunctions.h"
 #include "Blocks/B_Block.h"
+#include "Blocks/BlockManager.h"
 
 ULineTracingInteractions::ULineTracingInteractions()
 {
@@ -90,9 +91,9 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 	HittingCCube = McWorld->GetChunkCubeAt(chunkPos);
 	checkf(HittingCCube, TEXT("Hitting Coordinates lead to nonexistent chunk cube!"));
 	HittingBlock = HittingCCube->GetBlockData()[RelX][RelY][RelZ];
-	checkf(HittingBlock && HittingBlock->GetBlockEnum() != BAir, TEXT("Hitting Coordinates lead to nonexistent Block or Air!"));
+	checkf(HittingBlock && HittingBlock->GetName() != "Air", TEXT("Hitting Coordinates lead to nonexistent Block or Air!"));
 	InitialBlock = &(HittingCCube->GetBlockData()[RelX][RelY][RelZ]);
-	HittingCCube->GetBlockData()[RelX][RelY][RelZ] = McWorld->GetBlockFromEnum(BAir);
+	HittingCCube->GetBlockData()[RelX][RelY][RelZ] = BlockManager::GetStaticBlock("Air");
 	HittingCCube->UpdateMesh();
 	HittingBlockCoordinates = chunkPos.ToWorldCoordinates() + FVector(RelX, RelY, RelZ) * 100.f;
 	BreakingIndicator = GetWorld()->SpawnActor<ABlockBreaking>(HittingBlockCoordinates, FRotator::ZeroRotator, FActorSpawnParameters());
@@ -198,7 +199,7 @@ void ULineTracingInteractions::RightClickStart()
 	FVector EndPosition(Start + Direction * HandReachDistance);
 	if (GetWorld()->LineTraceSingleByChannel(Result, Start, EndPosition, ECC_Visibility))
 	{
-		Item::PostUseTask Task = (*CurrentItem)->ItemS->OnItemUse(Result, McWorld);
+		I_Item::PostUseTask Task = (*CurrentItem)->ItemS->OnItemUse(Result, McWorld);
 		switch (Task.Tasks) {
 		case Decrement:
 			(*CurrentItem)->ItemCount -= Task.Count;

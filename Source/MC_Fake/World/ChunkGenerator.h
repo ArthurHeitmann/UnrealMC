@@ -43,7 +43,7 @@ private:
 	void Stage_CaveCarving();
 	void Stage_Trees();
 
-	bool HasAirInRange(EAllBlocks* NextBlocks, int Start, int End);
+	bool HasAirInRange(FName* NextBlocks, int Start, int End);
 
 	void Wait();
 

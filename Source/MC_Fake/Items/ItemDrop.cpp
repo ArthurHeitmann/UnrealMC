@@ -5,7 +5,7 @@
 #include "RuntimeMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Item.h"
+#include "I_Item.h"
 #include "Components/SphereComponent.h"
 #include "Components/TimelineComponent.h"
 
@@ -91,7 +91,6 @@ void AItemDrop::EndPlay(EEndPlayReason::Type Reason)
 {
 }
 
-// Called every frame
 void AItemDrop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
