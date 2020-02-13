@@ -10,6 +10,8 @@
 #include "Items/I_Pickaxe_Stone.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/Inventory/ItemSystemComponent.h"
+#include "UI/UI_PauseMenu.h"
+#include "GameFramework/PlayerController.h"
 
 ADebugQuickCharacter::ADebugQuickCharacter()
 {
@@ -29,6 +31,7 @@ ADebugQuickCharacter::ADebugQuickCharacter()
 
 	ItemSystem = CreateDefaultSubobject<UItemSystemComponent>(TEXT("Item System"));
 	ItemSystem->SetupAttachment(GetRootComponent());
+
 }
 
 void ADebugQuickCharacter::MoveForward(float v)
@@ -120,6 +123,16 @@ void ADebugQuickCharacter::ToggleChunkBoarders()
 	UE_LOG(LogTemp, Error, TEXT("Feature currently unsupported"));
 }
 
+void ADebugQuickCharacter::TogglePauseMenu()
+{
+	bool bIsNowPaused = PauseMenu->Visibility == ESlateVisibility::Hidden;
+
+	PauseMenu->SetVisibility(bIsNowPaused ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	UGameplayStatics::SetGamePaused(GetWorld(), bIsNowPaused);
+	auto pc = GetWorld()->GetFirstPlayerController();
+	pc->bShowMouseCursor = bIsNowPaused;
+}
+
 void ADebugQuickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -133,6 +146,11 @@ void ADebugQuickCharacter::BeginPlay()
 
 	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
 	LineTracing->SetSelectedItemPointer(SelectedItemPointer);
+
+	PauseMenu = CreateWidget<UI_PauseMenu>(GetWorld(), UI_PauseMenu::StaticClass(), TEXT("Pause Menu"));
+	PauseMenu->SetPositionInViewport( { 200, 100 } );
+	PauseMenu->AddToViewport();
+	PauseMenu->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void ADebugQuickCharacter::Tick(float DeltaTime)
@@ -169,6 +187,7 @@ void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("ScrollDown"), IE_Pressed, this, &ADebugQuickCharacter::ScrollDown);
 	PlayerInputComponent->BindAction<FToggleItemWheel>(TEXT("ToggleItemWheel"), IE_Pressed, this, &ADebugQuickCharacter::ToggleItemWheel, true);
 	PlayerInputComponent->BindAction<FToggleItemWheel>(TEXT("ToggleItemWheel"), IE_Released, this, &ADebugQuickCharacter::ToggleItemWheel, false);
+	//PlayerInputComponent->BindAction(TEXT("TogglePauseMenu"), IE_Pressed, this, &ADebugQuickCharacter::TogglePauseMenu);
 
 	PlayerInputComponent->BindAxis(TEXT("Move Forward"), this, &ADebugQuickCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("Move Right"), this, &ADebugQuickCharacter::MoveRight);

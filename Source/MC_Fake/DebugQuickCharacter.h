@@ -21,6 +21,8 @@ private:
 	class ULineTracingInteractions* LineTracing;
 	UPROPERTY(EditAnywhere)
 	class UItemSystemComponent* ItemSystem;
+	UPROPERTY()
+	class UI_PauseMenu* PauseMenu;
 	
 	FItemStack* CurrentItem;
 
@@ -43,6 +45,8 @@ private:
 	void StartCrouch();
 	void EndCrouch();
 	void ToggleChunkBoarders();
+	UFUNCTION(BlueprintCallable)
+	void TogglePauseMenu();
 
 protected:
 	virtual void BeginPlay() override;
