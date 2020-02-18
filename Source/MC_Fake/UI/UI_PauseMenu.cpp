@@ -17,12 +17,9 @@ bool UI_PauseMenu::Initialize()
 	MenuList = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	UButton* DebugMenuBtn = WidgetTree->ConstructWidget<UButton>(UButton::StaticClass());
 	UTextBlock* DebugMenuText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-	DebugMenu = CreateWidget<UI_DebugMenu>(GetWorld(), UI_DebugMenu::StaticClass());
-	//DebugMenu = WidgetTree->ConstructWidget<UI_DebugMenu>(UI_DebugMenu::StaticClass());
 	
 	DebugMenuBtn->OnClicked.AddDynamic(this, &UI_PauseMenu::DebugMenuClick);
 	DebugMenuText->SetText(FText::FromString("Debug Menu"));
-	DebugMenu->SetBackFunction(this, static_cast<void(UObject::*)(UWidget*)>(&UI_PauseMenu::ResetView));
 
 	DebugMenuBtn->AddChild(DebugMenuText);
 	MenuList->AddChildToVerticalBox(DebugMenuBtn);
@@ -33,12 +30,15 @@ bool UI_PauseMenu::Initialize()
 
 void UI_PauseMenu::ResetView(UWidget* ChildWidget)
 {
-	Root->RemoveChild(ChildWidget);
-	Root->AddChildToCanvas(MenuList);
+	DebugMenu->RemoveFromParent();
+	this->AddToViewport();
 }
 
 void UI_PauseMenu::DebugMenuClick()
 {
-	Root->RemoveChild(MenuList);
-	Root->AddChildToCanvas(DebugMenu);
+	this->RemoveFromParent();
+	DebugMenu = CreateWidget<UI_DebugMenu>(GetWorld(), UI_DebugMenu::StaticClass());
+	DebugMenu->SetBackFunction(this, static_cast<void(UObject::*)(UWidget*)>(&UI_PauseMenu::ResetView));
+	DebugMenu->AddToViewport();
+	DebugMenu->SetPositionInViewport({ 200, 100 });
 }

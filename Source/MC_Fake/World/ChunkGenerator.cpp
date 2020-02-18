@@ -8,6 +8,23 @@
 #include "RunnableThread.h"
 #include "Blocks/BlockManager.h"
 
+bool ChunkGenerator::bEnableStageDirtGrass = true;
+bool ChunkGenerator::bEnableStageCaveCarving = true;
+bool ChunkGenerator::bEnableStageTrees = true;
+float ChunkGenerator::BaseTerrainHeight = 50;
+float ChunkGenerator::TerrainHeightMultiplier = 30;
+float ChunkGenerator::TerrainTurbulenceMultiplier = 13;
+int ChunkGenerator::HeightMapOctaves = 6;
+float ChunkGenerator::HeightMapFrequency = 1 / 600.f;
+int ChunkGenerator::TurbulenceOctaves = 2;
+float ChunkGenerator::TurbulenceFrequency = 1 / 40.f;
+float ChunkGenerator::SlopeGrass = 5;
+float ChunkGenerator::SlopeDirt = 7;
+int ChunkGenerator::CaveOctaves = 4;
+float ChunkGenerator::CaveFrequency = 1 / 400.f;
+float ChunkGenerator::CaveThreshold = .035;
+
+
 
 uint32 ChunkGenerator::Run()
 {
@@ -115,13 +132,13 @@ void ChunkGenerator::GenHeightMap()
 		//Height
 	UFastNoise* HeightNoise = NewObject<UFastNoise>();
 	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	HeightNoise->SetFractalOctaves(6);
-	HeightNoise->SetFrequency(1.f / 600.f);
+	HeightNoise->SetFractalOctaves(HeightMapOctaves);
+	HeightNoise->SetFrequency(HeightMapFrequency);
 	//Turbulence for height
 	UFastNoise* TurbulenceNoise = NewObject<UFastNoise>();
-	TurbulenceNoise->SetFrequency(1.f / 40.f);
 	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	TurbulenceNoise->SetFractalOctaves(2);
+	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
+	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);
 
 	//Height map generation
 		//26 x 26 Array (base = 16 x 16; + 5 on each side)
@@ -131,9 +148,9 @@ void ChunkGenerator::GenHeightMap()
 		Maps.HeightMap[x].SetNum(16);
 		for (int y = 0; y < 16; ++y)
 		{
-			float xOffset = TurbulenceNoise->GetNoise(Pos2D.X + x, 0) * 13.f;
-			float yOffset = TurbulenceNoise->GetNoise(0, Pos2D.Y + y) * 13.f;
-			Maps.HeightMap[x][y] = HeightNoise->GetNoise(Pos2D.X + x + xOffset, Pos2D.Y + y + yOffset) * 30.f + 50.f;
+			float xOffset = TurbulenceNoise->GetNoise(Pos2D.X + x + 154, 0) * TerrainTurbulenceMultiplier;
+			float yOffset = TurbulenceNoise->GetNoise(0, Pos2D.Y + y + 1615) * TerrainTurbulenceMultiplier;
+			Maps.HeightMap[x][y] = HeightNoise->GetNoise(Pos2D.X + x + xOffset, Pos2D.Y + y + yOffset) * TerrainHeightMultiplier + BaseTerrainHeight;
 		}
 	}
 
@@ -168,13 +185,13 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 		//HeightMap Noise
 	UFastNoise* HeightNoise = NewObject<UFastNoise>();
 	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	HeightNoise->SetFractalOctaves(6);
-	HeightNoise->SetFrequency(1.f / 600.f);
+	HeightNoise->SetFractalOctaves(HeightMapOctaves);
+	HeightNoise->SetFrequency(HeightMapFrequency);
 		//Turbulence for height
 	UFastNoise * TurbulenceNoise = NewObject<UFastNoise>();
-	TurbulenceNoise->SetFrequency(1.f / 40.f);
 	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	TurbulenceNoise->SetFractalOctaves(2);
+	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
+	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);
 
 	//Terrain generation
 	if (BlockData.Num() != 16)
@@ -191,13 +208,13 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 
 			for (int z = 0; z < 16; ++z)
 			{
-				int RelX = x + TurbulenceNoise->GetNoise(x + Pos.X, z) * 13.f;
-				int RelY = y + TurbulenceNoise->GetNoise(y + Pos.Y, z) * 13.f;
+				int RelX = x + TurbulenceNoise->GetNoise(x + Pos.X, z) * TerrainTurbulenceMultiplier;
+				int RelY = y + TurbulenceNoise->GetNoise(y + Pos.Y, z) * TerrainTurbulenceMultiplier;
 				float HeightMapValue;
 				if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
 					HeightMapValue = Maps.HeightMap[RelX][RelY];
 				else
-					HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * 30.f + 50;
+					HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * TerrainHeightMultiplier + BaseTerrainHeight;
 
 				if (Pos.Z + z <= HeightMapValue)
 					BlockData[x][y][z] = BlockManager::GetBlock("Stone");
@@ -210,6 +227,9 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 
 void ChunkGenerator::Stage_DirtGrass()
 {
+	if (!bEnableStageDirtGrass)
+		return;
+	
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
 	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
@@ -256,13 +276,16 @@ void ChunkGenerator::Stage_DirtGrass()
 
 void ChunkGenerator::Stage_CaveCarving()
 {
+	if (!bEnableStageCaveCarving)
+		return;
+	
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
 	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	//Cave noise 1
 	UFastNoise* CaveNoise1 = NewObject<UFastNoise>();
-	CaveNoise1->SetFractalOctaves(4);
-	CaveNoise1->SetFrequency(1.f / 400.f);
+	CaveNoise1->SetFractalOctaves(CaveOctaves);
+	CaveNoise1->SetFrequency(CaveFrequency);
 	CaveNoise1->SetNoiseType(ENoiseType::SimplexFractal);
 
 	for (int x = 0; x < 16; ++x)
@@ -279,7 +302,7 @@ void ChunkGenerator::Stage_CaveCarving()
 					topFactor = expf(0.4f * z -23.1) + 1.f;
 				float CaveNoiseValue = abs(CaveNoise1->GetNoise(Pos.X + x, Pos.Y + y, z + Pos.Z)) * bottomFactor * topFactor;
 
-				if (CaveNoiseValue < .035)
+				if (CaveNoiseValue < CaveFrequency)
 				{
 					if (BlockData[x][y][z]->GetName() != "Air")
 						delete BlockData[x][y][z];
@@ -292,6 +315,9 @@ void ChunkGenerator::Stage_CaveCarving()
 
 void ChunkGenerator::Stage_Trees()
 {
+	if (!bEnableStageTrees)
+		return;
+	
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
 	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 

@@ -126,7 +126,8 @@ void ADebugQuickCharacter::ToggleChunkBoarders()
 void ADebugQuickCharacter::TogglePauseMenu()
 {
 	bool bIsNowPaused = PauseMenu->Visibility == ESlateVisibility::Hidden;
-
+	if (!bIsNowPaused && !PauseMenu->IsInViewport())
+		return;
 	PauseMenu->SetVisibility(bIsNowPaused ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 	UGameplayStatics::SetGamePaused(GetWorld(), bIsNowPaused);
 	auto pc = GetWorld()->GetFirstPlayerController();
@@ -193,5 +194,10 @@ void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis(TEXT("Move Right"), this, &ADebugQuickCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ADebugQuickCharacter::Turn);
 	PlayerInputComponent->BindAxis(TEXT("Look Up"), this, &ADebugQuickCharacter::LookUp);
+}
+
+UWorldLoadingComponent* ADebugQuickCharacter::GetWorldLoadingComponent()
+{
+	return WorldLoader;
 }
 

@@ -19,6 +19,7 @@ protected:
 	class UCanvasPanel* Root;
 	class UVerticalBox* MenuList;
 	class UI_DebugMenu* DebugMenu;
+	
 
 	void ResetView(UWidget* ChildWidget);
 

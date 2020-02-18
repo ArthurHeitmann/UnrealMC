@@ -78,6 +78,20 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
+void UWorldLoadingComponent::ResetWorld()
+{
+	for (int i = 0; i < PlayerChunks.Num(); ++i)
+	{
+		if (Chunk* chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
+		{
+			PlayerChunks.RemoveAt(i--);               //i-- so that the index doesn't change on the next loop iteration
+			delete chunk;
+		}
+	}
+	
+	CurrentChunkCoordinates = { 1000000, 1000000 , 1000000 };
+}
+
 void UWorldLoadingComponent::ProcessChunkDistanceUpdate(const ChunkFormCoords3D & Pos3D)
 {
 	if (!PlayerChunks.Contains(Pos3D.To2D()))

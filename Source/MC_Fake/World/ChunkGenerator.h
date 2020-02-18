@@ -16,8 +16,6 @@
 class MC_FAKE_API ChunkGenerator : public FRunnable
 {
 private:
-	const float SLOPE_GRASS = 5;
-	const float SLOPE_DIRT = 7;
 
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
@@ -48,6 +46,22 @@ private:
 	void Wait();
 
 public:
+	static bool bEnableStageDirtGrass;
+	static bool bEnableStageCaveCarving;
+	static bool bEnableStageTrees;
+	static float BaseTerrainHeight;
+	static float TerrainHeightMultiplier;
+	static float TerrainTurbulenceMultiplier;
+	static int HeightMapOctaves;
+	static float HeightMapFrequency;
+	static int TurbulenceOctaves;
+	static float TurbulenceFrequency;
+	static float SlopeGrass;
+	static float SlopeDirt;
+	static int CaveOctaves;
+	static float CaveFrequency;
+	static float CaveThreshold;
+	
 	bool bRun = true;
 	bool bIsBusy;
 	FRunnableThread* ThisThread;
