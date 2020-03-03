@@ -114,6 +114,7 @@ void ChunkGenerator::GenerateChunkCubes()
 			case 255:
 				World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
 				CurrentCubeElement.Cube->SetIsGenerating(false);
+				ChunkMeshGenerator::GenerateChunkMesh(CurrentCubeElement.Cube);
 				bIsGenerating = false;
 				break;
 			default:
@@ -360,7 +361,7 @@ void ChunkGenerator::Stage_Trees()
 											SetBlockAt(xt, yt, zt + Pos.Z, BlockManager::GetBlock("LeavesOak"));
 									}
 									else
-										World->AddBlockSetTask(Pos.X + xt, Pos.Y + yt, Pos.Z + zt, BlockManager::GetBlock("LeavesOak"), 1);
+										World->AddBlockSetTask(Pos.X + xt, Pos.Y + yt, Pos.Z + zt, BlockManager::GetBlock("LeavesOak"), 1, false);
 								}
 							}
 						}

@@ -91,7 +91,15 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 	HittingCCube = McWorld->GetChunkCubeAt(chunkPos);
 	checkf(HittingCCube, TEXT("Hitting Coordinates lead to nonexistent chunk cube!"));
 	HittingBlock = HittingCCube->GetBlockData()[RelX][RelY][RelZ];
-	checkf(HittingBlock && HittingBlock->GetName() != "Air", TEXT("Hitting Coordinates lead to nonexistent Block or Air!"));
+
+	if (HittingBlock && HittingBlock->GetName() != "Air")
+	{
+		UE_LOG(LogTemp, Error, TEXT("Hitting Coordinates lead to nonexistent Block or Air!"));
+		HittingBlock = nullptr;
+		HittingCCube = nullptr;
+		return;
+	}
+	
 	InitialBlock = &(HittingCCube->GetBlockData()[RelX][RelY][RelZ]);
 	HittingCCube->GetBlockData()[RelX][RelY][RelZ] = BlockManager::GetStaticBlock("Air");
 	HittingCCube->UpdateMesh();
@@ -111,17 +119,17 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 
 	auto NeighborCCubes = HittingCCube->GetChunkCubeNeighbors();
 	if (RelX == 0 && NeighborCCubes.South)
-		NeighborCCubes.South->SetHasDataChanged();
+		NeighborCCubes.South->SetHasBlockDataChanged();
 	if (RelX == 15 && NeighborCCubes.North)
-		NeighborCCubes.North->SetHasDataChanged();
+		NeighborCCubes.North->SetHasBlockDataChanged();
 	if (RelY == 0 && NeighborCCubes.West)
-		NeighborCCubes.West->SetHasDataChanged();
+		NeighborCCubes.West->SetHasBlockDataChanged();
 	if (RelY == 15 && NeighborCCubes.East)
-		NeighborCCubes.East->SetHasDataChanged();
+		NeighborCCubes.East->SetHasBlockDataChanged();
 	if (RelZ == 0 && NeighborCCubes.Bottom)
-		NeighborCCubes.Bottom->SetHasDataChanged();
+		NeighborCCubes.Bottom->SetHasBlockDataChanged();
 	if (RelZ == 15 && NeighborCCubes.Top)
-		NeighborCCubes.Top->SetHasDataChanged();
+		NeighborCCubes.Top->SetHasBlockDataChanged();
 }
 
 void ULineTracingInteractions::ContinueBreaking()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Core/Public/HAL/Runnable.h"
+#include "ChunkMeshGenerator.h"
 #include "Queue.h"
 #include "McWorld.h"
 #include "McWorldStructs.h"
@@ -16,7 +17,6 @@
 class MC_FAKE_API ChunkGenerator : public FRunnable
 {
 private:
-
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
 	ChunkFormCoords3D Pos;

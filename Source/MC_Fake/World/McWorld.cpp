@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Misc/FileIO.h"
 #include "Blocks/BlockManager.h"
+#include "Misc/DateTime.h"
 
 
 
@@ -35,7 +36,7 @@ void AMcWorld::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const int numOfThreads = 3;
+	const int numOfThreads = 2;
 	GeneratorThreads.SetNum(numOfThreads);
 	for (int i = 0; i < numOfThreads; ++i)
 	{
@@ -44,17 +45,40 @@ void AMcWorld::BeginPlay()
 		FRunnableThread* T = FRunnableThread::Create(GeneratorThreads[i], TEXT("Chunk Generator Thread"), 0, TPri_Lowest);
 		GeneratorThreads[i]->ThisThread = T;
 	}
+
+	MeshGeneratorThreads.SetNum(4);
+	for (auto& t : MeshGeneratorThreads)
+	{
+		t = new ChunkMeshGeneratorThread;
+		t->SetWorld(this);
+	}
 }
 
 void AMcWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	ProcMeshGenTime = 0;
+	ThreadInitTime = 0;
+	
+	int32 t1 = FDateTime::Now().GetMillisecond();
 	for (auto& chunk : LoadedChunks)
 		chunk.Value->Tick(DeltaTime);
-
+	int32 t2 = FDateTime::Now().GetMillisecond();
+	int32 tDiff = t2 - t1;
+	if (tDiff > 3)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tick: %d"), currTick);
+		UE_LOG(LogTemp, Warning, TEXT("Chunk tick time: %d"), tDiff);
+		UE_LOG(LogTemp, Warning, TEXT("ProcMesh time: %d"), ProcMeshGenTime);
+		UE_LOG(LogTemp, Warning, TEXT("ThreadInit time: %d"), ThreadInitTime);
+	}
+	
 	DequeueChunkCubeGenTasks();
 	DequeueChunkGenTasks();
+	DequeueMeshGenTasks();
+	
+	++currTick;
 }
 
 void AMcWorld::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -64,10 +88,20 @@ void AMcWorld::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	for (int i = 0; i < GeneratorThreads.Num(); ++i)
 	{
 		GeneratorThreads[i]->bRun = false;
+		FPlatformProcess::Sleep(0.005);
 		GeneratorThreads[i]->ThisThread->Kill(true);
 		delete GeneratorThreads[i];
 	}
 	GeneratorThreads.Empty();
+
+	for (int i = 0; i < MeshGeneratorThreads.Num(); ++i)
+	{
+		MeshGeneratorThreads[i]->bRun = false;
+		FPlatformProcess::Sleep(0.005);
+		MeshGeneratorThreads[i]->thisThread->Kill(false);
+		delete MeshGeneratorThreads[i];
+	}
+	MeshGeneratorThreads.Empty();
 }
 
 void AMcWorld::DequeueChunkGenTasks()
@@ -104,6 +138,25 @@ void AMcWorld::DequeueChunkCubeGenTasks()
 	}
 }
 
+void AMcWorld::DequeueMeshGenTasks()
+{
+	if (!MeshGenBuffer.IsEmpty())
+	{
+		bool foundReadyThread = false;
+		for (auto thread : MeshGeneratorThreads)
+		{
+			if (!thread->bIsBusy && !MeshGenBuffer.IsEmpty()) {
+				foundReadyThread = true;
+				ChunkCube* newCube;
+				MeshGenBuffer.Peek(newCube);
+				MeshGenBuffer.Dequeue(newCube);
+				thread->SetChunkCube(newCube);
+			}
+		}
+
+	}
+}
+
 void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube)
 {
 	if (!BlockSetTasks.Contains(ChunkCube->GetPos()))
@@ -122,8 +175,8 @@ void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube)
 			Tasks.RemoveAtSwap(0);
 		}
 	}
-	if (bDataChanged)
-		ChunkCube->SetHasDataChanged();
+	//if (bDataChanged)
+		//ChunkCube->SetHasBlockDataChanged();
 
 }
 
@@ -147,7 +200,6 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	CompleteBlockSetTasks(FinishedChunkCube);
 
 	FinishedChunkCube->SetNextGenerationStage(255);
-	FinishedChunkCube->SetHasDataChanged();
 
 	
 	ChunkFormCoords3D key = CurrChunkPos;
@@ -268,6 +320,11 @@ void AMcWorld::AddChunkGenTask(ChunkCube* Cube)
 	}
 }
 
+void AMcWorld::AddMeshGenTask(ChunkCube* Cube)
+{
+	MeshGenBuffer.Enqueue(Cube);
+}
+
 void AMcWorld::AddLoadedChunkCube(ChunkCube* Cube, ChunkFormCoords3D CurrChunkPos)
 {
 	LoadedChunkCubes.Add(CurrChunkPos, Cube);
@@ -318,14 +375,15 @@ B_Block* AMcWorld::GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeeded
 	return nullptr;
 }
 
-void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* NewBlock, uint8 MinGenStage)
+void AMcWorld::AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* NewBlock, uint8 MinGenStage, bool bUpdateMesh)
 {
 	BlockSetBufferElement e(x, y, z, NewBlock, MinGenStage);
 	if (LoadedChunkCubes.Contains(e.CurrChunkPos) && LoadedChunkCubes[e.CurrChunkPos]->GetNextGenerationStage() >= MinGenStage)
 	{
 		auto& BlockData = LoadedChunkCubes[e.CurrChunkPos]->GetBlockData();
 		BlockData[e.RelX][e.RelY][e.RelZ] = NewBlock;
-		LoadedChunkCubes[e.CurrChunkPos]->SetHasDataChanged(true);
+		if (bUpdateMesh)
+			LoadedChunkCubes[e.CurrChunkPos]->SetHasBlockDataChanged(true);
 	}
 	else
 	{

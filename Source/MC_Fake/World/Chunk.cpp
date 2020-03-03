@@ -43,7 +43,7 @@ Chunk::~Chunk()
 
 void Chunk::CreateChunkCube(int8 PosZ)
 {
-	ChunkCube* NewCube = new ChunkCube({ Pos.X, Pos.Y, PosZ }, McWorld, this);
+ 	ChunkCube* NewCube = new ChunkCube({ Pos.X, Pos.Y, PosZ }, McWorld, this);
 	ChunkCubes.Add(PosZ, NewCube);
 	McWorld->AddLoadedChunkCube(NewCube, NewCube->GetPos());
 	McWorld->AddChunkGenTask(NewCube);
@@ -117,7 +117,6 @@ void Chunk::Tick(float Delta)
 	{
 		cube.Value->Tick(Delta);
 	}
-	
 }
 
 ChunkFormCoords2D Chunk::GetPos()

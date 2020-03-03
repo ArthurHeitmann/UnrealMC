@@ -38,14 +38,24 @@ private:
 	class URuntimeMeshComponent* ChunkMesh;
 	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
-	bool bHasDataChanged = false;
+	bool bHasMeshDataChanged = false;
+	bool bHasBlockDataChanged = false;
 	bool bIsGenerating = false;
 	bool bHasFinishedGenerating = false;
+	bool bIsMeshGenPending = false;
 
-	bool ShouldFaceBePlacedBetween(B_Block* b1, B_Block* b2, EDirection Side);
 protected:
 
 public:
+	TMap<uint16, TArray<FVector>> Vertices;
+	TMap<uint16, TArray<FVector2D>> UVs;
+	TMap<uint16, TArray<int32>> Triangles;
+	TMap<uint16, TArray<FVector>> Normals;
+	TMap<uint16, B_Block*> Materials;
+	TMap<uint16, TArray<FVector>> VerticesCustomCollision;
+	TMap<uint16, TArray<int32>> TrianglesCustomCollision;
+	FCriticalSection MeshLock;
+	
 	ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* ParentChunk);
 	~ChunkCube();
 	void Tick(float Delta);
@@ -56,9 +66,11 @@ public:
 	int GetNextGenerationStage();
 	class Chunk* GetParentChunk();
 	void SetParentChunk(class Chunk*);
-	void SetHasDataChanged(bool bState = true);
+	void SetHasMeshDataChanged(bool bState = true);
+	void SetHasBlockDataChanged(bool bState = true);
 	bool GetHasFinishedGenerating();
 	void SetHasFinishedGenerating(bool BState = true);
+	void SetIsMeshGenPending(bool val);
 	bool GetIsGenerating();
 	void SetIsGenerating(bool bState);
 	B_Block*& GetBlockAt(int x, int y, int z);
@@ -67,3 +79,6 @@ public:
 	void UpdateCubeNeighbor(EDirection NeighborSide, ChunkCube* NewNeighbor, bool bUpdateMesh = false);
 	void UpdateMesh();
 };
+
+int32 ProcMeshGenTime = 0;
+int32 ThreadInitTime = 0;

@@ -26,6 +26,7 @@ public:
 	class Chunk* CreateChunk(ChunkFormCoords2D Location);
 	class ChunkCube* GetChunkCubeAt(const ChunkFormCoords3D& Location);
 	void AddChunkGenTask(class ChunkCube* Cube);
+	void AddMeshGenTask(ChunkCube* Cube);
 	void AddLoadedChunkCube(class ChunkCube*, ChunkFormCoords3D CurrChunkPos);
 	void RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos);
 	void AddRemovedChunk(class Chunk* chunk);
@@ -33,10 +34,13 @@ public:
 	void QuickSave();
 	void QuickLoad();
 	class B_Block* GetBlockAt(int32 x, int32 y, int32 z, bool bLoadChunkIfNeeded, int MinGenStage = 0, int MaxGenState = 255);
-	void AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* Block, uint8 MinGenStage);
+	void AddBlockSetTask(int32 x, int32 y, int32 z, class B_Block* Block, uint8 MinGenStage, bool bUpdateMesh = true);
 	void CompleteBlockSetTasks(class ChunkCube * ChunkCube);
 	void FinalizeChunkGen(class Chunk* Chunk);
 	void FinalizeCubeGen(class ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos);
+	void DequeueChunkGenTasks();
+	void DequeueChunkCubeGenTasks();
+	void DequeueMeshGenTasks();
 
 protected:
 	virtual void BeginPlay() override;
@@ -46,7 +50,9 @@ private:
 	TMap<ChunkFormCoords2D, class Chunk*> LoadedChunks;
 	TMap<ChunkFormCoords3D, class ChunkCube*> LoadedChunkCubes;
 	TArray<class ChunkGenerator*> GeneratorThreads;
+	TArray<class ChunkMeshGeneratorThread*> MeshGeneratorThreads;
 	TQueue<ChunkGenBufferElement> ChunkGenBuffer;
+	TQueue<ChunkCube*> MeshGenBuffer;
 	TArray<Chunk*> RemovedChunksInGenBuffer;
 	TMap<ChunkFormCoords2D, TArray<ChunkCubeGenBufferElement>> ChunkCubeGenTasks;
 	TQueue<TArray<ChunkCubeGenBufferElement>> ChunkCubeGenBuffer;
@@ -62,6 +68,6 @@ private:
 	FCriticalSection NeighborUpdatesMutex;
 	FCriticalSection ChunkCubesGenQueueMutex;
 
-	void DequeueChunkGenTasks();
-	void DequeueChunkCubeGenTasks();
 };
+
+int32 currTick = 0;

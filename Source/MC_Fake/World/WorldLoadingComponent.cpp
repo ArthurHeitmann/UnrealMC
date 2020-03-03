@@ -2,6 +2,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/DateTime.h"
 
 UWorldLoadingComponent::UWorldLoadingComponent()
 {
@@ -42,6 +43,8 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	if (CurrentChunkCoordinates == ChunkCoordinatesNew)
 		return;
 
+	int32 t1 = FDateTime::Now().GetMillisecond();
+	
 	CurrentChunkCoordinates = ChunkCoordinatesNew;
 	ChunkFormCoords2D ChunkCoords2D = CurrentChunkCoordinates.To2D();
 
@@ -76,6 +79,11 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			}
 		}
 	}
+
+
+	int32 t2 = FDateTime::Now().GetMillisecond();
+	UE_LOG(LogTemp, Warning, TEXT("WorldLoadingComp tick time: %d"), t2 - t1);
+	
 }
 
 void UWorldLoadingComponent::ResetWorld()

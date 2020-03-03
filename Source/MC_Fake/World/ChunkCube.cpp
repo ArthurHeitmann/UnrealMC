@@ -5,13 +5,14 @@
 #include "McWorld.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "ChunkMeshGenerator.h"
 
 ChunkCube::ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* ParentChunk)
 {
 	this->Pos = Pos;
 	this->McWorld = McWorld;
 	this->ParentChunk = ParentChunk;
-
+	
 	Root = NewObject<USceneComponent>(McWorld);
 	Root->SetupAttachment(ParentChunk->Root);
 	Root->RegisterComponent();
@@ -33,15 +34,25 @@ ChunkCube::ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* Pare
 
 void ChunkCube::Tick(float Delta)
 {
-	if (bHasDataChanged && bHasFinishedGenerating)
+	int32 t11 = FDateTime::Now().GetMillisecond();
+	//if (bHasBlockDataChanged && bHasFinishedGenerating)
+		//MeshGenerator.bNewTask = true;
+	int32 t12 = FDateTime::Now().GetMillisecond();
+	int32 t21 = FDateTime::Now().GetMillisecond();
+	if (bHasMeshDataChanged && bHasFinishedGenerating)
 		UpdateMesh();
+	int32 t22 = FDateTime::Now().GetMillisecond();
+
+	ThreadInitTime += t12 - t11;
 }
 
 ChunkCube::~ChunkCube()
 {
+	//wait for block data to finish generating
 	while (bIsGenerating)
 		FPlatformProcess::Sleep(0.01);
 
+	//Remove all associations with this chunks in the world and other chunks 
 	McWorld->RemoveLoadedChunkCube(Pos);
 
 	for (int x = 0; x < BlockData.Num(); ++x)
@@ -75,120 +86,31 @@ void ChunkCube::UpdateMesh()
 	if (!bHasFinishedGenerating || !BlockData.Num())
 		return;
 
-	TMap<uint16, TArray<FVector>> Vertices;
-	TMap<uint16, TArray<FVector2D>> UVs;
-	TMap<uint16, TArray<int32>> Triangles;
-	TMap<uint16, TArray<FVector>> Normals;
-	TMap<uint16, B_Block*> Materials;
-	TMap<uint16, TArray<FVector>> VerticesCustomCollision;
-	TMap<uint16, TArray<int32>> TrianglesCustomCollision;
-	for (int x = 0; x < 16; ++x)
-	{
-		for (int y = 0; y < 16; ++y)
-		{
-			for (int z = 0; z < 16; ++z)
-			{
-				if (BlockData[x][y][z]->GetBlockModelType() != EBlockModelType::NONE)
-				{
-					uint16 cbe = BlockData[x][y][z]->GetBlockID(); //current block enum (of this iteration)
-					//If necessary create keys for new block type in all maps
-					if (!Materials.Contains(cbe))
-					{
-						Materials.Add(cbe, BlockData[x][y][z]);
-						Vertices.Add(cbe);
-						UVs.Add(cbe);
-						Triangles.Add(cbe);
-						Normals.Add(cbe);
-					}
-					//Handle custom block models
-					if (BlockData[x][y][z]->UsesCustomModel()) {
-						Triangles[cbe].Append(BlockData[x][y][z]->GetAllTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetAllVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetAllUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetAllNormals());
-						continue;
-					}
-					//Top
-					if (z != 15 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y][z + 1], TOP)
-						||
-						z == 15 && CubeNeighbors.Top && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbors.Top->GetBlockAt(x, y, 0), TOP))
-					{
-						Triangles[cbe].Append(BlockData[x][y][z]->GetTopTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetTopVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetTopUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetTopNormals());
-					}
-					//Bottom
-					if (z != 0 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y][z - 1], BOTTOM)
-						||
-						z == 0 && CubeNeighbors.Bottom && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbors.Bottom->GetBlockAt(x, y, 15), BOTTOM))
-					{
-						Triangles[cbe].Append(BlockData[x][y][z]->GetBottomTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetBottomVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetBottomUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetBottomNormals());
-					}
-					//Right
-					if (y != 15 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y + 1][z], EAST)
-						||
-						y == 15 && CubeNeighbors.East && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbors.East->GetBlockAt(x, 0, z), EAST))
-					{
-						Triangles[cbe].Append(BlockData[x][y][z]->GetRightTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetRightVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetRightUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetRightNormals());
-					}
-					//Left
-					if (y && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x][y - 1][z], WEST)
-						||
-						y == 0 && CubeNeighbors.West && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbors.West->GetBlockAt(x, 15, z), WEST))
-					{
-						Triangles[cbe].Append(BlockData[x][y][z]->GetLeftTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetLeftVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetLeftUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetLeftNormals());
-					}
-					//Front
-					if (x && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x - 1][y][z], SOUTH)
-						||
-						x == 0 && CubeNeighbors.South && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbors.South->GetBlockAt(15, y, z), SOUTH))
-					{
-						Triangles[cbe].Append(BlockData[x][y][z]->GetFrontTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetFrontVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetFrontUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetFrontNormals());
-					}
-					//Back
-					if (x != 15 && ShouldFaceBePlacedBetween(BlockData[x][y][z], BlockData[x + 1][y][z], NORTH)
-						||
-						x == 15 && CubeNeighbors.North && ShouldFaceBePlacedBetween(BlockData[x][y][z], CubeNeighbors.North->GetBlockAt(0, y, z), NORTH))
-					{
-						Triangles[cbe].Append(BlockData[x][y][z]->GetBackTrianglesFrom(Vertices[cbe].Num()));
-						Vertices[cbe].Append(BlockData[x][y][z]->GetBackVertices(x * 100, y * 100, z * 100));
-						UVs[cbe].Append(BlockData[x][y][z]->GetBackUVs());
-						Normals[cbe].Append(BlockData[x][y][z]->GetBackNormals());
-					}
-				}
-			}
-		}
-	}
-	
+	MeshLock.Lock();
+
+	int numFace = 0;
 	for (auto i = Vertices.CreateConstIterator(); i; ++i)
 	{
 		uint16 key = i.Key();
+		/*UE_LOG(LogTemp, Warning, TEXT("Z: %d cbe: %d Verts: %d Tris: %d Norms: %d UVs: %d"), 
+			Pos.Z,
+			key, 
+			Vertices[key].Num(),
+			Triangles[key].Num(),
+			Normals[key].Num(),
+			UVs[key].Num());*/
+		int32 t41 = FDateTime::Now().GetMillisecond();
 		ChunkMesh->CreateMeshSection(key, i.Value(), Triangles[key], Normals[key], UVs[key], TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
+		int32 t42 = FDateTime::Now().GetMillisecond();
+		ProcMeshGenTime += t42 - t41;
 		ChunkMesh->SetMaterial(key, Materials[key]->GetMaterial(ChunkMesh));
+		numFace += Vertices[key].Num() / 4;
 	}
+	//UE_LOG(LogTemp, Warning, TEXT("ms/face: %f\n"), ((float) t12 - t11) / numFace);
 
 
-	bHasDataChanged = false;
-}
-
-bool ChunkCube::ShouldFaceBePlacedBetween(B_Block* b1, B_Block* b2, EDirection Side)
-{
-	return b2->IsSideOptimizable(Side)
-		&& b2->GetBlockModelType() != BLOCK
-		|| !b2->IsBlockOpaque();
+	bHasMeshDataChanged = false;
+	MeshLock.Unlock();
 }
 
 ChunkFormCoords3D ChunkCube::GetPos()
@@ -221,9 +143,22 @@ void ChunkCube::SetParentChunk(Chunk* PChunk)
 	ParentChunk = PChunk;
 }
 
-void ChunkCube::SetHasDataChanged(bool val)
+void ChunkCube::SetHasMeshDataChanged(bool val)
 {
-	bHasDataChanged = val;
+	bHasMeshDataChanged = val;
+}
+
+void ChunkCube::SetHasBlockDataChanged(bool val)
+{
+	//MeshLock.Lock();
+	//bHasBlockDataChanged = val;
+	//MeshLock.Unlock();
+
+	if (val && !bIsMeshGenPending)
+	{
+		McWorld->AddMeshGenTask(this);
+		bIsMeshGenPending = true;
+	}
 }
 
 bool ChunkCube::GetHasFinishedGenerating()
@@ -234,6 +169,11 @@ bool ChunkCube::GetHasFinishedGenerating()
 void ChunkCube::SetHasFinishedGenerating(bool val)
 {
 	bHasFinishedGenerating = val;
+}
+
+void ChunkCube::SetIsMeshGenPending(bool val)
+{
+	bIsMeshGenPending = val;
 }
 
 bool ChunkCube::GetIsGenerating()
@@ -286,5 +226,5 @@ void ChunkCube::UpdateCubeNeighbor(EDirection NeighborSide, ChunkCube* NewNeighb
 	}
 	
 	if (bUpdateMesh && bHasFinishedGenerating)
-		bHasDataChanged = true;
+		SetHasBlockDataChanged(true);
 }
