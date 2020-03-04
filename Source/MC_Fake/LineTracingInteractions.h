@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Items/ItemStack.h"
+#include "World/ChunkFormCoords.h"
 #include "LineTracingInteractions.generated.h"
+
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -16,6 +18,8 @@ class MC_FAKE_API ULineTracingInteractions : public UActorComponent
 private:	
 	UPROPERTY(EditAnywhere)
 	float HandReachDistance;
+	ChunkFormCoords3D ChunkPos;
+	FIntVector RelPos;
 	class B_Block* HittingBlock;
 	class B_Block** InitialBlock;
 	class ABlockBreaking* BreakingIndicator;
@@ -30,9 +34,11 @@ private:
 	FItemStack** CurrentItem;
 	class AMcWorld* McWorld;
 
-	void RegisterNewHitAt(const FHitResult& hit);
+	void RegisterNewHit(const FHitResult& Hit);
 	void ContinueBreaking();
 	void CancelBreaking();
+
+	void CalcChunkAndRelBlockCoords(const FHitResult& Hit, ChunkFormCoords3D& chunkPosOut, FIntVector& RelOut);
 	FORCEINLINE float HitHelper(float NormalAxisVal, float Val);
 
 protected:

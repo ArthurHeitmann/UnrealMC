@@ -77,7 +77,7 @@ void AMcWorld::Tick(float DeltaTime)
 	DequeueChunkCubeGenTasks();
 	DequeueChunkGenTasks();
 	DequeueMeshGenTasks();
-	
+
 	++currTick;
 }
 
@@ -97,7 +97,7 @@ void AMcWorld::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	for (int i = 0; i < MeshGeneratorThreads.Num(); ++i)
 	{
 		MeshGeneratorThreads[i]->bRun = false;
-		FPlatformProcess::Sleep(0.005);
+		FPlatformProcess::Sleep(0.01);
 		MeshGeneratorThreads[i]->thisThread->Kill(false);
 		delete MeshGeneratorThreads[i];
 	}

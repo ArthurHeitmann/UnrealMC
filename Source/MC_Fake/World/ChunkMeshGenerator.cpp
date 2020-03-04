@@ -3,7 +3,6 @@
 
 void ChunkMeshGenerator::GenerateChunkMesh(ChunkCube* C)
 {
-
 	int32 t11 = FDateTime::Now().GetMillisecond();
 	C->MeshLock.Lock();
 	int32 t1D = FDateTime::Now().GetMillisecond() - t11;
@@ -152,8 +151,12 @@ uint32 ChunkMeshGeneratorThread::Run()
 	while (bRun)
 	{
 		while (!bNewTask)
+		{
 			FPlatformProcess::Sleep(0.005);
-
+			if (!bRun)
+				return 0;
+		}
+			
 		bNewTask = false;
 		Cube->SetIsMeshGenPending(false);
 		ChunkMeshGenerator::GenerateChunkMesh(Cube);

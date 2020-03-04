@@ -10,6 +10,7 @@
 #include "Misc/McStaticFunctions.h"
 #include "Blocks/B_Block.h"
 #include "Blocks/BlockManager.h"
+#include "World/ChunkMeshGenerator.h"
 
 ULineTracingInteractions::ULineTracingInteractions()
 {
@@ -33,7 +34,7 @@ void ULineTracingInteractions::BeginPlay()
 void ULineTracingInteractions::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	if (bIsHitting)
 		LeftClickStart();
 }
@@ -51,13 +52,36 @@ void ULineTracingInteractions::LeftClickStart()
 	{
 		if (Cast<URuntimeMeshComponent>(Result.Component))
 		{
+			ChunkFormCoords3D TmpChunkPos;
+			FIntVector TmpRelPos;
+			CalcChunkAndRelBlockCoords(Result, TmpChunkPos, TmpRelPos);
+			if (BreakingIndicator)
+			{
+				if (TmpChunkPos != ChunkPos || TmpRelPos != RelPos)
+				{
+					CancelBreaking();
+					ChunkPos = TmpChunkPos;
+					RelPos = TmpRelPos;
+					RegisterNewHit(Result);
+				}
+				else
+				{
+					ContinueBreaking();
+				}
+			}
+			else
+			{
+				ChunkPos = TmpChunkPos;
+				RelPos = TmpRelPos;
+				RegisterNewHit(Result);
+			}
 
-			if (ABlockBreaking* BreakingBlock = Cast<ABlockBreaking>(Result.Actor))
+			/*if (ABlockBreaking* BreakingBlock = Cast<ABlockBreaking>(Result.Actor))
 			{
 				if (BreakingBlock != BreakingIndicator)
 				{
 					CancelBreaking();
-					RegisterNewHitAt(Result);
+					RegisterNewHit();
 				}
 				else
 					ContinueBreaking();
@@ -67,8 +91,8 @@ void ULineTracingInteractions::LeftClickStart()
 				if (BreakingIndicator)
 					CancelBreaking();
 
-				RegisterNewHitAt(Result);
-			}
+				RegisterNewHit();
+			}*/
 		}
 	}
 	else if (BreakingIndicator)
@@ -77,22 +101,17 @@ void ULineTracingInteractions::LeftClickStart()
 	}
 }
 
-void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
+void ULineTracingInteractions::RegisterNewHit(const FHitResult& Hit)
 {
-	FVector HitLoc = hit.ImpactPoint / 100.f;
-	HitLoc.X = HitHelper(hit.Normal.X, HitLoc.X);
-	HitLoc.Y = HitHelper(hit.Normal.Y, HitLoc.Y);
-	HitLoc.Z = HitHelper(hit.Normal.Z, HitLoc.Z);
-	ChunkFormCoords3D chunkPos = ChunkFormCoords3D::FromNormalCoords(HitLoc.X, HitLoc.Y, HitLoc.Z);
-	int32 RelX = McStaticFunctions::SmartMod(HitLoc.X, 16);
-	int32 RelY = McStaticFunctions::SmartMod(HitLoc.Y, 16);
-	int32 RelZ = McStaticFunctions::SmartMod(HitLoc.Z, 16);
-
-	HittingCCube = McWorld->GetChunkCubeAt(chunkPos);
+	int32 RelX = RelPos[0];
+	int32 RelY = RelPos[1];
+	int32 RelZ = RelPos[2];
+	
+	HittingCCube = McWorld->GetChunkCubeAt(ChunkPos);
 	checkf(HittingCCube, TEXT("Hitting Coordinates lead to nonexistent chunk cube!"));
 	HittingBlock = HittingCCube->GetBlockData()[RelX][RelY][RelZ];
 
-	if (HittingBlock && HittingBlock->GetName() != "Air")
+	if (HittingBlock && HittingBlock->GetName() == "Air")
 	{
 		UE_LOG(LogTemp, Error, TEXT("Hitting Coordinates lead to nonexistent Block or Air!"));
 		HittingBlock = nullptr;
@@ -102,8 +121,7 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 	
 	InitialBlock = &(HittingCCube->GetBlockData()[RelX][RelY][RelZ]);
 	HittingCCube->GetBlockData()[RelX][RelY][RelZ] = BlockManager::GetStaticBlock("Air");
-	HittingCCube->UpdateMesh();
-	HittingBlockCoordinates = chunkPos.ToWorldCoordinates() + FVector(RelX, RelY, RelZ) * 100.f;
+	HittingBlockCoordinates = ChunkPos.ToWorldCoordinates() + FVector(RelX, RelY, RelZ) * 100.f;
 	BreakingIndicator = GetWorld()->SpawnActor<ABlockBreaking>(HittingBlockCoordinates, FRotator::ZeroRotator, FActorSpawnParameters());
 	BreakingIndicator->InitWithBlock(HittingBlock);
 
@@ -113,7 +131,7 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 	TimeSpentHitting = GetWorld()->GetDeltaSeconds() * speedFactor;
 	BreakingIndicator->SetTimePassed(TimeSpentHitting);
 
-	HittingBlock->OnBeginBreak(GetWorld(), hit.ImpactPoint);
+	HittingBlock->OnBeginBreak(GetWorld(), Hit.ImpactPoint);
 
 	LastUsedItem = (*CurrentItem)->ItemS;
 
@@ -130,6 +148,8 @@ void ULineTracingInteractions::RegisterNewHitAt(const FHitResult& hit)
 		NeighborCCubes.Bottom->SetHasBlockDataChanged();
 	if (RelZ == 15 && NeighborCCubes.Top)
 		NeighborCCubes.Top->SetHasBlockDataChanged();
+
+	HittingCCube->SetHasBlockDataChanged();
 }
 
 void ULineTracingInteractions::ContinueBreaking()
@@ -162,12 +182,28 @@ void ULineTracingInteractions::ContinueBreaking()
 
 void ULineTracingInteractions::CancelBreaking()
 {
+	
 	(*InitialBlock) = HittingBlock;
+	ChunkMeshGenerator::GenerateChunkMesh(HittingCCube);
 	HittingCCube->UpdateMesh();
-	this->BreakingIndicator->Destroy();
+	BreakingIndicator->Destroy();
 	BreakingIndicator = nullptr;
 	HittingBlock = nullptr;
 	InitialBlock = nullptr;
+}
+
+void ULineTracingInteractions::CalcChunkAndRelBlockCoords(const FHitResult& Hit, ChunkFormCoords3D& chunkPosOut,
+	FIntVector& RelOut)
+{
+	FVector HitLoc = Hit.ImpactPoint / 100.f;
+	HitLoc.X = HitHelper(Hit.Normal.X, HitLoc.X);
+	HitLoc.Y = HitHelper(Hit.Normal.Y, HitLoc.Y);
+	HitLoc.Z = HitHelper(Hit.Normal.Z, HitLoc.Z);
+	chunkPosOut = ChunkFormCoords3D::FromNormalCoords(HitLoc.X, HitLoc.Y, HitLoc.Z);
+	RelOut.X = McStaticFunctions::SmartMod(HitLoc.X, 16);
+	RelOut.Y = McStaticFunctions::SmartMod(HitLoc.Y, 16);
+	RelOut.Z = McStaticFunctions::SmartMod(HitLoc.Z, 16);
+	
 }
 
 float ULineTracingInteractions::HitHelper(float NormalAxisVal, float Val)
