@@ -28,6 +28,10 @@ private:
 	int NextGenerationStage;
 	int LastGenerationStage;
 
+	class UFastNoise* HeightNoise;
+	UFastNoise* TurbulenceNoise;
+	UFastNoise* CaveNoise1;
+	
 	class B_Block* GetBlockAt(int32 X, int32 Y, int32 Z);
 	void SetBlockAt(int32 X, int32 Y, int32 Z, class B_Block* Block);
 
@@ -67,6 +71,7 @@ public:
 	FRunnableThread* ThisThread;
 
 	~ChunkGenerator();
+	ChunkGenerator();
 	virtual uint32 Run() override;
 	void SetChunkData(class Chunk* WorkingChunk);
 	void SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes);

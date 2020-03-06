@@ -52,7 +52,7 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	for (int i = 0; i < PlayerChunks.Num(); ++i)
 	{
 		ChunkFormCoords2D LocDiff = ChunkCoords2D - PlayerChunks[i];
-		if (FMath::Max(abs(LocDiff.X), abs(LocDiff.Y)) > ChunkLoadingDistance + 3)
+		if (FMath::Max(abs(LocDiff.X), abs(LocDiff.Y)) > ChunkLoadingDistance - 1)
 		{
 			if (Chunk* chunk = McFWorld->GetChunkAt(PlayerChunks[i]))
 			{

@@ -18,6 +18,12 @@ class MC_FAKE_API AMcWorld : public AActor
 public:	
 	UPROPERTY(EditAnywhere)
 	USceneComponent* ChunksRoot;
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumChunkGenBuffer = 0;
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumChunkCubeGenBuffer = 0;
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumMeshGenBuffer = 0;
 
 	AMcWorld();
 	virtual void Tick(float DeltaTime) override;
@@ -67,7 +73,7 @@ private:
 	TMap<class ChunkCube*, ChunkNeighborUpdates> NeighborUpdateTasks;
 	FCriticalSection NeighborUpdatesMutex;
 	FCriticalSection ChunkCubesGenQueueMutex;
-
+	FCriticalSection MeshGenBufferMutex;
 };
 
 int32 currTick = 0;

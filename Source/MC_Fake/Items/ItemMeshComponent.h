@@ -24,7 +24,7 @@ protected:
 	UStaticMesh* TmpItemMesh;
 	UMaterial* TmpItemMaterial;
 	I_Item PreviousItem;
-	bool bWasPreviouseItemEmpty = true;
+	bool bWasPreviousItemEmpty = true;
 	FItemStack const ** ItemPointer;
 
 	void OnItemChange();

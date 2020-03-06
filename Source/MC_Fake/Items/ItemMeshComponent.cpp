@@ -12,7 +12,7 @@ void UItemMeshComponent::OnItemChange()
 	if ((*ItemPointer)->ItemCount > 0)
 	{
 		bool bCustomMesh = (*ItemPointer)->ItemS->HasCustomDisplayMesh();
-		if (bWasPreviouseItemEmpty)
+		if (bWasPreviousItemEmpty)
 		{
 			if (bCustomMesh)
 				CustomMesh->SetVisibility(true);
@@ -41,7 +41,7 @@ void UItemMeshComponent::OnItemChange()
 	{
 		ItemMesh->SetVisibility(false);
 		CustomMesh->SetVisibility(false);
-		bWasPreviouseItemEmpty = true;
+		bWasPreviousItemEmpty = true;
 	}
 }
 

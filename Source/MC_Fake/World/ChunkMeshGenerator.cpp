@@ -160,6 +160,8 @@ uint32 ChunkMeshGeneratorThread::Run()
 		bNewTask = false;
 		Cube->SetIsMeshGenPending(false);
 		ChunkMeshGenerator::GenerateChunkMesh(Cube);
+		if (World)
+			World->DequeueMeshGenTasks();
 		bIsBusy = false;
 	}
 	return 0;

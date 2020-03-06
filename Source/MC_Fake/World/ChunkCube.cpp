@@ -34,16 +34,10 @@ ChunkCube::ChunkCube(ChunkFormCoords3D Pos, class AMcWorld* McWorld, Chunk* Pare
 
 void ChunkCube::Tick(float Delta)
 {
-	int32 t11 = FDateTime::Now().GetMillisecond();
-	//if (bHasBlockDataChanged && bHasFinishedGenerating)
-		//MeshGenerator.bNewTask = true;
-	int32 t12 = FDateTime::Now().GetMillisecond();
 	int32 t21 = FDateTime::Now().GetMillisecond();
 	if (bHasMeshDataChanged && bHasFinishedGenerating)
 		UpdateMesh();
 	int32 t22 = FDateTime::Now().GetMillisecond();
-
-	ThreadInitTime += t12 - t11;
 }
 
 ChunkCube::~ChunkCube()

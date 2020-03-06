@@ -32,11 +32,12 @@ Chunk::~Chunk()
 
 	TArray<USceneComponent*> Comps;
 	Root->GetChildrenComponents(true, Comps);
-	for (auto& Comp : Comps)
+	for (auto& Comp : Comps) {
 		Comp->DestroyComponent();
+	}
 
 	Root->DestroyComponent();
-
+	
 	for (auto& Cube : ChunkCubes)
 		delete Cube.Value;
 }

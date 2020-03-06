@@ -113,8 +113,8 @@ void ChunkGenerator::GenerateChunkCubes()
 				break;
 			case 255:
 				World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
-				CurrentCubeElement.Cube->SetIsGenerating(false);
 				ChunkMeshGenerator::GenerateChunkMesh(CurrentCubeElement.Cube);
+				CurrentCubeElement.Cube->SetIsGenerating(false);
 				bIsGenerating = false;
 				break;
 			default:
@@ -128,18 +128,6 @@ void ChunkGenerator::GenerateChunkCubes()
 void ChunkGenerator::GenHeightMap()
 {
 	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
-
-	//Noise setup
-		//Height
-	UFastNoise* HeightNoise = NewObject<UFastNoise>();
-	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	HeightNoise->SetFractalOctaves(HeightMapOctaves);
-	HeightNoise->SetFrequency(HeightMapFrequency);
-	//Turbulence for height
-	UFastNoise* TurbulenceNoise = NewObject<UFastNoise>();
-	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
-	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);
 
 	//Height map generation
 		//26 x 26 Array (base = 16 x 16; + 5 on each side)
@@ -181,18 +169,6 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 {
 	auto& BlockData = CurrentCubeElement.Cube->GetBlockData();
 	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
-
-	//Noise setup
-		//HeightMap Noise
-	UFastNoise* HeightNoise = NewObject<UFastNoise>();
-	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	HeightNoise->SetFractalOctaves(HeightMapOctaves);
-	HeightNoise->SetFrequency(HeightMapFrequency);
-		//Turbulence for height
-	UFastNoise * TurbulenceNoise = NewObject<UFastNoise>();
-	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
-	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
-	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);
 
 	//Terrain generation
 	if (BlockData.Num() != 16)
@@ -284,10 +260,6 @@ void ChunkGenerator::Stage_CaveCarving()
 	ChunkGenMaps& Maps = CurrentChunk->GetChunkGenMaps();
 
 	//Cave noise 1
-	UFastNoise* CaveNoise1 = NewObject<UFastNoise>();
-	CaveNoise1->SetFractalOctaves(CaveOctaves);
-	CaveNoise1->SetFrequency(CaveFrequency);
-	CaveNoise1->SetNoiseType(ENoiseType::SimplexFractal);
 
 	for (int x = 0; x < 16; ++x)
 	{
@@ -392,6 +364,24 @@ void ChunkGenerator::Wait()
 	{
 		FPlatformProcess::Sleep(.01);	// wait
 	}
+}
+
+ChunkGenerator::ChunkGenerator()
+{
+	HeightNoise = NewObject<UFastNoise>();
+	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
+	HeightNoise->SetFractalOctaves(HeightMapOctaves);
+	HeightNoise->SetFrequency(HeightMapFrequency);
+
+	TurbulenceNoise = NewObject<UFastNoise>();
+	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
+	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
+	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);
+
+	CaveNoise1 = NewObject<UFastNoise>();
+	CaveNoise1->SetFractalOctaves(CaveOctaves);
+	CaveNoise1->SetFrequency(CaveFrequency);
+	CaveNoise1->SetNoiseType(ENoiseType::SimplexFractal);
 }
 
 ChunkGenerator::~ChunkGenerator()
