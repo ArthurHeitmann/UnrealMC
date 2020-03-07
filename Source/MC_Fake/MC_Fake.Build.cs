@@ -11,7 +11,7 @@ public class MC_Fake : ModuleRules
             "Engine",
             "InputCore",
             "EngineSettings",
-            "UnrealFastNoisePlugin",
+            //"UnrealFastNoisePlugin",
             "UMG"
         });
 

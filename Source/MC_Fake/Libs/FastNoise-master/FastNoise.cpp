@@ -181,13 +181,13 @@ const FN_DECIMAL CELL_3D_Z[] =
 	FN_DECIMAL(0.615630723), FN_DECIMAL(0.3430367014), FN_DECIMAL(0.8193658136), FN_DECIMAL(-0.5829600957), FN_DECIMAL(0.07911697781), FN_DECIMAL(0.7854296063), FN_DECIMAL(-0.4107442306), FN_DECIMAL(0.4766964066), FN_DECIMAL(-0.9045999527), FN_DECIMAL(-0.1673856787), FN_DECIMAL(0.2828077348), FN_DECIMAL(-0.5902737632), FN_DECIMAL(-0.321506229), FN_DECIMAL(-0.5224513133), FN_DECIMAL(-0.4090169985), FN_DECIMAL(-0.3599685311),
 };
 
-static int FastFloor(FN_DECIMAL f) { return (f >= 0 ? (int)f : (int)f - 1); }
-static int FastRound(FN_DECIMAL f) { return (f >= 0) ? (int)(f + FN_DECIMAL(0.5)) : (int)(f - FN_DECIMAL(0.5)); }
+static int FastFloor(FN_DECIMAL f) { return (f >= 0 ? (int) f : (int) f - 1); }
+static int FastRound(FN_DECIMAL f) { return (f >= 0) ? (int) (f + FN_DECIMAL(0.5)) : (int) (f - FN_DECIMAL(0.5)); }
 static int FastAbs(int i) { return abs(i); }
 static FN_DECIMAL FastAbs(FN_DECIMAL f) { return fabs(f); }
 static FN_DECIMAL Lerp(FN_DECIMAL a, FN_DECIMAL b, FN_DECIMAL t) { return a + t * (b - a); }
-static FN_DECIMAL InterpHermiteFunc(FN_DECIMAL t) { return t*t*(3 - 2 * t); }
-static FN_DECIMAL InterpQuinticFunc(FN_DECIMAL t) { return t*t*t*(t*(t * 6 - 15) + 10); }
+static FN_DECIMAL InterpHermiteFunc(FN_DECIMAL t) { return t * t * (3 - 2 * t); }
+static FN_DECIMAL InterpQuinticFunc(FN_DECIMAL t) { return t * t * t * (t * (t * 6 - 15) + 10); }
 static FN_DECIMAL CubicLerp(FN_DECIMAL a, FN_DECIMAL b, FN_DECIMAL c, FN_DECIMAL d, FN_DECIMAL t)
 {
 	FN_DECIMAL p = (d - c) - (a - b);
@@ -205,7 +205,7 @@ void FastNoise::SetSeed(int seed)
 
 	for (int j = 0; j < 256; j++)
 	{
-        int rng = (int)(gen() % (256 - j));
+		int rng = (int) (gen() % (256 - j));
 		int k = rng + j;
 		int l = m_perm[j];
 		m_perm[j] = m_perm[j + 256] = m_perm[k];
@@ -313,19 +313,19 @@ FN_DECIMAL FastNoise::GradCoord2D(unsigned char offset, int x, int y, FN_DECIMAL
 {
 	unsigned char lutPos = Index2D_12(offset, x, y);
 
-	return xd*GRAD_X[lutPos] + yd*GRAD_Y[lutPos];
+	return xd * GRAD_X[lutPos] + yd * GRAD_Y[lutPos];
 }
 FN_DECIMAL FastNoise::GradCoord3D(unsigned char offset, int x, int y, int z, FN_DECIMAL xd, FN_DECIMAL yd, FN_DECIMAL zd) const
 {
 	unsigned char lutPos = Index3D_12(offset, x, y, z);
 
-	return xd*GRAD_X[lutPos] + yd*GRAD_Y[lutPos] + zd*GRAD_Z[lutPos];
+	return xd * GRAD_X[lutPos] + yd * GRAD_Y[lutPos] + zd * GRAD_Z[lutPos];
 }
 FN_DECIMAL FastNoise::GradCoord4D(unsigned char offset, int x, int y, int z, int w, FN_DECIMAL xd, FN_DECIMAL yd, FN_DECIMAL zd, FN_DECIMAL wd) const
 {
 	unsigned char lutPos = Index4D_32(offset, x, y, z, w) << 2;
 
-	return xd*GRAD_4D[lutPos] + yd*GRAD_4D[lutPos + 1] + zd*GRAD_4D[lutPos + 2] + wd*GRAD_4D[lutPos + 3];
+	return xd * GRAD_4D[lutPos] + yd * GRAD_4D[lutPos + 1] + zd * GRAD_4D[lutPos + 2] + wd * GRAD_4D[lutPos + 3];
 }
 
 FN_DECIMAL FastNoise::GetNoise(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL z) const
@@ -469,9 +469,9 @@ FN_DECIMAL FastNoise::GetNoise(FN_DECIMAL x, FN_DECIMAL y) const
 		{
 		case FBM:
 			return SingleCubicFractalFBM(x, y);
-		case Billow:	 
+		case Billow:
 			return SingleCubicFractalBillow(x, y);
-		case RigidMulti: 
+		case RigidMulti:
 			return SingleCubicFractalRigidMulti(x, y);
 		}
 	}
@@ -613,19 +613,19 @@ FN_DECIMAL FastNoise::SingleValue(unsigned char offset, FN_DECIMAL x, FN_DECIMAL
 	switch (m_interp)
 	{
 	case Linear:
-		xs = x - (FN_DECIMAL)x0;
-		ys = y - (FN_DECIMAL)y0;
-		zs = z - (FN_DECIMAL)z0;
+		xs = x - (FN_DECIMAL) x0;
+		ys = y - (FN_DECIMAL) y0;
+		zs = z - (FN_DECIMAL) z0;
 		break;
 	case Hermite:
-		xs = InterpHermiteFunc(x - (FN_DECIMAL)x0);
-		ys = InterpHermiteFunc(y - (FN_DECIMAL)y0);
-		zs = InterpHermiteFunc(z - (FN_DECIMAL)z0);
+		xs = InterpHermiteFunc(x - (FN_DECIMAL) x0);
+		ys = InterpHermiteFunc(y - (FN_DECIMAL) y0);
+		zs = InterpHermiteFunc(z - (FN_DECIMAL) z0);
 		break;
 	case Quintic:
-		xs = InterpQuinticFunc(x - (FN_DECIMAL)x0);
-		ys = InterpQuinticFunc(y - (FN_DECIMAL)y0);
-		zs = InterpQuinticFunc(z - (FN_DECIMAL)z0);
+		xs = InterpQuinticFunc(x - (FN_DECIMAL) x0);
+		ys = InterpQuinticFunc(y - (FN_DECIMAL) y0);
+		zs = InterpQuinticFunc(z - (FN_DECIMAL) z0);
 		break;
 	}
 
@@ -727,16 +727,16 @@ FN_DECIMAL FastNoise::SingleValue(unsigned char offset, FN_DECIMAL x, FN_DECIMAL
 	switch (m_interp)
 	{
 	case Linear:
-		xs = x - (FN_DECIMAL)x0;
-		ys = y - (FN_DECIMAL)y0;
+		xs = x - (FN_DECIMAL) x0;
+		ys = y - (FN_DECIMAL) y0;
 		break;
 	case Hermite:
-		xs = InterpHermiteFunc(x - (FN_DECIMAL)x0);
-		ys = InterpHermiteFunc(y - (FN_DECIMAL)y0);
+		xs = InterpHermiteFunc(x - (FN_DECIMAL) x0);
+		ys = InterpHermiteFunc(y - (FN_DECIMAL) y0);
 		break;
 	case Quintic:
-		xs = InterpQuinticFunc(x - (FN_DECIMAL)x0);
-		ys = InterpQuinticFunc(y - (FN_DECIMAL)y0);
+		xs = InterpQuinticFunc(x - (FN_DECIMAL) x0);
+		ys = InterpQuinticFunc(y - (FN_DECIMAL) y0);
 		break;
 	}
 
@@ -841,25 +841,25 @@ FN_DECIMAL FastNoise::SinglePerlin(unsigned char offset, FN_DECIMAL x, FN_DECIMA
 	switch (m_interp)
 	{
 	case Linear:
-		xs = x - (FN_DECIMAL)x0;
-		ys = y - (FN_DECIMAL)y0;
-		zs = z - (FN_DECIMAL)z0;
+		xs = x - (FN_DECIMAL) x0;
+		ys = y - (FN_DECIMAL) y0;
+		zs = z - (FN_DECIMAL) z0;
 		break;
 	case Hermite:
-		xs = InterpHermiteFunc(x - (FN_DECIMAL)x0);
-		ys = InterpHermiteFunc(y - (FN_DECIMAL)y0);
-		zs = InterpHermiteFunc(z - (FN_DECIMAL)z0);
+		xs = InterpHermiteFunc(x - (FN_DECIMAL) x0);
+		ys = InterpHermiteFunc(y - (FN_DECIMAL) y0);
+		zs = InterpHermiteFunc(z - (FN_DECIMAL) z0);
 		break;
 	case Quintic:
-		xs = InterpQuinticFunc(x - (FN_DECIMAL)x0);
-		ys = InterpQuinticFunc(y - (FN_DECIMAL)y0);
-		zs = InterpQuinticFunc(z - (FN_DECIMAL)z0);
+		xs = InterpQuinticFunc(x - (FN_DECIMAL) x0);
+		ys = InterpQuinticFunc(y - (FN_DECIMAL) y0);
+		zs = InterpQuinticFunc(z - (FN_DECIMAL) z0);
 		break;
 	}
 
-	FN_DECIMAL xd0 = x - (FN_DECIMAL)x0;
-	FN_DECIMAL yd0 = y - (FN_DECIMAL)y0;
-	FN_DECIMAL zd0 = z - (FN_DECIMAL)z0;
+	FN_DECIMAL xd0 = x - (FN_DECIMAL) x0;
+	FN_DECIMAL yd0 = y - (FN_DECIMAL) y0;
+	FN_DECIMAL zd0 = z - (FN_DECIMAL) z0;
 	FN_DECIMAL xd1 = xd0 - 1;
 	FN_DECIMAL yd1 = yd0 - 1;
 	FN_DECIMAL zd1 = zd0 - 1;
@@ -963,21 +963,21 @@ FN_DECIMAL FastNoise::SinglePerlin(unsigned char offset, FN_DECIMAL x, FN_DECIMA
 	switch (m_interp)
 	{
 	case Linear:
-		xs = x - (FN_DECIMAL)x0;
-		ys = y - (FN_DECIMAL)y0;
+		xs = x - (FN_DECIMAL) x0;
+		ys = y - (FN_DECIMAL) y0;
 		break;
 	case Hermite:
-		xs = InterpHermiteFunc(x - (FN_DECIMAL)x0);
-		ys = InterpHermiteFunc(y - (FN_DECIMAL)y0);
+		xs = InterpHermiteFunc(x - (FN_DECIMAL) x0);
+		ys = InterpHermiteFunc(y - (FN_DECIMAL) y0);
 		break;
 	case Quintic:
-		xs = InterpQuinticFunc(x - (FN_DECIMAL)x0);
-		ys = InterpQuinticFunc(y - (FN_DECIMAL)y0);
+		xs = InterpQuinticFunc(x - (FN_DECIMAL) x0);
+		ys = InterpQuinticFunc(y - (FN_DECIMAL) y0);
 		break;
 	}
 
-	FN_DECIMAL xd0 = x - (FN_DECIMAL)x0;
-	FN_DECIMAL yd0 = y - (FN_DECIMAL)y0;
+	FN_DECIMAL xd0 = x - (FN_DECIMAL) x0;
+	FN_DECIMAL yd0 = y - (FN_DECIMAL) y0;
 	FN_DECIMAL xd1 = xd0 - 1;
 	FN_DECIMAL yd1 = yd0 - 1;
 
@@ -1126,45 +1126,45 @@ FN_DECIMAL FastNoise::SingleSimplex(unsigned char offset, FN_DECIMAL x, FN_DECIM
 	FN_DECIMAL x1 = x0 - i1 + G3;
 	FN_DECIMAL y1 = y0 - j1 + G3;
 	FN_DECIMAL z1 = z0 - k1 + G3;
-	FN_DECIMAL x2 = x0 - i2 + 2*G3;
-	FN_DECIMAL y2 = y0 - j2 + 2*G3;
-	FN_DECIMAL z2 = z0 - k2 + 2*G3;
-	FN_DECIMAL x3 = x0 - 1 + 3*G3;
-	FN_DECIMAL y3 = y0 - 1 + 3*G3;
-	FN_DECIMAL z3 = z0 - 1 + 3*G3;
+	FN_DECIMAL x2 = x0 - i2 + 2 * G3;
+	FN_DECIMAL y2 = y0 - j2 + 2 * G3;
+	FN_DECIMAL z2 = z0 - k2 + 2 * G3;
+	FN_DECIMAL x3 = x0 - 1 + 3 * G3;
+	FN_DECIMAL y3 = y0 - 1 + 3 * G3;
+	FN_DECIMAL z3 = z0 - 1 + 3 * G3;
 
 	FN_DECIMAL n0, n1, n2, n3;
 
-	t = FN_DECIMAL(0.6) - x0*x0 - y0*y0 - z0*z0;
+	t = FN_DECIMAL(0.6) - x0 * x0 - y0 * y0 - z0 * z0;
 	if (t < 0) n0 = 0;
 	else
 	{
 		t *= t;
-		n0 = t*t*GradCoord3D(offset, i, j, k, x0, y0, z0);
+		n0 = t * t * GradCoord3D(offset, i, j, k, x0, y0, z0);
 	}
 
-	t = FN_DECIMAL(0.6) - x1*x1 - y1*y1 - z1*z1;
+	t = FN_DECIMAL(0.6) - x1 * x1 - y1 * y1 - z1 * z1;
 	if (t < 0) n1 = 0;
 	else
 	{
 		t *= t;
-		n1 = t*t*GradCoord3D(offset, i + i1, j + j1, k + k1, x1, y1, z1);
+		n1 = t * t * GradCoord3D(offset, i + i1, j + j1, k + k1, x1, y1, z1);
 	}
 
-	t = FN_DECIMAL(0.6) - x2*x2 - y2*y2 - z2*z2;
+	t = FN_DECIMAL(0.6) - x2 * x2 - y2 * y2 - z2 * z2;
 	if (t < 0) n2 = 0;
 	else
 	{
 		t *= t;
-		n2 = t*t*GradCoord3D(offset, i + i2, j + j2, k + k2, x2, y2, z2);
+		n2 = t * t * GradCoord3D(offset, i + i2, j + j2, k + k2, x2, y2, z2);
 	}
 
-	t = FN_DECIMAL(0.6) - x3*x3 - y3*y3 - z3*z3;
+	t = FN_DECIMAL(0.6) - x3 * x3 - y3 * y3 - z3 * z3;
 	if (t < 0) n3 = 0;
 	else
 	{
 		t *= t;
-		n3 = t*t*GradCoord3D(offset, i + 1, j + 1, k + 1, x3, y3, z3);
+		n3 = t * t * GradCoord3D(offset, i + 1, j + 1, k + 1, x3, y3, z3);
 	}
 
 	return 32 * (n0 + n1 + n2 + n3);
@@ -1295,14 +1295,14 @@ FN_DECIMAL FastNoise::SingleSimplex(unsigned char offset, FN_DECIMAL x, FN_DECIM
 		i1 = 0; j1 = 1;
 	}
 
-	FN_DECIMAL x1 = x0 - (FN_DECIMAL)i1 + G2;
-	FN_DECIMAL y1 = y0 - (FN_DECIMAL)j1 + G2;
-	FN_DECIMAL x2 = x0 - 1 + 2*G2;
-	FN_DECIMAL y2 = y0 - 1 + 2*G2;
+	FN_DECIMAL x1 = x0 - (FN_DECIMAL) i1 + G2;
+	FN_DECIMAL y1 = y0 - (FN_DECIMAL) j1 + G2;
+	FN_DECIMAL x2 = x0 - 1 + 2 * G2;
+	FN_DECIMAL y2 = y0 - 1 + 2 * G2;
 
 	FN_DECIMAL n0, n1, n2;
 
-	t = FN_DECIMAL(0.5) - x0*x0 - y0*y0;
+	t = FN_DECIMAL(0.5) - x0 * x0 - y0 * y0;
 	if (t < 0) n0 = 0;
 	else
 	{
@@ -1310,20 +1310,20 @@ FN_DECIMAL FastNoise::SingleSimplex(unsigned char offset, FN_DECIMAL x, FN_DECIM
 		n0 = t * t * GradCoord2D(offset, i, j, x0, y0);
 	}
 
-	t = FN_DECIMAL(0.5) - x1*x1 - y1*y1;
+	t = FN_DECIMAL(0.5) - x1 * x1 - y1 * y1;
 	if (t < 0) n1 = 0;
 	else
 	{
 		t *= t;
-		n1 = t*t*GradCoord2D(offset, i + i1, j + j1, x1, y1);
+		n1 = t * t * GradCoord2D(offset, i + i1, j + j1, x1, y1);
 	}
 
-	t = FN_DECIMAL(0.5) - x2*x2 - y2*y2;
+	t = FN_DECIMAL(0.5) - x2 * x2 - y2 * y2;
 	if (t < 0) n2 = 0;
 	else
 	{
 		t *= t;
-		n2 = t*t*GradCoord2D(offset, i + 1, j + 1, x2, y2);
+		n2 = t * t * GradCoord2D(offset, i + 1, j + 1, x2, y2);
 	}
 
 	return 70 * (n0 + n1 + n2);
@@ -1386,44 +1386,44 @@ FN_DECIMAL FastNoise::SingleSimplex(unsigned char offset, FN_DECIMAL x, FN_DECIM
 	FN_DECIMAL y1 = y0 - j1 + G4;
 	FN_DECIMAL z1 = z0 - k1 + G4;
 	FN_DECIMAL w1 = w0 - l1 + G4;
-	FN_DECIMAL x2 = x0 - i2 + 2*G4;
-	FN_DECIMAL y2 = y0 - j2 + 2*G4;
-	FN_DECIMAL z2 = z0 - k2 + 2*G4;
-	FN_DECIMAL w2 = w0 - l2 + 2*G4;
-	FN_DECIMAL x3 = x0 - i3 + 3*G4;
-	FN_DECIMAL y3 = y0 - j3 + 3*G4;
-	FN_DECIMAL z3 = z0 - k3 + 3*G4;
-	FN_DECIMAL w3 = w0 - l3 + 3*G4;
-	FN_DECIMAL x4 = x0 - 1 + 4*G4;
-	FN_DECIMAL y4 = y0 - 1 + 4*G4;
-	FN_DECIMAL z4 = z0 - 1 + 4*G4;
-	FN_DECIMAL w4 = w0 - 1 + 4*G4;
+	FN_DECIMAL x2 = x0 - i2 + 2 * G4;
+	FN_DECIMAL y2 = y0 - j2 + 2 * G4;
+	FN_DECIMAL z2 = z0 - k2 + 2 * G4;
+	FN_DECIMAL w2 = w0 - l2 + 2 * G4;
+	FN_DECIMAL x3 = x0 - i3 + 3 * G4;
+	FN_DECIMAL y3 = y0 - j3 + 3 * G4;
+	FN_DECIMAL z3 = z0 - k3 + 3 * G4;
+	FN_DECIMAL w3 = w0 - l3 + 3 * G4;
+	FN_DECIMAL x4 = x0 - 1 + 4 * G4;
+	FN_DECIMAL y4 = y0 - 1 + 4 * G4;
+	FN_DECIMAL z4 = z0 - 1 + 4 * G4;
+	FN_DECIMAL w4 = w0 - 1 + 4 * G4;
 
-	t = FN_DECIMAL(0.6) - x0*x0 - y0*y0 - z0*z0 - w0*w0;
+	t = FN_DECIMAL(0.6) - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
 	if (t < 0) n0 = 0;
 	else {
 		t *= t;
 		n0 = t * t * GradCoord4D(offset, i, j, k, l, x0, y0, z0, w0);
 	}
-	t = FN_DECIMAL(0.6) - x1*x1 - y1*y1 - z1*z1 - w1*w1;
+	t = FN_DECIMAL(0.6) - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
 	if (t < 0) n1 = 0;
 	else {
 		t *= t;
 		n1 = t * t * GradCoord4D(offset, i + i1, j + j1, k + k1, l + l1, x1, y1, z1, w1);
 	}
-	t = FN_DECIMAL(0.6) - x2*x2 - y2*y2 - z2*z2 - w2*w2;
+	t = FN_DECIMAL(0.6) - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
 	if (t < 0) n2 = 0;
 	else {
 		t *= t;
 		n2 = t * t * GradCoord4D(offset, i + i2, j + j2, k + k2, l + l2, x2, y2, z2, w2);
 	}
-	t = FN_DECIMAL(0.6) - x3*x3 - y3*y3 - z3*z3 - w3*w3;
+	t = FN_DECIMAL(0.6) - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
 	if (t < 0) n3 = 0;
 	else {
 		t *= t;
 		n3 = t * t * GradCoord4D(offset, i + i3, j + j3, k + k3, l + l3, x3, y3, z3, w3);
 	}
-	t = FN_DECIMAL(0.6) - x4*x4 - y4*y4 - z4*z4 - w4*w4;
+	t = FN_DECIMAL(0.6) - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
 	if (t < 0) n4 = 0;
 	else {
 		t *= t;
@@ -1444,9 +1444,9 @@ FN_DECIMAL FastNoise::GetCubicFractal(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL z) 
 	{
 	case FBM:
 		return SingleCubicFractalFBM(x, y, z);
-	case Billow:	 
+	case Billow:
 		return SingleCubicFractalBillow(x, y, z);
-	case RigidMulti: 
+	case RigidMulti:
 		return SingleCubicFractalRigidMulti(x, y, z);
 	default:
 		return 0;
@@ -1533,35 +1533,35 @@ FN_DECIMAL FastNoise::SingleCubic(unsigned char offset, FN_DECIMAL x, FN_DECIMAL
 	int y3 = y1 + 2;
 	int z3 = z1 + 2;
 
-	FN_DECIMAL xs = x - (FN_DECIMAL)x1;
-	FN_DECIMAL ys = y - (FN_DECIMAL)y1;
-	FN_DECIMAL zs = z - (FN_DECIMAL)z1;
+	FN_DECIMAL xs = x - (FN_DECIMAL) x1;
+	FN_DECIMAL ys = y - (FN_DECIMAL) y1;
+	FN_DECIMAL zs = z - (FN_DECIMAL) z1;
 
 	return CubicLerp(
 		CubicLerp(
-		CubicLerp(ValCoord3DFast(offset, x0, y0, z0), ValCoord3DFast(offset, x1, y0, z0), ValCoord3DFast(offset, x2, y0, z0), ValCoord3DFast(offset, x3, y0, z0), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y1, z0), ValCoord3DFast(offset, x1, y1, z0), ValCoord3DFast(offset, x2, y1, z0), ValCoord3DFast(offset, x3, y1, z0), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y2, z0), ValCoord3DFast(offset, x1, y2, z0), ValCoord3DFast(offset, x2, y2, z0), ValCoord3DFast(offset, x3, y2, z0), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y3, z0), ValCoord3DFast(offset, x1, y3, z0), ValCoord3DFast(offset, x2, y3, z0), ValCoord3DFast(offset, x3, y3, z0), xs),
-		ys),
+			CubicLerp(ValCoord3DFast(offset, x0, y0, z0), ValCoord3DFast(offset, x1, y0, z0), ValCoord3DFast(offset, x2, y0, z0), ValCoord3DFast(offset, x3, y0, z0), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y1, z0), ValCoord3DFast(offset, x1, y1, z0), ValCoord3DFast(offset, x2, y1, z0), ValCoord3DFast(offset, x3, y1, z0), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y2, z0), ValCoord3DFast(offset, x1, y2, z0), ValCoord3DFast(offset, x2, y2, z0), ValCoord3DFast(offset, x3, y2, z0), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y3, z0), ValCoord3DFast(offset, x1, y3, z0), ValCoord3DFast(offset, x2, y3, z0), ValCoord3DFast(offset, x3, y3, z0), xs),
+			ys),
 		CubicLerp(
-		CubicLerp(ValCoord3DFast(offset, x0, y0, z1), ValCoord3DFast(offset, x1, y0, z1), ValCoord3DFast(offset, x2, y0, z1), ValCoord3DFast(offset, x3, y0, z1), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y1, z1), ValCoord3DFast(offset, x1, y1, z1), ValCoord3DFast(offset, x2, y1, z1), ValCoord3DFast(offset, x3, y1, z1), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y2, z1), ValCoord3DFast(offset, x1, y2, z1), ValCoord3DFast(offset, x2, y2, z1), ValCoord3DFast(offset, x3, y2, z1), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y3, z1), ValCoord3DFast(offset, x1, y3, z1), ValCoord3DFast(offset, x2, y3, z1), ValCoord3DFast(offset, x3, y3, z1), xs),
-		ys),
+			CubicLerp(ValCoord3DFast(offset, x0, y0, z1), ValCoord3DFast(offset, x1, y0, z1), ValCoord3DFast(offset, x2, y0, z1), ValCoord3DFast(offset, x3, y0, z1), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y1, z1), ValCoord3DFast(offset, x1, y1, z1), ValCoord3DFast(offset, x2, y1, z1), ValCoord3DFast(offset, x3, y1, z1), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y2, z1), ValCoord3DFast(offset, x1, y2, z1), ValCoord3DFast(offset, x2, y2, z1), ValCoord3DFast(offset, x3, y2, z1), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y3, z1), ValCoord3DFast(offset, x1, y3, z1), ValCoord3DFast(offset, x2, y3, z1), ValCoord3DFast(offset, x3, y3, z1), xs),
+			ys),
 		CubicLerp(
-		CubicLerp(ValCoord3DFast(offset, x0, y0, z2), ValCoord3DFast(offset, x1, y0, z2), ValCoord3DFast(offset, x2, y0, z2), ValCoord3DFast(offset, x3, y0, z2), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y1, z2), ValCoord3DFast(offset, x1, y1, z2), ValCoord3DFast(offset, x2, y1, z2), ValCoord3DFast(offset, x3, y1, z2), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y2, z2), ValCoord3DFast(offset, x1, y2, z2), ValCoord3DFast(offset, x2, y2, z2), ValCoord3DFast(offset, x3, y2, z2), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y3, z2), ValCoord3DFast(offset, x1, y3, z2), ValCoord3DFast(offset, x2, y3, z2), ValCoord3DFast(offset, x3, y3, z2), xs),
-		ys),
+			CubicLerp(ValCoord3DFast(offset, x0, y0, z2), ValCoord3DFast(offset, x1, y0, z2), ValCoord3DFast(offset, x2, y0, z2), ValCoord3DFast(offset, x3, y0, z2), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y1, z2), ValCoord3DFast(offset, x1, y1, z2), ValCoord3DFast(offset, x2, y1, z2), ValCoord3DFast(offset, x3, y1, z2), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y2, z2), ValCoord3DFast(offset, x1, y2, z2), ValCoord3DFast(offset, x2, y2, z2), ValCoord3DFast(offset, x3, y2, z2), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y3, z2), ValCoord3DFast(offset, x1, y3, z2), ValCoord3DFast(offset, x2, y3, z2), ValCoord3DFast(offset, x3, y3, z2), xs),
+			ys),
 		CubicLerp(
-		CubicLerp(ValCoord3DFast(offset, x0, y0, z3), ValCoord3DFast(offset, x1, y0, z3), ValCoord3DFast(offset, x2, y0, z3), ValCoord3DFast(offset, x3, y0, z3), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y1, z3), ValCoord3DFast(offset, x1, y1, z3), ValCoord3DFast(offset, x2, y1, z3), ValCoord3DFast(offset, x3, y1, z3), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y2, z3), ValCoord3DFast(offset, x1, y2, z3), ValCoord3DFast(offset, x2, y2, z3), ValCoord3DFast(offset, x3, y2, z3), xs),
-		CubicLerp(ValCoord3DFast(offset, x0, y3, z3), ValCoord3DFast(offset, x1, y3, z3), ValCoord3DFast(offset, x2, y3, z3), ValCoord3DFast(offset, x3, y3, z3), xs),
-		ys),
+			CubicLerp(ValCoord3DFast(offset, x0, y0, z3), ValCoord3DFast(offset, x1, y0, z3), ValCoord3DFast(offset, x2, y0, z3), ValCoord3DFast(offset, x3, y0, z3), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y1, z3), ValCoord3DFast(offset, x1, y1, z3), ValCoord3DFast(offset, x2, y1, z3), ValCoord3DFast(offset, x3, y1, z3), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y2, z3), ValCoord3DFast(offset, x1, y2, z3), ValCoord3DFast(offset, x2, y2, z3), ValCoord3DFast(offset, x3, y2, z3), xs),
+			CubicLerp(ValCoord3DFast(offset, x0, y3, z3), ValCoord3DFast(offset, x1, y3, z3), ValCoord3DFast(offset, x2, y3, z3), ValCoord3DFast(offset, x3, y3, z3), xs),
+			ys),
 		zs) * CUBIC_3D_BOUNDING;
 }
 
@@ -1575,9 +1575,9 @@ FN_DECIMAL FastNoise::GetCubicFractal(FN_DECIMAL x, FN_DECIMAL y) const
 	{
 	case FBM:
 		return SingleCubicFractalFBM(x, y);
-	case Billow:	 
+	case Billow:
 		return SingleCubicFractalBillow(x, y);
-	case RigidMulti: 
+	case RigidMulti:
 		return SingleCubicFractalRigidMulti(x, y);
 	default:
 		return 0;
@@ -1660,8 +1660,8 @@ FN_DECIMAL FastNoise::SingleCubic(unsigned char offset, FN_DECIMAL x, FN_DECIMAL
 	int x3 = x1 + 2;
 	int y3 = y1 + 2;
 
-	FN_DECIMAL xs = x - (FN_DECIMAL)x1;
-	FN_DECIMAL ys = y - (FN_DECIMAL)y1;
+	FN_DECIMAL xs = x - (FN_DECIMAL) x1;
+	FN_DECIMAL ys = y - (FN_DECIMAL) y1;
 
 	return CubicLerp(
 		CubicLerp(ValCoord2DFast(offset, x0, y0), ValCoord2DFast(offset, x1, y0), ValCoord2DFast(offset, x2, y0), ValCoord2DFast(offset, x3, y0), xs),
@@ -1807,7 +1807,7 @@ FN_DECIMAL FastNoise::SingleCellular2Edge(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL
 	int yr = FastRound(y);
 	int zr = FastRound(z);
 
-	FN_DECIMAL distance[FN_CELLULAR_INDEX_MAX+1] = { 999999,999999,999999,999999 };
+	FN_DECIMAL distance[FN_CELLULAR_INDEX_MAX + 1] = { 999999,999999,999999,999999 };
 
 	switch (m_cellularDistanceFunction)
 	{
@@ -1828,7 +1828,7 @@ FN_DECIMAL FastNoise::SingleCellular2Edge(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL
 
 					for (int i = m_cellularDistanceIndex1; i > 0; i--)
 						distance[i] = fmax(fmin(distance[i], newDistance), distance[i - 1]);
-					distance[0] = fmin(distance[0], newDistance); 
+					distance[0] = fmin(distance[0], newDistance);
 				}
 			}
 		}
@@ -1934,7 +1934,7 @@ FN_DECIMAL FastNoise::SingleCellular(FN_DECIMAL x, FN_DECIMAL y) const
 
 				FN_DECIMAL vecX = xi - x + CELL_2D_X[lutPos] * m_cellularJitter;
 				FN_DECIMAL vecY = yi - y + CELL_2D_Y[lutPos] * m_cellularJitter;
-															
+
 				FN_DECIMAL newDistance = vecX * vecX + vecY * vecY;
 
 				if (newDistance < distance)
@@ -2131,19 +2131,19 @@ void FastNoise::SingleGradientPerturb(unsigned char offset, FN_DECIMAL warpAmp, 
 	{
 	default:
 	case Linear:
-		xs = xf - (FN_DECIMAL)x0;
-		ys = yf - (FN_DECIMAL)y0;
-		zs = zf - (FN_DECIMAL)z0;
+		xs = xf - (FN_DECIMAL) x0;
+		ys = yf - (FN_DECIMAL) y0;
+		zs = zf - (FN_DECIMAL) z0;
 		break;
 	case Hermite:
-		xs = InterpHermiteFunc(xf - (FN_DECIMAL)x0);
-		ys = InterpHermiteFunc(yf - (FN_DECIMAL)y0);
-		zs = InterpHermiteFunc(zf - (FN_DECIMAL)z0);
+		xs = InterpHermiteFunc(xf - (FN_DECIMAL) x0);
+		ys = InterpHermiteFunc(yf - (FN_DECIMAL) y0);
+		zs = InterpHermiteFunc(zf - (FN_DECIMAL) z0);
 		break;
 	case Quintic:
-		xs = InterpQuinticFunc(xf - (FN_DECIMAL)x0);
-		ys = InterpQuinticFunc(yf - (FN_DECIMAL)y0);
-		zs = InterpQuinticFunc(zf - (FN_DECIMAL)z0);
+		xs = InterpQuinticFunc(xf - (FN_DECIMAL) x0);
+		ys = InterpQuinticFunc(yf - (FN_DECIMAL) y0);
+		zs = InterpQuinticFunc(zf - (FN_DECIMAL) z0);
 		break;
 	}
 
@@ -2220,16 +2220,16 @@ void FastNoise::SingleGradientPerturb(unsigned char offset, FN_DECIMAL warpAmp, 
 	{
 	default:
 	case Linear:
-		xs = xf - (FN_DECIMAL)x0;
-		ys = yf - (FN_DECIMAL)y0;
+		xs = xf - (FN_DECIMAL) x0;
+		ys = yf - (FN_DECIMAL) y0;
 		break;
 	case Hermite:
-		xs = InterpHermiteFunc(xf - (FN_DECIMAL)x0);
-		ys = InterpHermiteFunc(yf - (FN_DECIMAL)y0);
+		xs = InterpHermiteFunc(xf - (FN_DECIMAL) x0);
+		ys = InterpHermiteFunc(yf - (FN_DECIMAL) y0);
 		break;
 	case Quintic:
-		xs = InterpQuinticFunc(xf - (FN_DECIMAL)x0);
-		ys = InterpQuinticFunc(yf - (FN_DECIMAL)y0);
+		xs = InterpQuinticFunc(xf - (FN_DECIMAL) x0);
+		ys = InterpQuinticFunc(yf - (FN_DECIMAL) y0);
 		break;
 	}
 

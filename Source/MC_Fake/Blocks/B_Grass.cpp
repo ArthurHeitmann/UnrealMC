@@ -11,7 +11,7 @@ B_Grass::B_Grass()
 	BlockModelType = EBlockModelType::BLOCK;
 	BreakingAction = ABreakPlant;
 	BreakTime = 0.9f;
-	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/grass.grass'"));
+	static ConstructorHelpers::FObjectFinder<UTexture> TextureObj(TEXT("Texture2D'/Game/Materials/Textures/grass_flat.grass_flat'"));
 	Texture = TextureObj.Object;
 }
 

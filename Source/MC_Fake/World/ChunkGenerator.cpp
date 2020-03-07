@@ -3,21 +3,22 @@
 #include "Chunk.h"
 #include "ChunkCube.h"
 #include "Engine/Texture.h"
-#include "FastNoise/FastNoise.h"
+#include "Libs/FastNoise-master/FastNoise.h"
 #include "McWorld.h"
 #include "RunnableThread.h"
 #include "Blocks/BlockManager.h"
 
+float ChunkGenerator::SeaLevel = 45.f;
 bool ChunkGenerator::bEnableStageDirtGrass = true;
-bool ChunkGenerator::bEnableStageCaveCarving = true;
-bool ChunkGenerator::bEnableStageTrees = true;
+bool ChunkGenerator::bEnableStageCaveCarving = false;
+bool ChunkGenerator::bEnableStageTrees = false;
 float ChunkGenerator::BaseTerrainHeight = 50;
 float ChunkGenerator::TerrainHeightMultiplier = 30;
 float ChunkGenerator::TerrainTurbulenceMultiplier = 13;
 int ChunkGenerator::HeightMapOctaves = 6;
 float ChunkGenerator::HeightMapFrequency = 1 / 600.f;
 int ChunkGenerator::TurbulenceOctaves = 2;
-float ChunkGenerator::TurbulenceFrequency = 1 / 40.f;
+float ChunkGenerator::TurbulenceFrequency = 1 / 70.f;
 float ChunkGenerator::SlopeGrass = 5;
 float ChunkGenerator::SlopeDirt = 7;
 int ChunkGenerator::CaveOctaves = 4;
@@ -195,6 +196,8 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 
 				if (Pos.Z + z <= HeightMapValue)
 					BlockData[x][y][z] = BlockManager::GetBlock("Stone");
+				else if (Pos.Z + z <= SeaLevel)
+					BlockData[x][y][z] = BlockManager::GetBlock("Water");
 				else
 					BlockData[x][y][z] = BlockManager::GetStaticBlock("Air");
 			}
@@ -368,24 +371,28 @@ void ChunkGenerator::Wait()
 
 ChunkGenerator::ChunkGenerator()
 {
-	HeightNoise = NewObject<UFastNoise>();
-	HeightNoise->SetNoiseType(ENoiseType::SimplexFractal);
+	HeightNoise = new FastNoise;
+	HeightNoise->SetNoiseType(FastNoise::NoiseType::SimplexFractal);
 	HeightNoise->SetFractalOctaves(HeightMapOctaves);
 	HeightNoise->SetFrequency(HeightMapFrequency);
 
-	TurbulenceNoise = NewObject<UFastNoise>();
-	TurbulenceNoise->SetNoiseType(ENoiseType::SimplexFractal);
+	TurbulenceNoise = new FastNoise;
+	TurbulenceNoise->SetNoiseType(FastNoise::SimplexFractal);
 	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
 	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);
 
-	CaveNoise1 = NewObject<UFastNoise>();
+	CaveNoise1 = new FastNoise;
 	CaveNoise1->SetFractalOctaves(CaveOctaves);
 	CaveNoise1->SetFrequency(CaveFrequency);
-	CaveNoise1->SetNoiseType(ENoiseType::SimplexFractal);
+	CaveNoise1->SetNoiseType(FastNoise::SimplexFractal);
 }
 
 ChunkGenerator::~ChunkGenerator()
 {
 	if (ThisThread)
 		delete ThisThread;
+
+	delete HeightNoise;
+	delete TurbulenceNoise;
+	delete CaveNoise1;
 }

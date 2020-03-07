@@ -169,7 +169,7 @@ uint32 ChunkMeshGeneratorThread::Run()
 
 bool ChunkMeshGenerator::ShouldFaceBePlacedBetween(B_Block* b1, B_Block* b2, EDirection Side)
 {
-	return b2->IsSideOptimizable(Side)
-		&& b2->GetBlockModelType() != BLOCK
-		|| !b2->IsBlockOpaque();
+	return (!b1->IsSideOptimizable(Side) || b2->GetBlockModelType() != BLOCK) && b2->GetBlockModelType() != FLUID
+		||
+		(b1->GetBlockModelType() == FLUID) ^ (b2->GetBlockModelType() == FLUID);
 }

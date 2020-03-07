@@ -47,9 +47,9 @@ bool UI_DebugMenu::Initialize()
 	CreateDebugInput(StageTrees)
 	CreateDebugInput(TerrainHeightMultiplier)
 	CreateDebugInput(TerrainHeight)
-	CreateDebugInput(TurbulenceMult)
 	CreateDebugInput(HeightOctaves)
 	CreateDebugInput(HeightFrequency)
+	CreateDebugInput(TurbulenceMult)
 	CreateDebugInput(TurbulenceOctaves)
 	CreateDebugInput(TurbulenceFrequency)
 	CreateDebugInput(SlopeGrass)
@@ -57,6 +57,7 @@ bool UI_DebugMenu::Initialize()
 	CreateDebugInput(CaveOctaves)
 	CreateDebugInput(CaveFrequency)
 	CreateDebugInput(CaveThreshold)
+	CreateDebugInput(SeaLevel)
 	
 
 	return true;
@@ -184,4 +185,11 @@ void UI_DebugMenu::UpdateCaveThreshold(const FText& Text, ETextCommit::Type Comm
 	FString s = Text.ToString();
 	if (CommitMethod == ETextCommit::Type::OnEnter)
 		ChunkGenerator::CaveThreshold = FCString::Atof(*s);
+}
+
+void UI_DebugMenu::UpdateSeaLevel(const ::FText& Text, ETextCommit::Type CommitMethod)
+{
+	FString s = Text.ToString();
+	if (CommitMethod == ETextCommit::Type::OnEnter)
+		ChunkGenerator::SeaLevel = FCString::Atof(*s);
 }

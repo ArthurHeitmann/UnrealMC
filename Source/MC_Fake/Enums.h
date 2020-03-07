@@ -5,7 +5,7 @@ enum EDirection {
 };
 
 enum EBlockModelType {
-	NONE, BLOCK, WATER, ITEM
+	NONE, BLOCK, FLUID, ITEM
 };
 
 enum EItemActions {

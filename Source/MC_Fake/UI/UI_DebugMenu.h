@@ -53,6 +53,7 @@ class MC_FAKE_API UI_DebugMenu : public UUserWidget
 	DefineDebugInput(CaveOctaves)
 	DefineDebugInput(CaveFrequency)
 	DefineDebugInput(CaveThreshold)
+	DefineDebugInput(SeaLevel)
 
 	bool Initialize() override;
 	UFUNCTION()
@@ -90,6 +91,8 @@ class MC_FAKE_API UI_DebugMenu : public UUserWidget
 	void UpdateCaveFrequency(const FText& Text, ETextCommit::Type CommitMethod);
 	UFUNCTION()
 	void UpdateCaveThreshold(const FText& Text, ETextCommit::Type CommitMethod);
+	UFUNCTION()
+	void UpdateSeaLevel(const FText& Text, ETextCommit::Type CommitMethod);
 public:
 	void SetBackFunction(UObject* FuncUO, void(UObject::*BackFunc)(UWidget*));
 };

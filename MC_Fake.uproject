@@ -17,10 +17,6 @@
 	],
 	"Plugins": [
 		{
-			"Name": "UnrealFastNoisePlugin",
-			"Enabled": true
-		},
-		{
 			"Name": "MeshEditor",
 			"Enabled": true
 		},

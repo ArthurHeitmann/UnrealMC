@@ -28,9 +28,9 @@ private:
 	int NextGenerationStage;
 	int LastGenerationStage;
 
-	class UFastNoise* HeightNoise;
-	UFastNoise* TurbulenceNoise;
-	UFastNoise* CaveNoise1;
+	class FastNoise* HeightNoise;
+	FastNoise* TurbulenceNoise;
+	FastNoise* CaveNoise1;
 	
 	class B_Block* GetBlockAt(int32 X, int32 Y, int32 Z);
 	void SetBlockAt(int32 X, int32 Y, int32 Z, class B_Block* Block);
@@ -50,6 +50,7 @@ private:
 	void Wait();
 
 public:
+	static float SeaLevel;
 	static bool bEnableStageDirtGrass;
 	static bool bEnableStageCaveCarving;
 	static bool bEnableStageTrees;
