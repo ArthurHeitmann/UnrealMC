@@ -107,10 +107,10 @@ void ChunkGenerator::GenerateChunkCubes()
 				Stage_DirtGrass();
 				break;
 			case 2:
-				Stage_CaveCarving();
+				//Stage_CaveCarving();
 				break;
 			case 3:
-				Stage_Trees();
+				//Stage_Trees();
 				break;
 			case 255:
 				World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
@@ -138,9 +138,10 @@ void ChunkGenerator::GenHeightMap()
 		Maps.HeightMap[x].SetNum(16);
 		for (int y = 0; y < 16; ++y)
 		{
-			float xOffset = TurbulenceNoise->GetNoise(Pos2D.X + x + 154, 0) * TerrainTurbulenceMultiplier;
-			float yOffset = TurbulenceNoise->GetNoise(0, Pos2D.Y + y + 1615) * TerrainTurbulenceMultiplier;
-			Maps.HeightMap[x][y] = HeightNoise->GetNoise(Pos2D.X + x + xOffset, Pos2D.Y + y + yOffset) * TerrainHeightMultiplier + BaseTerrainHeight;
+			// float xOffset = TurbulenceNoise->GetNoise(Pos2D.X + x + 154, 0) * TerrainTurbulenceMultiplier;
+			// float yOffset = TurbulenceNoise->GetNoise(0, Pos2D.Y + y + 1615) * TerrainTurbulenceMultiplier;
+			// Maps.HeightMap[x][y] = HeightNoise->GetNoise(Pos2D.X + x + xOffset, Pos2D.Y + y + yOffset) * TerrainHeightMultiplier + BaseTerrainHeight;
+			Maps.HeightMap[x][y] = BaseTerrainHeight;
 		}
 	}
 
@@ -186,13 +187,14 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 
 			for (int z = 0; z < 16; ++z)
 			{
-				int RelX = x + TurbulenceNoise->GetNoise(x + Pos.X, z) * TerrainTurbulenceMultiplier;
-				int RelY = y + TurbulenceNoise->GetNoise(y + Pos.Y, z) * TerrainTurbulenceMultiplier;
-				float HeightMapValue;
-				if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
-					HeightMapValue = Maps.HeightMap[RelX][RelY];
-				else
-					HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * TerrainHeightMultiplier + BaseTerrainHeight;
+				float HeightMapValue = Maps.HeightMap[x][y];
+				// int RelX = x + TurbulenceNoise->GetNoise(x + Pos.X, z) * TerrainTurbulenceMultiplier;
+				// int RelY = y + TurbulenceNoise->GetNoise(y + Pos.Y, z) * TerrainTurbulenceMultiplier;
+				// float HeightMapValue;
+				// if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
+				// 	HeightMapValue = Maps.HeightMap[RelX][RelY];
+				// else
+				// 	HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * TerrainHeightMultiplier + BaseTerrainHeight;
 
 				if (Pos.Z + z <= HeightMapValue)
 					BlockData[x][y][z] = BlockManager::GetBlock("Stone");
