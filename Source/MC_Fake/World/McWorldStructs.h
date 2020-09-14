@@ -4,18 +4,18 @@
 #include "ChunkFormCoords.h"
 
 struct ChunkCubeGenBufferElement {
-	class ChunkCube* Cube;
+	class UChunkCube* Cube;
 	int NextGenStage;
 };
 
 struct ChunkGenBufferElement {
 	int32 X;
 	int32 Y;
-	class Chunk* Chunk;
+	class UChunk* Chunk;
 };
 
 struct BlockSetBufferElement {
-	ChunkFormCoords3D CurrChunkPos;
+	FChunkFormCoords3D CurrChunkPos;
 	uint16 RelX, RelY, RelZ;
 	class B_Block* BlockS;
 	uint8 MinGenStage;
@@ -44,10 +44,10 @@ struct BlockSetBufferElement {
 
 struct ChunkNeighborUpdates {
 	//North, East, South, West, Top, Bottom
-	class ChunkCube* NewNChunk;
-	class ChunkCube* NewEChunk;
-	class ChunkCube* NewSChunk;
-	class ChunkCube* NewWChunk;
-	class ChunkCube* NewTChunk;
-	class ChunkCube* NewBChunk;
+	class UChunkCube* NewNChunk;
+	class UChunkCube* NewEChunk;
+	class UChunkCube* NewSChunk;
+	class UChunkCube* NewWChunk;
+	class UChunkCube* NewTChunk;
+	class UChunkCube* NewBChunk;
 };

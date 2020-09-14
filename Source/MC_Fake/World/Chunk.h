@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Blocks/B_Block.h"
+#include "Chunk.generated.h"
 
 struct ChunkGenMaps {
 	TArray<TArray<float>> HeightMap;
@@ -10,14 +11,18 @@ struct ChunkGenMaps {
 	TArray<TArray<float>> PrecipitationMap;
 	//River & etc. data
 };
-
-class MC_FAKE_API Chunk
+UCLASS()
+class MC_FAKE_API UChunk : public USceneComponent
 {
+GENERATED_BODY()
+	
 protected:
-	class AMcWorld* McWorld;
-	USceneComponent* CubesRoot;
-	TMap<int8, class ChunkCube*> ChunkCubes;
-	ChunkFormCoords2D Pos;
+	bool bHasBeenDestroyed = false;
+	UPROPERTY()
+	class AMcWorld* McWorld = nullptr;
+	UPROPERTY()
+	TMap<int8, class UChunkCube*> ChunkCubes;
+	FChunkFormCoords2D Pos;
 	ChunkGenMaps ChunkDataMaps;
 	bool bHasFinishedGenerating = false;
 	bool bIsGenerating = false;
@@ -25,24 +30,24 @@ protected:
 	void CreateChunkCube(int8 PosZ);
 
 public:
-	USceneComponent* Root;
-
-	Chunk(ChunkFormCoords2D Pos, class AMcWorld* McWorld);
-	~Chunk();
-	ChunkFormCoords2D GetPos();
+	UChunk();
+	virtual void BeginPlay() override;
+	void Init(FChunkFormCoords2D pPos, class AMcWorld* pMcWorld);
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	FChunkFormCoords2D GetPos();
 	void SetHasFinishedGenerating(bool bState);
 	bool GetHasFinishedGenerating();
 	bool GetIsGenerating();
 	void SetIsGenerating(bool bState);
-	class ChunkCube* GetChunkCube(int8 PosZ);
+	class UChunkCube* GetChunkCube(int8 PosZ);
 	/* Loads new ChunkCubes if they now are in range */
 	void UpdateChunkCubesLoading(int8 BaseHeight, int8 RangeDown, int8 RangeUp);
-	TMap<int8, class ChunkCube*>& GetChunkCubes();
+	TMap<int8, class UChunkCube*>& GetChunkCubes();
 	B_Block* GetBlockAt(int x, int y, int z);
 	B_Block*& GetBlockAtAsRef(int x, int y, int z);
 	ChunkGenMaps& GetChunkGenMaps();
+	bool HasBeenDestroyed();
 
-	void Tick(float Delta);
-
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 };

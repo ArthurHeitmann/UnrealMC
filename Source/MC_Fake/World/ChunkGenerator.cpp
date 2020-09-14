@@ -14,9 +14,9 @@ bool ChunkGenerator::bEnableStageCaveCarving = false;
 bool ChunkGenerator::bEnableStageTrees = false;
 float ChunkGenerator::BaseTerrainHeight = 50;
 float ChunkGenerator::TerrainHeightMultiplier = 30;
-float ChunkGenerator::TerrainTurbulenceMultiplier = 13;
-int ChunkGenerator::HeightMapOctaves = 6;
-float ChunkGenerator::HeightMapFrequency = 1 / 600.f;
+float ChunkGenerator::TerrainTurbulenceMultiplier = 0;
+int ChunkGenerator::HeightMapOctaves = 2;
+float ChunkGenerator::HeightMapFrequency = 1 / 70.f;
 int ChunkGenerator::TurbulenceOctaves = 2;
 float ChunkGenerator::TurbulenceFrequency = 1 / 70.f;
 float ChunkGenerator::SlopeGrass = 5;
@@ -38,6 +38,7 @@ uint32 ChunkGenerator::Run()
 
 		if (bGenerateChunk)
 		{
+			// UE_LOG(LogTemp, Warning, TEXT("---------Gening chunk data"));
 			GenerateChunkData();
 			bGenerateChunk = false;
 			CurrentChunk = nullptr;
@@ -45,6 +46,7 @@ uint32 ChunkGenerator::Run()
 		}
 		if (bGenerateChunkCube)
 		{
+			// UE_LOG(LogTemp, Warning, TEXT("---------Gening chunk cubes"));
 			GenerateChunkCubes();
 			bGenerateChunkCube = false;
 		}
@@ -59,7 +61,7 @@ B_Block* ChunkGenerator::GetBlockAt(int32 X, int32 Y, int32 Z)
 {
 	int8 PosZ = static_cast<int8>(floorf(Z / 16));
 	
-	ChunkCube* c = CurrentChunk->GetChunkCube(PosZ);
+	UChunkCube* c = CurrentChunk->GetChunkCube(PosZ);
 	if (c && c->GetBlockData().Num() == 16)
 		return c->GetBlockAt(X, Y, Z % 16);
 
@@ -70,7 +72,7 @@ void ChunkGenerator::SetBlockAt(int32 X, int32 Y, int32 Z, B_Block* Block)
 {
 	int8 PosZ = static_cast<int8>(floorf(Z / 16));
 
-	if (ChunkCube* c = CurrentChunk->GetChunkCube(PosZ))
+	if (UChunkCube* c = CurrentChunk->GetChunkCube(PosZ))
 		c->GetBlockData()[X][Y][Z % 16] = Block;
 
 }
@@ -107,10 +109,10 @@ void ChunkGenerator::GenerateChunkCubes()
 				Stage_DirtGrass();
 				break;
 			case 2:
-				//Stage_CaveCarving();
+				Stage_CaveCarving();
 				break;
 			case 3:
-				//Stage_Trees();
+				Stage_Trees();
 				break;
 			case 255:
 				World->FinalizeCubeGen(CurrentCubeElement.Cube, CurrentCubeElement.Cube->GetPos());
@@ -138,16 +140,16 @@ void ChunkGenerator::GenHeightMap()
 		Maps.HeightMap[x].SetNum(16);
 		for (int y = 0; y < 16; ++y)
 		{
-			// float xOffset = TurbulenceNoise->GetNoise(Pos2D.X + x + 154, 0) * TerrainTurbulenceMultiplier;
-			// float yOffset = TurbulenceNoise->GetNoise(0, Pos2D.Y + y + 1615) * TerrainTurbulenceMultiplier;
-			// Maps.HeightMap[x][y] = HeightNoise->GetNoise(Pos2D.X + x + xOffset, Pos2D.Y + y + yOffset) * TerrainHeightMultiplier + BaseTerrainHeight;
-			Maps.HeightMap[x][y] = BaseTerrainHeight;
+			float xOffset = TurbulenceNoise->GetNoise(Pos2D.X + x + 154, 0) * TerrainTurbulenceMultiplier;
+			float yOffset = TurbulenceNoise->GetNoise(0, Pos2D.Y + y + 1615) * TerrainTurbulenceMultiplier;
+			Maps.HeightMap[x][y] = HeightNoise->GetNoise(Pos2D.X + x + xOffset, Pos2D.Y + y + yOffset) * TerrainHeightMultiplier + BaseTerrainHeight;
+			//Maps.HeightMap[x][y] = BaseTerrainHeight;
 		}
 	}
 
 }
 
-void ChunkGenerator::SetChunkData(Chunk* WorkingChunk)
+void ChunkGenerator::SetChunkData(UChunk* WorkingChunk)
 {
 	CurrentChunk = WorkingChunk;
 	bIsBusy = true;
@@ -187,19 +189,25 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 
 			for (int z = 0; z < 16; ++z)
 			{
-				float HeightMapValue = Maps.HeightMap[x][y];
-				// int RelX = x + TurbulenceNoise->GetNoise(x + Pos.X, z) * TerrainTurbulenceMultiplier;
-				// int RelY = y + TurbulenceNoise->GetNoise(y + Pos.Y, z) * TerrainTurbulenceMultiplier;
-				// float HeightMapValue;
-				// if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
-				// 	HeightMapValue = Maps.HeightMap[RelX][RelY];
-				// else
-				// 	HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * TerrainHeightMultiplier + BaseTerrainHeight;
+				//float HeightMapValue = Maps.HeightMap[x][y];
+				 int RelX = x + TurbulenceNoise->GetNoise(x + Pos.X, z) * TerrainTurbulenceMultiplier;
+				 int RelY = y + TurbulenceNoise->GetNoise(y + Pos.Y, z) * TerrainTurbulenceMultiplier;
+				RelX = x;
+				RelY = y;
+				if (z + Pos.Z > 46)
+				{
+					RelX += 1.18f * (z+Pos.Z) - 54.12f;
+				}
+				 float HeightMapValue;
+				 if (RelX >= 0 && RelX < 16 && RelY >= 0 && RelY < 16)
+				 	HeightMapValue = Maps.HeightMap[RelX][RelY];
+				 else
+				 	HeightMapValue = HeightNoise->GetNoise(Pos.X + RelX, Pos.Y + RelY) * TerrainHeightMultiplier + BaseTerrainHeight;
 
 				if (Pos.Z + z <= HeightMapValue)
 					BlockData[x][y][z] = BlockManager::GetBlock("Stone");
-				else if (Pos.Z + z <= SeaLevel)
-					BlockData[x][y][z] = BlockManager::GetBlock("Water");
+				// else if (Pos.Z + z <= SeaLevel)
+				// 	BlockData[x][y][z] = BlockManager::GetBlock("Water");
 				else
 					BlockData[x][y][z] = BlockManager::GetStaticBlock("Air");
 			}

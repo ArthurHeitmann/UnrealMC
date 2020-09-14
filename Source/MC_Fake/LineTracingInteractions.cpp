@@ -52,7 +52,7 @@ void ULineTracingInteractions::LeftClickStart()
 	{
 		if (Cast<URuntimeMeshComponent>(Result.Component))
 		{
-			ChunkFormCoords3D TmpChunkPos;
+			FChunkFormCoords3D TmpChunkPos;
 			FIntVector TmpRelPos;
 			CalcChunkAndRelBlockCoords(Result, TmpChunkPos, TmpRelPos);
 			if (BreakingIndicator)
@@ -192,14 +192,14 @@ void ULineTracingInteractions::CancelBreaking()
 	InitialBlock = nullptr;
 }
 
-void ULineTracingInteractions::CalcChunkAndRelBlockCoords(const FHitResult& Hit, ChunkFormCoords3D& chunkPosOut,
+void ULineTracingInteractions::CalcChunkAndRelBlockCoords(const FHitResult& Hit, FChunkFormCoords3D& chunkPosOut,
 	FIntVector& RelOut)
 {
 	FVector HitLoc = Hit.ImpactPoint / 100.f;
 	HitLoc.X = HitHelper(Hit.Normal.X, HitLoc.X);
 	HitLoc.Y = HitHelper(Hit.Normal.Y, HitLoc.Y);
 	HitLoc.Z = HitHelper(Hit.Normal.Z, HitLoc.Z);
-	chunkPosOut = ChunkFormCoords3D::FromNormalCoords(HitLoc.X, HitLoc.Y, HitLoc.Z);
+	chunkPosOut = FChunkFormCoords3D::FromNormalCoords(HitLoc.X, HitLoc.Y, HitLoc.Z);
 	RelOut.X = McStaticFunctions::SmartMod(HitLoc.X, 16);
 	RelOut.Y = McStaticFunctions::SmartMod(HitLoc.Y, 16);
 	RelOut.Z = McStaticFunctions::SmartMod(HitLoc.Z, 16);

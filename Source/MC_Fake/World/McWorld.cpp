@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "Chunk.h"
 #include "ChunkCube.h"
+#include "Matrix3x4.h"
 #include "Core/Public/HAL/RunnableThread.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Misc/FileIO.h"
@@ -22,7 +23,8 @@ AMcWorld::AMcWorld()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ChunksRoot = CreateDefaultSubobject <USceneComponent>(TEXT("Chunks Root"));
-
+	SetRootComponent(ChunksRoot);
+	
 	static bool bHaveClonablesBeenInitialized = false;
 	if (!bHaveClonablesBeenInitialized)
 	{
@@ -57,22 +59,6 @@ void AMcWorld::BeginPlay()
 void AMcWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	ProcMeshGenTime = 0;
-	ThreadInitTime = 0;
-	
-	int32 t1 = FDateTime::Now().GetMillisecond();
-	for (auto& chunk : LoadedChunks)
-		chunk.Value->Tick(DeltaTime);
-	int32 t2 = FDateTime::Now().GetMillisecond();
-	int32 tDiff = t2 - t1;
-	if (tDiff > 3)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Tick: %d"), currTick);
-		UE_LOG(LogTemp, Warning, TEXT("Chunk tick time: %d"), tDiff);
-		UE_LOG(LogTemp, Warning, TEXT("ProcMesh time: %d"), ProcMeshGenTime);
-		UE_LOG(LogTemp, Warning, TEXT("ThreadInit time: %d"), ThreadInitTime);
-	}
 	
 	DequeueChunkCubeGenTasks();
 	DequeueChunkGenTasks();
@@ -83,7 +69,9 @@ void AMcWorld::Tick(float DeltaTime)
 
 void AMcWorld::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	bHasBeenDestroyed = true;
 	Super::EndPlay(EndPlayReason);
+
 	UE_LOG(LogTemp, Warning, TEXT("Destroying McWorld!"));
 	for (int i = 0; i < GeneratorThreads.Num(); ++i)
 	{
@@ -103,7 +91,7 @@ void AMcWorld::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 	MeshGeneratorThreads.Empty();
 
-	TArray<Chunk*> AllChunks;
+	TArray<UChunk*> AllChunks;
 	LoadedChunks.GenerateValueArray(AllChunks);
 	for (auto chunk : AllChunks)
 		delete chunk;
@@ -160,7 +148,7 @@ void AMcWorld::DequeueMeshGenTasks()
 		{
 			if (!thread->bIsBusy && !MeshGenBuffer.IsEmpty()) {
 				foundReadyThread = true;
-				ChunkCube* newCube;
+				UChunkCube* newCube;
 				MeshGenBuffer.Dequeue(newCube);
 				thread->SetChunkCube(newCube);
 				--NumMeshGenBuffer;
@@ -171,7 +159,7 @@ void AMcWorld::DequeueMeshGenTasks()
 	MeshGenBufferMutex.Unlock();
 }
 
-void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube)
+void AMcWorld::CompleteBlockSetTasks(UChunkCube * ChunkCube)
 {
 	if (!BlockSetTasks.Contains(ChunkCube->GetPos()))
 		return;
@@ -194,9 +182,9 @@ void AMcWorld::CompleteBlockSetTasks(ChunkCube * ChunkCube)
 
 }
 
-void AMcWorld::FinalizeChunkGen(Chunk* Chunk)
+void AMcWorld::FinalizeChunkGen(UChunk* Chunk)
 {
-	ChunkFormCoords2D p = Chunk->GetPos();
+	FChunkFormCoords2D p = Chunk->GetPos();
 
 	Chunk->SetHasFinishedGenerating(true);
 	if (ChunkCubeGenTasks.Contains(p))
@@ -208,7 +196,7 @@ void AMcWorld::FinalizeChunkGen(Chunk* Chunk)
 	}
 }
 
-void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D CurrChunkPos)
+void AMcWorld::FinalizeCubeGen(UChunkCube* FinishedChunkCube, FChunkFormCoords3D CurrChunkPos)
 {
 	NeighborUpdatesMutex.Lock();
 
@@ -217,7 +205,7 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	FinishedChunkCube->SetNextGenerationStage(255);
 
 	
-	ChunkFormCoords3D key = CurrChunkPos;
+	FChunkFormCoords3D key = CurrChunkPos;
 	key.X--;
 	if (LoadedChunkCubes.Contains(key)) 
 	{
@@ -293,35 +281,38 @@ void AMcWorld::FinalizeCubeGen(ChunkCube* FinishedChunkCube, ChunkFormCoords3D C
 	NeighborUpdatesMutex.Unlock();
 }
 
-Chunk* AMcWorld::GetChunkAt(ChunkFormCoords2D Location)
+UChunk* AMcWorld::GetChunkAt(FChunkFormCoords2D Location)
 {
-	Chunk** FoundChunk = LoadedChunks.Find(Location);
+	UChunk** FoundChunk = LoadedChunks.Find(Location);
 	return FoundChunk ? *FoundChunk : nullptr;
 }
 
-Chunk* AMcWorld::CreateChunk(ChunkFormCoords2D Location)
+UChunk* AMcWorld::CreateChunk(FChunkFormCoords2D Location)
 {
-	if (Chunk* TmpChunk = GetChunkAt(Location))
+	if (UChunk* TmpChunk = GetChunkAt(Location))
 		return TmpChunk;
-	Chunk* NewChunk = new Chunk(Location, this);
+	// UChunk* NewChunk = new UChunk(Location, this);
+	UChunk* NewChunk = NewObject<UChunk>(this);
+	NewChunk->RegisterComponent();
+	NewChunk->Init(Location, this);
+	NewChunk->AttachToComponent(ChunksRoot, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	ChunkGenBuffer.Enqueue({ Location.X, Location.Y, NewChunk }); 
 	
 	LoadedChunks.Add(Location, NewChunk);
 
-	
 	return NewChunk;
 }
 
-ChunkCube* AMcWorld::GetChunkCubeAt(const ChunkFormCoords3D& Location)
+UChunkCube* AMcWorld::GetChunkCubeAt(const FChunkFormCoords3D& Location)
 {
-	ChunkCube** FoundChunkC = LoadedChunkCubes.Find(Location);
+	UChunkCube** FoundChunkC = LoadedChunkCubes.Find(Location);
 	return FoundChunkC ? *FoundChunkC : nullptr;
 }
 
-void AMcWorld::AddChunkGenTask(ChunkCube* Cube)
+void AMcWorld::AddChunkGenTask(UChunkCube* Cube)
 {
 
-	Chunk** c = LoadedChunks.Find(Cube->GetPos().To2D());
+	UChunk** c = LoadedChunks.Find(Cube->GetPos().To2D());
 	if (c && (*c)->GetHasFinishedGenerating())
 	{
 		ChunkCubeGenBuffer.Enqueue({ { Cube, 0 } });
@@ -329,7 +320,7 @@ void AMcWorld::AddChunkGenTask(ChunkCube* Cube)
 	}
 	else
 	{
-		ChunkFormCoords2D key2D = Cube->GetPos().To2D();
+		FChunkFormCoords2D key2D = Cube->GetPos().To2D();
 
 		if (!ChunkCubeGenTasks.Contains(key2D))
 			ChunkCubeGenTasks.Add(key2D, TArray<ChunkCubeGenBufferElement>());
@@ -338,7 +329,7 @@ void AMcWorld::AddChunkGenTask(ChunkCube* Cube)
 	}
 }
 
-void AMcWorld::AddMeshGenTask(ChunkCube* Cube)
+void AMcWorld::AddMeshGenTask(UChunkCube* Cube)
 {
 	MeshGenBufferMutex.Lock();
 	MeshGenBuffer.Enqueue(Cube);
@@ -346,23 +337,27 @@ void AMcWorld::AddMeshGenTask(ChunkCube* Cube)
 	++NumMeshGenBuffer;
 }
 
-void AMcWorld::AddLoadedChunkCube(ChunkCube* Cube, ChunkFormCoords3D CurrChunkPos)
+void AMcWorld::AddLoadedChunkCube(UChunkCube* Cube, FChunkFormCoords3D CurrChunkPos)
 {
+	// UE_LOG(LogTemp, Warning, TEXT("Adding CC at %s"), *CurrChunkPos.toString());
 	LoadedChunkCubes.Add(CurrChunkPos, Cube);
 }
 
-void AMcWorld::RemoveLoadedChunkCube(ChunkFormCoords3D CurrChunkPos)
+void AMcWorld::RemoveLoadedChunkCube(FChunkFormCoords3D CurrChunkPos)
 {
+	if (bHasBeenDestroyed)		// ChunkCube::EndPlay can get called multiple times
+		return;
+	// UE_LOG(LogTemp, Warning, TEXT("Removing CC at %s"), *CurrChunkPos.toString());	
 	LoadedChunkCubes.FindAndRemoveChecked(CurrChunkPos);
 	ChunkCubeGenTasks.Remove(CurrChunkPos.To2D());
 }
 
-void AMcWorld::AddRemovedChunk(Chunk* chunk)
+void AMcWorld::AddRemovedChunk(UChunk* chunk)
 {
 	RemovedChunksInGenBuffer.Add(chunk);
 }
 
-void AMcWorld::RemoveLoadedChunk(ChunkFormCoords2D Pos)
+void AMcWorld::RemoveLoadedChunk(FChunkFormCoords2D Pos)
 {
 	LoadedChunks.Remove(Pos);
 }

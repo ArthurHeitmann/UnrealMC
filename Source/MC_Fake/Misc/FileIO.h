@@ -34,8 +34,8 @@ public:
 	//TODO convert to int32
 
 	static ChunkData LoadChunk(const FString& WorldName, int PosX, int PosY);
-	static void SaveChunk(class Chunk*, const FString& Worldname);
-	static TArray<uint8> ChunkToBytes(class Chunk* Chunk);
+	static void SaveChunk(class UChunk*, const FString& Worldname);
+	static TArray<uint8> ChunkToBytes(class UChunk* Chunk);
 	static bool DoesChunkExist(const FString& WorldName, int PosX, int PosY);
 
 };

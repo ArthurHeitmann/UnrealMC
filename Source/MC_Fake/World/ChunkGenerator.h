@@ -19,11 +19,11 @@ class MC_FAKE_API ChunkGenerator : public FRunnable
 private:
 	bool bGenerateChunk = false;
 	bool bGenerateChunkCube = false;
-	ChunkFormCoords3D Pos;
-	ChunkFormCoords2D Pos2D;
+	FChunkFormCoords3D Pos;
+	FChunkFormCoords2D Pos2D;
 	TArray<ChunkCubeGenBufferElement> CubeGenerationList;
 	ChunkCubeGenBufferElement CurrentCubeElement;
-	class Chunk* CurrentChunk;
+	class UChunk* CurrentChunk;
 	class AMcWorld* World;
 	int NextGenerationStage;
 	int LastGenerationStage;
@@ -74,7 +74,7 @@ public:
 	~ChunkGenerator();
 	ChunkGenerator();
 	virtual uint32 Run() override;
-	void SetChunkData(class Chunk* WorkingChunk);
+	void SetChunkData(class UChunk* WorkingChunk);
 	void SetCubesData(TArray<ChunkCubeGenBufferElement>& Cubes);
 	void SetWorld(class AMcWorld* NewWorld);
 

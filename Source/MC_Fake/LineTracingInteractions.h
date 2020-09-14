@@ -18,12 +18,12 @@ class MC_FAKE_API ULineTracingInteractions : public UActorComponent
 private:	
 	UPROPERTY(EditAnywhere)
 	float HandReachDistance;
-	ChunkFormCoords3D ChunkPos;
+	FChunkFormCoords3D ChunkPos;
 	FIntVector RelPos;
 	class B_Block* HittingBlock;
 	class B_Block** InitialBlock;
 	class ABlockBreaking* BreakingIndicator;
-	class ChunkCube* HittingCCube;
+	class UChunkCube* HittingCCube;
 	FVector HittingBlockCoordinates;
 	FIntVector HittingCoordinates;
 	class I_Item* LastUsedItem;
@@ -38,7 +38,7 @@ private:
 	void ContinueBreaking();
 	void CancelBreaking();
 
-	void CalcChunkAndRelBlockCoords(const FHitResult& Hit, ChunkFormCoords3D& chunkPosOut, FIntVector& RelOut);
+	void CalcChunkAndRelBlockCoords(const FHitResult& Hit, FChunkFormCoords3D& chunkPosOut, FIntVector& RelOut);
 	FORCEINLINE float HitHelper(float NormalAxisVal, float Val);
 
 protected:

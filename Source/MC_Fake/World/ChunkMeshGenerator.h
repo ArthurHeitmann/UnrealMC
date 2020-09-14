@@ -10,12 +10,12 @@ class ChunkMeshGenerator
 protected:
 	static bool ShouldFaceBePlacedBetween(class B_Block* b1, B_Block* b2, EDirection Side);
 public:
-	static void GenerateChunkMesh(class ChunkCube* C);
+	static void GenerateChunkMesh(class UChunkCube* C);
 };
 
 class ChunkMeshGeneratorThread : public FRunnable
 {
-	ChunkCube* Cube = nullptr;
+	UChunkCube* Cube = nullptr;
 	bool bNewTask = false;
 	class AMcWorld* World;
 public:
@@ -24,7 +24,7 @@ public:
 	bool bIsBusy = false;
 
 	ChunkMeshGeneratorThread();
-	void SetChunkCube(class ChunkCube* C);
+	void SetChunkCube(class UChunkCube* C);
 	void SetWorld(AMcWorld* W);
 	virtual uint32 Run() override;
 };

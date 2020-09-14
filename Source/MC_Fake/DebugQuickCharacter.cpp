@@ -46,12 +46,12 @@ void ADebugQuickCharacter::MoveRight(float v)
 
 void ADebugQuickCharacter::LookUp(float v)
 {
-	AddControllerPitchInput(v);
+	AddControllerPitchInput(v * .75f);
 }
 
 void ADebugQuickCharacter::Turn(float v)
 {
-	AddControllerYawInput(v);
+	AddControllerYawInput(v * .75f);
 }
 
 void ADebugQuickCharacter::LeftClick()

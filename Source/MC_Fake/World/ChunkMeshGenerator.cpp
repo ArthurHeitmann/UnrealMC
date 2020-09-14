@@ -1,8 +1,11 @@
 #include "ChunkMeshGenerator.h"
 #include "ChunkCube.h"
 
-void ChunkMeshGenerator::GenerateChunkMesh(ChunkCube* C)
+void ChunkMeshGenerator::GenerateChunkMesh(UChunkCube* C)
 {
+	if (C->HasBeenDestroyed())
+		return;
+	
 	int32 t11 = FDateTime::Now().GetMillisecond();
 	C->MeshLock.Lock();
 	int32 t1D = FDateTime::Now().GetMillisecond() - t11;
@@ -134,7 +137,7 @@ ChunkMeshGeneratorThread::ChunkMeshGeneratorThread()
 	thisThread = FRunnableThread::Create(this, TEXT("Chunk Mesh Gen Thread"));
 }
 
-void ChunkMeshGeneratorThread::SetChunkCube(ChunkCube* C)
+void ChunkMeshGeneratorThread::SetChunkCube(UChunkCube* C)
 {
 	Cube = C;
 	bNewTask = true;
