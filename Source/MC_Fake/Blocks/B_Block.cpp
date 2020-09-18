@@ -24,6 +24,7 @@ B_Block::B_Block()
 	}
 	bCustomItemDrops = false;
 	bCustomCollisionMesh = false;
+	bHasCollision = true;
 
 	Texture = nullptr;
 	TextureBMP = nullptr;
@@ -76,6 +77,11 @@ bool B_Block::IsBlockOpaque()
 bool B_Block::UsesCustomModel()
 {
 	return false;
+}
+
+bool B_Block::HasCollision()
+{
+	return bHasCollision;
 }
 
 FName B_Block::GetName()

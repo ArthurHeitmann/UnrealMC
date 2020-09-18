@@ -6,12 +6,12 @@ public class MC_Fake : ModuleRules
 	{
         bUseRTTI = true;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new string[] { "Core",
+        PublicDependencyModuleNames.AddRange(new string[] { 
+            "Core",
             "CoreUObject",
             "Engine",
             "InputCore",
             "EngineSettings",
-            //"UnrealFastNoisePlugin",
             "UMG"
         });
 

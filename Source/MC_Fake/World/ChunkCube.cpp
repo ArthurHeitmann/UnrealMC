@@ -26,12 +26,12 @@ void UChunkCube::Init(FChunkFormCoords3D pPos, AMcWorld* pMcWorld, UChunk* pPare
 	CustomCollisionMesh = NewObject<URuntimeMeshComponent>(this);
 	CustomCollisionMesh->SetupAttachment(this);
 	CustomCollisionMesh->RegisterComponent();
-	BoundingBox = NewObject<UBoxComponent>(this);
-	BoundingBox->SetupAttachment(this);
-	BoundingBox->RegisterComponent();
-	BoundingBox->SetBoxExtent({ 800.f, 800.f, 800.f });
-	BoundingBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
-	BoundingBox->bHiddenInGame = true;
+	// BoundingBox = NewObject<UBoxComponent>(this);
+	// BoundingBox->SetupAttachment(this);
+	// BoundingBox->RegisterComponent();
+	// BoundingBox->SetBoxExtent({ 800.f, 800.f, 800.f });
+	// BoundingBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
+	// BoundingBox->bHiddenInGame = true;
 }
 
 void UChunkCube::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -110,10 +110,18 @@ void UChunkCube::UpdateMesh()
 			Normals[key].Num(),
 			UVs[key].Num());*/
 		int32 t41 = FDateTime::Now().GetMillisecond();
-		ChunkMesh->CreateMeshSection(key, i.Value(), Triangles[key], Normals[key], UVs[key], TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
+		ChunkMesh->CreateMeshSection(
+			key,
+			i.Value(),
+			Triangles[key],
+			Normals[key],
+			UVs[key],
+			TArray<FColor>(),
+			TArray<FRuntimeMeshTangent>(),
+			Blocks[key]->HasCollision());
 		int32 t42 = FDateTime::Now().GetMillisecond();
 		ProcMeshGenTime += t42 - t41;
-		ChunkMesh->SetMaterial(key, Materials[key]->GetMaterial(ChunkMesh));
+		ChunkMesh->SetMaterial(key, Blocks[key]->GetMaterial(ChunkMesh));
 		numFace += Vertices[key].Num() / 4;
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("ms/face: %f\n"), ((float) t12 - t11) / numFace);

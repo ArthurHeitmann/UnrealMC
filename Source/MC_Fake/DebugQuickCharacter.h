@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+
 #include "GameFramework/Character.h"
 #include "Items/ItemStack.h"
+
 #include "DebugQuickCharacter.generated.h"
 
 UCLASS()
@@ -13,6 +16,8 @@ class MC_FAKE_API ADebugQuickCharacter : public ACharacter
 	GENERATED_BODY()
 
 private:
+	UPROPERTY(EditDefaultsOnly)
+	class USpringArmComponent* CameraArm;
 	UPROPERTY(EditDefaultsOnly)
 	class UCameraComponent* Camera;
 	UPROPERTY(EditAnywhere)

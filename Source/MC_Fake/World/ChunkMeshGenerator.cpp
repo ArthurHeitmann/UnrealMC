@@ -19,18 +19,18 @@ void ChunkMeshGenerator::GenerateChunkMesh(UChunkCube* C)
 	
 	
 	auto& BlockData = C->GetBlockData();
+	auto& Blocks = C->Blocks;
 	auto& Vertices = C->Vertices;
 	auto& Triangles = C->Triangles;
 	auto& UVs = C->UVs;
 	auto& Normals = C->Normals;
-	auto& Materials = C->Materials;
 	auto& CubeNeighbors = C->GetChunkCubeNeighbors();
 
 	Vertices.Empty();
 	Triangles.Empty();
 	UVs.Empty();
 	Normals.Empty();
-	Materials.Empty();
+	Blocks.Empty();
 	
 	
 	for (int x = 0; x < 16; ++x) {
@@ -42,9 +42,9 @@ void ChunkMeshGenerator::GenerateChunkMesh(UChunkCube* C)
 				{
 					uint16 BlockID = BlockData[x][y][z]->GetBlockID();
 					//If necessary create keys for new block type in all maps
-					if (!Materials.Contains(BlockID))
+					if (!Blocks.Contains(BlockID))
 					{
-						Materials.Add(BlockID, BlockData[x][y][z]);
+						Blocks.Add(BlockID, BlockData[x][y][z]);
 						Vertices.Add(BlockID);
 						UVs.Add(BlockID);
 						Triangles.Add(BlockID);

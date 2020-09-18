@@ -56,7 +56,7 @@ public:
 	TMap<uint16, TArray<FVector2D>> UVs;
 	TMap<uint16, TArray<int32>> Triangles;
 	TMap<uint16, TArray<FVector>> Normals;
-	TMap<uint16, B_Block*> Materials;
+	TMap<uint16, B_Block*> Blocks;
 	TMap<uint16, TArray<FVector>> VerticesCustomCollision;
 	TMap<uint16, TArray<int32>> TrianglesCustomCollision;
 	FCriticalSection MeshLock;

@@ -206,8 +206,8 @@ void ChunkGenerator::Stage_BaseStoneTerrain()
 
 				if (Pos.Z + z <= HeightMapValue)
 					BlockData[x][y][z] = BlockManager::GetBlock("Stone");
-				// else if (Pos.Z + z <= SeaLevel)
-				// 	BlockData[x][y][z] = BlockManager::GetBlock("Water");
+				else if (Pos.Z + z <= SeaLevel)
+					BlockData[x][y][z] = BlockManager::GetBlock("Water");
 				else
 					BlockData[x][y][z] = BlockManager::GetStaticBlock("Air");
 			}

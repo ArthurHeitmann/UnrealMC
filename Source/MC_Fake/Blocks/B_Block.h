@@ -48,6 +48,7 @@ protected:
 	bool bCustomItemDrops;
 	/** Whether this block has a custom Mesh for handling collision (with the player and the Line Traces) */
 	bool bCustomCollisionMesh;
+	bool bHasCollision;
 
 	/**
 	 *Drops an Item where the Block has been broken
@@ -76,6 +77,7 @@ public:
 	virtual bool IsBlockOpaque();
 	/** If True no Block sides will be optimized. All Vertices, Triangles, etc. will be retrieved in one call. */
 	virtual bool UsesCustomModel();
+	virtual bool HasCollision();
 	virtual FName GetName();
 	virtual uint16 GetBlockID();
 	virtual EBlockModelType GetBlockModelType();

@@ -12,17 +12,19 @@
 #include "Player/Inventory/ItemSystemComponent.h"
 #include "UI/UI_PauseMenu.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/SpringArmComponent.h"
 
 ADebugQuickCharacter::ADebugQuickCharacter()
 {
-	I_Pickaxe_Stone();
-
 	PrimaryActorTick.bCanEverTick = true;
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 
+	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Arm"));
+	CameraArm->SetupAttachment(GetRootComponent());
+	CameraArm->AddLocalOffset({-25, 0, 55});
+	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(GetRootComponent());
-	Camera->AddLocalOffset({-25, 0, 55});
+	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = true;
 	WorldLoader = CreateDefaultSubobject<UWorldLoadingComponent>(TEXT("World Loader"));
 	WorldLoader->SetupAttachment(GetRootComponent());
