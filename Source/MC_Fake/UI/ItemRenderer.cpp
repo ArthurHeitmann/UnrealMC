@@ -10,11 +10,11 @@ AItemRenderer::AItemRenderer()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	USceneComponent* Root = CreateDefaultSubobject<USceneCaptureComponent>(TEXT("Root"));
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Scene Capture"));
 	ItemMesh = CreateDefaultSubobject<UItemMeshComponent>(TEXT("Item Mesh"));
-	UWorld* World = GetWorld();
+	UWorld* World = AActor::GetWorld();
 	if (World)
 	{
 		RenderTarget = UKismetRenderingLibrary::CreateRenderTarget2D(World, 150, 150);
@@ -65,7 +65,7 @@ void AItemRenderer::BeginPlay()
 	ItemMesh->SetItemMeshOffset(Offset);
 	ItemMesh->SetCustomMeshOffset(Offset);
 
-	AddActorWorldOffset(TotalOffset); 
+	AddActorWorldOffset(TotalOffset);
 }
 
 void AItemRenderer::EndPlay(EEndPlayReason::Type Reason)

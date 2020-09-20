@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "I_Item.h"
+#include "RuntimeMeshProviderStatic.h"
 #include "Components/SphereComponent.h"
 #include "Components/TimelineComponent.h"
 
@@ -16,12 +17,14 @@ AItemDrop::AItemDrop()
 	InteractionZone = CreateDefaultSubobject<USphereComponent>(TEXT("ItemDrop Interaction Zone"));
 	InteractionZone->SetSphereRadius(0);
 	Mesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("Item Drop Mesh"));
+	MeshProvider = NewObject<URuntimeMeshProviderStatic>(this, TEXT("Mesh Provider"));
 	SM = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeFinder(TEXT("StaticMesh'/Game/Meshes/Misc/cube.cube'"));
 	SM->SetStaticMesh(CubeFinder.Object);
 	SetRootComponent(SM);
 	Mesh->SetupAttachment(GetRootComponent());
 	Mesh->AddLocalOffset({0, 0, 15});
+	Mesh->Initialize(MeshProvider);
 	InteractionZone->SetCollisionProfileName(TEXT("NoCollision"));
 	SM->SetCollisionProfileName(TEXT("NoCollision"));
 	SM->SetWorldScale3D({.25, .25, .25});
@@ -119,8 +122,21 @@ void AItemDrop::Tick(float DeltaTime)
 
 void AItemDrop::SetMesh(const TArray<FVector>& Verts, const TArray<int32>& Tris, const TArray<FVector2D>& UVs, const TArray<FVector>& Normals, UMaterialInstanceDynamic* Material)
 {
-	Mesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
-	Mesh->SetMaterial(0, Material);
+	MeshProvider->SetupMaterialSlot(0, FName(TEXT("Item Drop Material Slot")), Material);
+	MeshProvider->CreateSectionFromComponents(
+		0,
+		0, 
+		0,
+		Verts,
+		Tris,
+		Normals,
+		UVs,
+		TArray<FColor>(),
+		TArray<FRuntimeMeshTangent>(),
+		ERuntimeMeshUpdateFrequency::Infrequent,
+		false);
+	// Mesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
+	// Mesh->SetMaterial(0, Material);
 }
 
 void AItemDrop::SetItemStack(FItemStack NewItemStack)

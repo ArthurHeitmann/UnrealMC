@@ -5,6 +5,7 @@
 #include "ItemStack.h"
 #include "ItemDrop.generated.h"
 
+class URuntimeMeshProviderStatic;
 UCLASS()
 class MC_FAKE_API AItemDrop : public AActor
 {
@@ -15,6 +16,8 @@ protected:
 	USceneComponent* Root;
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* InteractionZone;
+	UPROPERTY()
+	URuntimeMeshProviderStatic* MeshProvider;
 	float TimeElapsed;
 	FItemStack ItemStack;
 	bool InitComplete = false;

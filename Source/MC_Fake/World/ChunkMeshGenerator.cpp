@@ -1,5 +1,7 @@
 #include "ChunkMeshGenerator.h"
 #include "ChunkCube.h"
+#include "RuntimeMeshComponent.h"
+#include "RuntimeMeshProviderStatic.h"
 
 void ChunkMeshGenerator::GenerateChunkMesh(UChunkCube* C)
 {
@@ -9,7 +11,7 @@ void ChunkMeshGenerator::GenerateChunkMesh(UChunkCube* C)
 	int32 t11 = FDateTime::Now().GetMillisecond();
 	C->MeshLock.Lock();
 	int32 t1D = FDateTime::Now().GetMillisecond() - t11;
-	if (t1D > 0)
+	if (t1D > 1)
 		UE_LOG(LogTemp, Warning, TEXT("MeshGen Locking for %d"), t1D);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Generating Mesh for %d %d %d"), C->GetPos().X, C->GetPos().Y, C->GetPos().Z);

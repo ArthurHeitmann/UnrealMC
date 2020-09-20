@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "ChunkMeshGenerator.h"
+#include "RuntimeMeshProviderStatic.h"
 
 UChunkCube::UChunkCube()
 {
@@ -26,12 +27,14 @@ void UChunkCube::Init(FChunkFormCoords3D pPos, AMcWorld* pMcWorld, UChunk* pPare
 	CustomCollisionMesh = NewObject<URuntimeMeshComponent>(this);
 	CustomCollisionMesh->SetupAttachment(this);
 	CustomCollisionMesh->RegisterComponent();
-	// BoundingBox = NewObject<UBoxComponent>(this);
-	// BoundingBox->SetupAttachment(this);
-	// BoundingBox->RegisterComponent();
-	// BoundingBox->SetBoxExtent({ 800.f, 800.f, 800.f });
-	// BoundingBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
-	// BoundingBox->bHiddenInGame = true;
+	MeshProvider = NewObject<URuntimeMeshProviderStatic>(this);
+	ChunkMesh->Initialize(MeshProvider);
+	BoundingBox = NewObject<UBoxComponent>(this);
+	BoundingBox->SetupAttachment(this);
+	BoundingBox->RegisterComponent();
+	BoundingBox->SetBoxExtent({ 800.f, 800.f, 800.f });
+	BoundingBox->AddRelativeLocation({ 800.f, 800.f, 800.f });
+	BoundingBox->bHiddenInGame = true;
 }
 
 void UChunkCube::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -98,30 +101,56 @@ void UChunkCube::UpdateMesh()
 
 	MeshLock.Lock();
 
+	
 	int numFace = 0;
 	for (auto i = Vertices.CreateConstIterator(); i; ++i)
 	{
 		uint16 key = i.Key();
 		/*UE_LOG(LogTemp, Warning, TEXT("Z: %d cbe: %d Verts: %d Tris: %d Norms: %d UVs: %d"), 
-			Pos.Z,
-			key, 
-			Vertices[key].Num(),
-			Triangles[key].Num(),
-			Normals[key].Num(),
-			UVs[key].Num());*/
+		Pos.Z,
+		key, 
+		Vertices[key].Num(),
+		Triangles[key].Num(),
+		Normals[key].Num(),
+		UVs[key].Num());*/
 		int32 t41 = FDateTime::Now().GetMillisecond();
-		ChunkMesh->CreateMeshSection(
-			key,
-			i.Value(),
-			Triangles[key],
-			Normals[key],
-			UVs[key],
-			TArray<FColor>(),
-			TArray<FRuntimeMeshTangent>(),
-			Blocks[key]->HasCollision());
+		if (i.Value().Num())
+		{
+			MeshProvider->SetupMaterialSlot(
+             key, 
+             FName(),
+             Blocks[key]->GetMaterial(ChunkMesh)
+         );
+			MeshProvider->CreateSectionFromComponents(
+                0,
+                key,
+                key,
+                i.Value(),
+                Triangles[key],
+                Normals[key],
+                UVs[key],
+                TArray<FColor>(),
+                TArray<FRuntimeMeshTangent>(),
+                ERuntimeMeshUpdateFrequency::Average,
+                Blocks[key]->HasCollision()
+                );
+		}
+		else if (MeshProvider->GetSectionIds(0).Contains(key))
+		{
+			MeshProvider->RemoveSection(0, key);
+		}
+		// ChunkMesh->CreateMeshSection(
+		//           key,
+		//           i.Value(),
+		//           Triangles[key],
+		//           Normals[key],
+		//           UVs[key],
+		//           TArray<FColor>(),
+		//           TArray<FRuntimeMeshTangent>(),
+		//           Blocks[key]->HasCollision());
 		int32 t42 = FDateTime::Now().GetMillisecond();
 		ProcMeshGenTime += t42 - t41;
-		ChunkMesh->SetMaterial(key, Blocks[key]->GetMaterial(ChunkMesh));
+		// ChunkMesh->SetMaterial(key, Blocks[key]->GetMaterial(ChunkMesh));
 		numFace += Vertices[key].Num() / 4;
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("ms/face: %f\n"), ((float) t12 - t11) / numFace);

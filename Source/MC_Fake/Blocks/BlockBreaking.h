@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/Actor.h"
 #include "BlockBreaking.generated.h"
+
+class URuntimeMeshProviderStatic;
 
 UCLASS()
 /**
@@ -29,6 +32,10 @@ private:
 	class URuntimeMeshComponent* CollisionMesh;
 	UPROPERTY(EditAnywhere)
 	USceneComponent* Root;
+	UPROPERTY()
+	URuntimeMeshProviderStatic* MeshProvider;
+	UPROPERTY()
+	URuntimeMeshProviderStatic* CollisionMeshProvider;
 
 protected:
 	virtual void BeginPlay() override;

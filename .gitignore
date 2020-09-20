@@ -91,3 +91,5 @@ DerivedDataCache/*
 #custom
 enc_temp_folder/*
 AssetRegistryCache/*
+.idea/*
+.vs.old/*

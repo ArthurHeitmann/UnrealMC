@@ -15,7 +15,9 @@ public class MC_Fake : ModuleRules
             "UMG"
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "RenderCore", "RHI", "RuntimeMeshComponent" });
+        PublicDependencyModuleNames.Add("RuntimeMeshComponent");
+        
+        // PublicDependencyModuleNames.AddRange(new string[] { "RenderCore", "RHI", "RuntimeMeshComponent" }); TODO remove
 
         //PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
         //#ifndef UE_4_22_OR_LATER

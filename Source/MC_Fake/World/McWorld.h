@@ -60,6 +60,7 @@ private:
 	TArray<class ChunkMeshGeneratorThread*> MeshGeneratorThreads;
 	TQueue<ChunkGenBufferElement> ChunkGenBuffer;
 	TQueue<UChunkCube*> MeshGenBuffer;
+	UPROPERTY(VisibleAnywhere)
 	TArray<UChunk*> RemovedChunksInGenBuffer;
 	TMap<FChunkFormCoords2D, TArray<ChunkCubeGenBufferElement>> ChunkCubeGenTasks;
 	TQueue<TArray<ChunkCubeGenBufferElement>> ChunkCubeGenBuffer;

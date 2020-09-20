@@ -2,6 +2,7 @@
 #include "RuntimeMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "B_Block.h"
+#include "RuntimeMeshProviderStatic.h"
 
 ABlockBreaking::ABlockBreaking()
 {
@@ -14,6 +15,10 @@ ABlockBreaking::ABlockBreaking()
 	Mesh->SetupAttachment(GetRootComponent());
 	CollisionMesh->SetupAttachment(GetRootComponent());
 	CollisionMesh->SetVisibility(false);
+	MeshProvider = NewObject<URuntimeMeshProviderStatic>(this, TEXT("Mesh Provider"));
+	Mesh->Initialize(MeshProvider);
+	CollisionMeshProvider = NewObject<URuntimeMeshProviderStatic>(this, TEXT("Collision Mesh Provider"));
+	CollisionMesh->Initialize(CollisionMeshProvider);
 }
 
 void ABlockBreaking::BeginPlay()
@@ -25,17 +30,23 @@ void ABlockBreaking::BeginPlay()
 void ABlockBreaking::InitWithBlock(B_Block* NewBlock)
 {
 	BlockReference = NewBlock;
-	if (Mesh->GetNumSections())
-		Mesh->ClearAllMeshSections();
+	if (MeshProvider->GetSectionIds(0).Num())
+	{
+		for (int32 section : MeshProvider->GetSectionIds(0))
+			MeshProvider->RemoveSection(0, section);
+	}
 	
 	TArray<FVector> Vertices(NewBlock->GetAllVertices(0.f, 0.f, 0.f));
 	TArray<int32> Triangles(NewBlock->GetAllTrianglesFrom());
 	TArray<FVector2D> UVs(NewBlock->GetAllUVs());
 	TArray<FVector> Normals(NewBlock->GetAllNormals());
 
-	Mesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
-	Mesh->SetMaterial(0, NewBlock->GetMaterial(this));
-	CollisionMesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);
+	MeshProvider->SetupMaterialSlot(0, FName(TEXT("")), NewBlock->GetMaterial(this));
+	MeshProvider->CreateSectionFromComponents(0, 0, 0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), ERuntimeMeshUpdateFrequency::Infrequent, false);
+	CollisionMeshProvider->CreateSectionFromComponents(0, 0, 0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), ERuntimeMeshUpdateFrequency::Infrequent, true);
+	// Mesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
+	// Mesh->SetMaterial(0, NewBlock->GetMaterial(this));
+	// CollisionMesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), true);		TODO remove
 }
 
 void ABlockBreaking::SetTimePassed(float Seconds)

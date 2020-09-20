@@ -83,7 +83,9 @@ void UWorldLoadingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 
 	int32 t2 = FDateTime::Now().GetMillisecond();
-	UE_LOG(LogTemp, Warning, TEXT("WorldLoadingComp tick time: %d"), t2 - t1);
+	int32 diff = t2 - t1;
+	if (diff > 1)
+		UE_LOG(LogTemp, Warning, TEXT("WorldLoadingComp tick time: %d"), diff);
 	
 }
 

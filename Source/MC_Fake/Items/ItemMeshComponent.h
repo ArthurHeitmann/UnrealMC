@@ -20,8 +20,13 @@ protected:
 	UStaticMeshComponent* ItemMesh;
 	UPROPERTY(EditAnywhere)
 	URuntimeMeshComponent* CustomMesh;
+	UPROPERTY()
+	URuntimeMeshProviderStatic* MeshProvider;
+	UPROPERTY(EditAnywhere)
 	UMaterialInstanceDynamic* ItemMaterial;
+	UPROPERTY()
 	UStaticMesh* TmpItemMesh;
+	UPROPERTY()
 	UMaterial* TmpItemMaterial;
 	I_Item PreviousItem;
 	bool bWasPreviousItemEmpty = true;

@@ -6,6 +6,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Components/StaticMeshComponent.h"
 #include "I_Item.h"
+#include "RuntimeMeshProviderStatic.h"
 
 void UItemMeshComponent::OnItemChange()
 {
@@ -28,8 +29,22 @@ void UItemMeshComponent::OnItemChange()
 			TArray<FVector> Normals;
 			UMaterial* Mat;
 			(*ItemPointer)->ItemS->GetCustomDisplayMesh(CustomMesh, Verts, UVs, Tris, Normals, Mat);
-			CustomMesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
-			CustomMesh->SetMaterial(0, Mat);
+			MeshProvider->SetupMaterialSlot(0, TEXT("Custom Mesh Material Slot"), Mat);
+			MeshProvider->CreateSectionFromComponents(
+				0,
+				0,
+				0,
+				Verts,
+				Tris,
+				Normals,
+				UVs,
+				TArray<FColor>(),
+				TArray<FRuntimeMeshTangent>(),
+				ERuntimeMeshUpdateFrequency::Infrequent,
+				false
+			);
+			// CustomMesh->CreateMeshSection(0, Verts, Tris, Normals, UVs, TArray<FColor>(), TArray<FRuntimeMeshTangent>(), false);
+			// CustomMesh->SetMaterial(0, Mat);
 		}
 		else
 		{
@@ -51,8 +66,6 @@ void UItemMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	{
 		OnItemChange();
 		PreviousItem = *(*ItemPointer)->ItemS;
-		auto l = GetComponentLocation();
-		UE_LOG(LogTemp, Warning, TEXT("x %f y %f z %f"), l.X, l.Y, l.Z);
 	}
 }
 
@@ -62,6 +75,8 @@ void UItemMeshComponent::BeginPlay()
 
 	ItemMesh = NewObject<UStaticMeshComponent>(this, TEXT("Item Mesh"));
 	CustomMesh = NewObject<URuntimeMeshComponent>(this, TEXT("Custom Mesh"));
+	MeshProvider = NewObject<URuntimeMeshProviderStatic>(this);
+	CustomMesh->Initialize(MeshProvider);
 	ItemMesh->SetupAttachment(this);
 	CustomMesh->SetupAttachment(this);
 	ItemMesh->RegisterComponent();
@@ -87,7 +102,6 @@ void UItemMeshComponent::SetItem(FItemStack const ** NewItemStackPointer)
 	ItemPointer = NewItemStackPointer;
 	PreviousItem = *(*ItemPointer)->ItemS;
 	OnItemChange();
-	
 }
 
 void UItemMeshComponent::SetItemMeshOffset(const FTransform & Offset)

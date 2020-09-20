@@ -6,6 +6,8 @@
 #include "ChunkFormCoords.h"
 #include "ChunkCube.generated.h"
 
+class URuntimeMeshProviderStatic;
+
 struct ChunkCubeGenData {
 	bool bIsAboveSurface;
 	bool bHasGrass;
@@ -36,12 +38,6 @@ private:
 	TArray<TArray<TArray<class B_Block*>>> BlockData;
 	ChunkCubeGenData CubeData;
 	ChunkCubeNeighbors CubeNeighbors;
-	UPROPERTY()
-	class UBoxComponent* BoundingBox;
-	UPROPERTY()
-	class URuntimeMeshComponent* ChunkMesh;
-	UPROPERTY()
-	class URuntimeMeshComponent* CustomCollisionMesh;
 	int NextGenerationStage = 0;
 	bool bHasMeshDataChanged = false;
 	bool bHasBlockDataChanged = false;
@@ -52,6 +48,14 @@ private:
 protected:
 
 public:
+	UPROPERTY()
+	class UBoxComponent* BoundingBox;
+	UPROPERTY(EditAnywhere)
+	class URuntimeMeshComponent* ChunkMesh;
+	UPROPERTY()
+	URuntimeMeshProviderStatic* MeshProvider;
+	UPROPERTY()
+	class URuntimeMeshComponent* CustomCollisionMesh;
 	TMap<uint16, TArray<FVector>> Vertices;
 	TMap<uint16, TArray<FVector2D>> UVs;
 	TMap<uint16, TArray<int32>> Triangles;

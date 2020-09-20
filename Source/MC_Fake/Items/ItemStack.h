@@ -20,9 +20,7 @@ struct FItemStack {
 
 	FItemStack() : ItemCount(0), ItemS(nullptr) {}
 	FItemStack(I_Item* I, int32 Num) : ItemCount(Num), ItemS(I) {}
-	~FItemStack() {
-		UE_LOG(LogTemp, Warning, TEXT(""));
-	}
+	~FItemStack() {}
 };
 
 
