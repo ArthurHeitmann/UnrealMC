@@ -137,12 +137,12 @@ void UWorldLoadingComponent::CalcCubeRangeFromDist(const FChunkFormCoords2D& Pos
 	float MaxDist = fmaxf(abs(LocDiff.X), abs(LocDiff.Y));
 	if (MaxDist <= 5)
 	{
-		OutRangeDown = 2;
+		OutRangeDown = 4;
 		OutRangeUp = 4;
 	}
 	else
 	{
-		OutRangeDown = 1;
+		OutRangeDown = 3;
 
 		if (MaxDist <= 9)
 			OutRangeUp = 3;

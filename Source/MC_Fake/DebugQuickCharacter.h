@@ -30,6 +30,7 @@ private:
 	class UI_PauseMenu* PauseMenu;
 	
 	FItemStack* CurrentItem;
+	class I_Item* initItem;
 
 	void MoveForward(float v);
 	void MoveRight(float v);

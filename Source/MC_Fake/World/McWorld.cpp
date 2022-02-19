@@ -38,7 +38,7 @@ void AMcWorld::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const int numOfThreads = 3;
+	const int numOfThreads = 4;
 	GeneratorThreads.SetNum(numOfThreads);
 	for (int i = 0; i < numOfThreads; ++i)
 	{

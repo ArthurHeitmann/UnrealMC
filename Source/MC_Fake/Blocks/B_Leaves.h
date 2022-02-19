@@ -17,6 +17,7 @@ public:
 	B_Leaves();
 
 	bool IsBlockOpaque() override;
+	bool IsSideOptimizable(EDirection Direction) override;
 	virtual void OnBreak(class UWorld* World, FVector Location) override;
 
 	UMaterialInstanceDynamic* GetMaterial(UObject* UObj) override;

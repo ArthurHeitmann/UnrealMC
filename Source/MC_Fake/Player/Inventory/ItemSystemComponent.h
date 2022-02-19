@@ -28,9 +28,9 @@ public:
 	void SetSelectedItemPointer(FItemStack const ** NewISPointer);
 	void SetItemWheelVisibility(bool State);
 
-protected:
 	UPROPERTY(EditAnywhere)
 	class UItemSlots* Slot_BasicInventory;
+protected:
 	UPROPERTY(EditAnywhere)
 	class UUI_QuickAccessSlots* QuickAccessSlots;
 	UPROPERTY(EditAnywhere)

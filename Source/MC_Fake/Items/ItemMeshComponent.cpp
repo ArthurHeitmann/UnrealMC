@@ -16,9 +16,15 @@ void UItemMeshComponent::OnItemChange()
 		if (bWasPreviousItemEmpty)
 		{
 			if (bCustomMesh)
+			{
 				CustomMesh->SetVisibility(true);
+				ItemMesh->SetVisibility(false);
+			}
 			else
+			{
 				ItemMesh->SetVisibility(true);
+				CustomMesh->SetVisibility(false);
+			}
 		}
 
 		if (bCustomMesh)

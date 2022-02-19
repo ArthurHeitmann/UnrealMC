@@ -23,6 +23,11 @@ bool B_Leaves::IsBlockOpaque()
 	return false;
 }
 
+bool B_Leaves::IsSideOptimizable(EDirection Direction)
+{
+	return false;
+}
+
 void B_Leaves::OnBreak(UWorld* World, FVector Location)
 {
 }

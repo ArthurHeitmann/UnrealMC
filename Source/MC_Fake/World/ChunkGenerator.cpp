@@ -10,20 +10,20 @@
 
 float ChunkGenerator::SeaLevel = 45.f;
 bool ChunkGenerator::bEnableStageDirtGrass = true;
-bool ChunkGenerator::bEnableStageCaveCarving = false;
-bool ChunkGenerator::bEnableStageTrees = false;
+bool ChunkGenerator::bEnableStageCaveCarving = true;
+bool ChunkGenerator::bEnableStageTrees = true;
 float ChunkGenerator::BaseTerrainHeight = 50;
-float ChunkGenerator::TerrainHeightMultiplier = 30;
-float ChunkGenerator::TerrainTurbulenceMultiplier = 0;
-int ChunkGenerator::HeightMapOctaves = 2;
-float ChunkGenerator::HeightMapFrequency = 1 / 70.f;
+float ChunkGenerator::TerrainHeightMultiplier = 90;
+float ChunkGenerator::TerrainTurbulenceMultiplier = 3;
+int ChunkGenerator::HeightMapOctaves = 6;
+float ChunkGenerator::HeightMapFrequency = 1 / 300.f;
 int ChunkGenerator::TurbulenceOctaves = 2;
 float ChunkGenerator::TurbulenceFrequency = 1 / 70.f;
 float ChunkGenerator::SlopeGrass = 5;
 float ChunkGenerator::SlopeDirt = 7;
 int ChunkGenerator::CaveOctaves = 4;
 float ChunkGenerator::CaveFrequency = 1 / 400.f;
-float ChunkGenerator::CaveThreshold = .035;
+float ChunkGenerator::CaveThreshold = .0175;
 
 
 
@@ -282,13 +282,13 @@ void ChunkGenerator::Stage_CaveCarving()
 			{
 				float bottomFactor = 1.0;
 				float topFactor = 1.0;
-				if (z < 6)
+				if (Pos.Z + z < 6)
 					bottomFactor = expf(-z + 6.5f) + 1.f;
-				if (z > 50)
+				if (Pos.Z + z > 50)
 					topFactor = expf(0.4f * z -23.1) + 1.f;
 				float CaveNoiseValue = abs(CaveNoise1->GetNoise(Pos.X + x, Pos.Y + y, z + Pos.Z)) * bottomFactor * topFactor;
 
-				if (CaveNoiseValue < CaveFrequency)
+				if (CaveNoiseValue < CaveThreshold && BlockData[x][y][z]->GetName() != "Water")
 				{
 					if (BlockData[x][y][z]->GetName() != "Air")
 						delete BlockData[x][y][z];
@@ -312,7 +312,9 @@ void ChunkGenerator::Stage_Trees()
 	{
 		for (int y = 0; y < 16; ++y)
 		{
-			int32 seed = (x + Pos.X + y + Pos.Y) ^ ((x + Pos.X) * (y + Pos.Y)) ^ ((x + Pos.X) - (y + Pos.Y));
+			int32 seedk1 = x + Pos.X;
+			int32 seedk2 = y + Pos.Y;
+			int32 seed = ((seedk1 + seedk2) * (seedk1 + seedk2 + 1)) / 2 + seedk2;
 			Rand.Initialize(seed);
 			auto rand = Rand.RandRange(0, 48);
 			if (rand == 10)
@@ -334,8 +336,8 @@ void ChunkGenerator::Stage_Trees()
 								for (int yt = y - 2; yt <= y + 2; ++yt)
 								{
 									if ((pow(xt - x, 2) + pow(yt - y, 2) == 8)
-										|| (pow(xt - x, 2) + pow(yt - y, 2) <= 2 && zt == z + TreeHeight - 3
-										|| xt == x && yt == y)
+										//|| pow(xt - x, 2) + pow(yt - y, 2) <= 2 && zt == z + TreeHeight - 3
+										|| xt == x && yt == y
 										|| Rand.RandRange(0,6) == 5)
 										continue;
 									if (xt >= 0 && xt < 16 && yt >= 0 && yt < 16)		//Within chunkBoundaries
@@ -386,7 +388,7 @@ ChunkGenerator::ChunkGenerator()
 	HeightNoise->SetFractalOctaves(HeightMapOctaves);
 	HeightNoise->SetFrequency(HeightMapFrequency);
 
-	TurbulenceNoise = new FastNoise;
+	TurbulenceNoise = new FastNoise(418626);
 	TurbulenceNoise->SetNoiseType(FastNoise::SimplexFractal);
 	TurbulenceNoise->SetFrequency(TurbulenceFrequency);
 	TurbulenceNoise->SetFractalOctaves(TurbulenceOctaves);

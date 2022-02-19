@@ -13,6 +13,7 @@
 #include "UI/UI_PauseMenu.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/Inventory/ItemSlots.h"
 
 ADebugQuickCharacter::ADebugQuickCharacter()
 {
@@ -33,6 +34,7 @@ ADebugQuickCharacter::ADebugQuickCharacter()
 
 	ItemSystem = CreateDefaultSubobject<UItemSystemComponent>(TEXT("Item System"));
 	ItemSystem->SetupAttachment(GetRootComponent());
+	initItem = new I_Pickaxe_Stone;
 
 }
 
@@ -147,6 +149,9 @@ void ADebugQuickCharacter::BeginPlay()
 	ItemSystem->InitPickUpBox({ 125, 125, 125 });
 	ItemSystem->InitSelectedItemMesh(Camera);
 
+	ItemSystem->Slot_BasicInventory->GetStackAt(1)->ItemS = initItem;
+	ItemSystem->Slot_BasicInventory->GetStackAt(1)->ItemCount = 1;
+
 	ItemSystem->SetSelectedItemPointer(const_cast<const FItemStack * *>(SelectedItemPointer));
 	LineTracing->SetSelectedItemPointer(SelectedItemPointer);
 
@@ -190,7 +195,7 @@ void ADebugQuickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("ScrollDown"), IE_Pressed, this, &ADebugQuickCharacter::ScrollDown);
 	PlayerInputComponent->BindAction<FToggleItemWheel>(TEXT("ToggleItemWheel"), IE_Pressed, this, &ADebugQuickCharacter::ToggleItemWheel, true);
 	PlayerInputComponent->BindAction<FToggleItemWheel>(TEXT("ToggleItemWheel"), IE_Released, this, &ADebugQuickCharacter::ToggleItemWheel, false);
-	//PlayerInputComponent->BindAction(TEXT("TogglePauseMenu"), IE_Pressed, this, &ADebugQuickCharacter::TogglePauseMenu);
+	PlayerInputComponent->BindAction(TEXT("TogglePauseMenu"), IE_Pressed, this, &ADebugQuickCharacter::TogglePauseMenu);
 
 	PlayerInputComponent->BindAxis(TEXT("Move Forward"), this, &ADebugQuickCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("Move Right"), this, &ADebugQuickCharacter::MoveRight);
